@@ -488,17 +488,41 @@ function initMap() {
     window.homeMap = null;
   }
 
-  // Addis Ababa coordinates
+  // Base Street Map Layer
+  const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  });
+
+  // High-Resolution Esri Satellite Imagery
+  const satelliteImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    attribution: 'Tiles &copy; Esri &mdash; Earthstar Geographics'
+  });
+
+  // Road and Neighborhood Labels Overlay
+  const satelliteLabels = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    attribution: ''
+  });
+
+  const satelliteLayer = L.layerGroup([satelliteImagery, satelliteLabels]);
+
+  // Addis Ababa coordinates with Satellite Layer enabled by default
   const map = L.map('homeCatalogMap', {
     center: [9.0108, 38.7613],
     zoom: 12,
     minZoom: 5,
-    maxZoom: 19
+    maxZoom: 19,
+    layers: [satelliteLayer]
   });
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+  // Layer Switcher Control
+  const baseMaps = {
+    "🛰️ Satellite (Hybrid)": satelliteLayer,
+    "🗺️ Street Map": streetLayer
+  };
+  L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
   frontendMarkersLayer = L.layerGroup().addTo(map);
 

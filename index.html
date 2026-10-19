@@ -599,6 +599,10 @@
                         <h2 style="font-size: 26px; font-weight: 800; color: var(--text-main);">Explore Listings on the Map</h2>
                         <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Search any city or neighborhood (e.g. Bole) or click any pin to preview properties.</p>
                     </div>
+                    <div style="display: flex; gap: 8px; align-items: center; background: var(--bg-main); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                        <button type="button" id="btnMapSatellite" class="btn btn-primary btn-sm" onclick="switchMapLayer('satellite')">🛰️ Satellite View</button>
+                        <button type="button" id="btnMapStreet" class="btn btn-secondary btn-sm" onclick="switchMapLayer('street')">🗺️ Street Map</button>
+                    </div>
                 </div>
 
                 <!-- Map Search Bar -->
@@ -1264,6 +1268,9 @@
     }
 
     let staticMarkersLayer = null;
+    let streetTileLayer = null;
+    let satelliteTileLayer = null;
+    let currentMapLayer = 'satellite';
 
     function initMap() {
       const mapElement = document.getElementById('homeCatalogMap');
@@ -1278,16 +1285,41 @@
         window.homeMap = null;
       }
 
+      // Base Street Map Layer
+      streetTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      });
+
+      // High-Resolution Esri Satellite Imagery
+      const satelliteImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: 'Tiles &copy; Esri &mdash; Earthstar Geographics'
+      });
+
+      // Road and Neighborhood Labels Overlay
+      const satelliteLabels = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: ''
+      });
+
+      satelliteTileLayer = L.layerGroup([satelliteImagery, satelliteLabels]);
+
+      // Initialize map with Satellite Layer enabled by default
       const map = L.map('homeCatalogMap', {
         center: [9.0108, 38.7613],
         zoom: 12,
         minZoom: 5,
-        maxZoom: 19
+        maxZoom: 19,
+        layers: [satelliteTileLayer]
       });
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
+      // Layer Switcher Control
+      const baseMaps = {
+        "🛰️ Satellite (Hybrid)": satelliteTileLayer,
+        "🗺️ Street Map": streetTileLayer
+      };
+      L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
       staticMarkersLayer = L.layerGroup().addTo(map);
 
@@ -1321,6 +1353,34 @@
       setTimeout(function() {
         if (window.homeMap) window.homeMap.invalidateSize();
       }, 300);
+    }
+
+    function switchMapLayer(type) {
+      if (!window.homeMap || !streetTileLayer || !satelliteTileLayer) return;
+      currentMapLayer = type;
+
+      const btnSat = document.getElementById('btnMapSatellite');
+      const btnStr = document.getElementById('btnMapStreet');
+
+      if (type === 'satellite') {
+        if (window.homeMap.hasLayer(streetTileLayer)) {
+          window.homeMap.removeLayer(streetTileLayer);
+        }
+        if (!window.homeMap.hasLayer(satelliteTileLayer)) {
+          window.homeMap.addLayer(satelliteTileLayer);
+        }
+        if (btnSat) { btnSat.className = 'btn btn-primary btn-sm'; }
+        if (btnStr) { btnStr.className = 'btn btn-secondary btn-sm'; }
+      } else {
+        if (window.homeMap.hasLayer(satelliteTileLayer)) {
+          window.homeMap.removeLayer(satelliteTileLayer);
+        }
+        if (!window.homeMap.hasLayer(streetTileLayer)) {
+          window.homeMap.addLayer(streetTileLayer);
+        }
+        if (btnStr) { btnStr.className = 'btn btn-primary btn-sm'; }
+        if (btnSat) { btnSat.className = 'btn btn-secondary btn-sm'; }
+      }
     }
 
     const ETHIOPIAN_MAP_LOCATIONS = {
