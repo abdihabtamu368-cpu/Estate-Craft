@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Automatically trigger phone verification OTP step
             sendPhoneOtp($newUserId, $phone);
 
-            $_SESSION['flash_success'] = "Account created successfully! Please verify your phone number to complete setup.";
-            header("Location: " . BASE_URL . "/auth/verify_phone.php");
+            $_SESSION['flash_success'] = "Welcome to EstateCraft, " . htmlspecialchars($newUser['full_name']) . "! Your account has been created.";
+            header("Location: " . BASE_URL . "/index.php");
             exit;
         }
     }
@@ -100,6 +100,7 @@ $googleAuthUrl = isGoogleAuthReady()
     ])
     : BASE_URL . "/auth/google_callback.php?notice=config_required";
 
+$hideHeaderNavbar = true;
 require_once __DIR__ . '/../includes/header.php';
 ?>
 

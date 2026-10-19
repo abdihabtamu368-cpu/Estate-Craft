@@ -68,6 +68,7 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
 </head>
 <body class="<?= ($activeTheme === 'dark') ? 'theme-dark' : '' ?>">
 
+<?php if (empty($hideHeaderNavbar)): ?>
 <header class="site-header">
     <div class="nav-container">
         <a href="<?= BASE_URL ?>/index.php" class="brand-logo" id="headerBrandLogo">
@@ -184,6 +185,7 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
         </div>
     </div>
 </header>
+<?php endif; ?>
 
 <script>
 // Language selector dropdown toggle

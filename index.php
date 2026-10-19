@@ -34,6 +34,222 @@ $featuredProperties = $stmtFeatured->fetchAll();
 $stmtCities = $pdo->query("SELECT city, COUNT(*) as count FROM properties WHERE status = 'active' GROUP BY city ORDER BY count DESC LIMIT 4");
 $topCities = $stmtCities->fetchAll();
 
+// First Page check: If user is not logged in and not browsing as guest, show Facebook-style Sign In / Create Account page directly
+$isGuest = isset($_GET['guest']) && $_GET['guest'] == '1';
+
+if (!$currentUser && !$isGuest) {
+    $hideHeaderNavbar = true;
+    $pageTitle = "Log in or Sign up - EstateCraft";
+
+    require_once __DIR__ . '/includes/header.php';
+    ?>
+
+    <section class="fb-landing-section" style="min-height: 100vh;">
+        <div class="fb-landing-container">
+            <!-- Left Column: Branding, Tagline & Photo Cards Collage -->
+            <div class="fb-left-col">
+                <div class="fb-brand-circle">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </div>
+
+                <h1 class="fb-headline">
+                    Explore<br>
+                    the homes<br>
+                    <span class="accent-blue">you love.</span>
+                </h1>
+
+                <!-- Visual Collage -->
+                <div class="fb-collage">
+                    <!-- Phone-style story card (Main top right) -->
+                    <div class="fb-card-story">
+                        <div class="fb-story-time">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            16:45
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Modern Villa in Addis Ababa">
+                        <div class="fb-story-bottom-bar">
+                            <div class="fb-story-circle"></div>
+                            <div class="fb-story-circle"></div>
+                            <div class="fb-story-circle"></div>
+                        </div>
+                    </div>
+
+                    <!-- Middle left square card with star badge -->
+                    <div class="fb-card-square">
+                        <div class="fb-card-badge">★</div>
+                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=500&q=80" alt="Modern Interior">
+                    </div>
+
+                    <!-- Bottom card -->
+                    <div class="fb-card-bottom">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=500&q=80" alt="Luxury Compound">
+                    </div>
+
+                    <!-- Avatar circle -->
+                    <div class="fb-avatar-circle">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Verified Broker">
+                    </div>
+
+                    <!-- Floating Reactions -->
+                    <div class="fb-reaction-laugh" title="Excited">😆</div>
+                    <div class="fb-reaction-heart" title="Love this home">❤️</div>
+                </div>
+            </div>
+
+            <!-- Center Divider Line -->
+            <div class="fb-center-divider"></div>
+
+            <!-- Right Column: Login & Create Account Box -->
+            <div class="fb-right-col" style="max-width: 440px;">
+                <div class="fb-auth-box">
+                    <?php if (!empty($_SESSION['flash_error'])): ?>
+                        <div class="alert alert-error" style="margin-bottom: 16px; border-radius: 8px;">
+                            <div><?= htmlspecialchars($_SESSION['flash_error']) ?></div>
+                        </div>
+                        <?php unset($_SESSION['flash_error']); ?>
+                    <?php endif; ?>
+
+                    <?php if (!empty($_SESSION['flash_success'])): ?>
+                        <div class="alert alert-success" style="margin-bottom: 16px; border-radius: 8px;">
+                            <div><?= htmlspecialchars($_SESSION['flash_success']) ?></div>
+                        </div>
+                        <?php unset($_SESSION['flash_success']); ?>
+                    <?php endif; ?>
+
+                    <!-- View 1: Log In Card -->
+                    <div id="firstPageLoginCard">
+                        <h2 class="fb-login-heading">Log into EstateCraft</h2>
+
+                        <form method="POST" action="<?= BASE_URL ?>/auth/login.php">
+                            <?= getCsrfInput() ?>
+
+                            <div class="fb-input-wrapper">
+                                <input type="text" name="email" class="fb-field-input" placeholder="Email or mobile number" required autocomplete="username">
+                            </div>
+
+                            <div class="fb-input-wrapper" style="position: relative;">
+                                <input type="password" id="firstPageLoginPassword" name="password" class="fb-field-input" placeholder="Password" required autocomplete="current-password" style="padding-right: 44px;">
+                                <button type="button" onclick="togglePasswordVisibility('firstPageLoginPassword', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 16px;" title="Show/Hide Password">
+                                    👁️
+                                </button>
+                            </div>
+
+                            <button type="submit" class="fb-submit-btn" id="btnSubmitFirstPageLogin">
+                                Log in
+                            </button>
+
+                            <div class="fb-forgot-link-wrap">
+                                <a href="<?= BASE_URL ?>/auth/forgot_password.php" class="fb-forgot-link">Forgot password?</a>
+                            </div>
+
+                            <div class="fb-line-sep"></div>
+
+                            <button type="button" class="fb-create-acc-btn" id="btnShowCreateAccount" onclick="toggleAuthForm('register')">
+                                Create new account
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- View 2: Create New Account Card (Toggled) -->
+                    <div id="firstPageRegisterCard" style="display: none;">
+                        <h2 class="fb-login-heading" style="margin-bottom: 4px;">Create a new account</h2>
+                        <p style="color: #65676b; font-size: 14px; margin-bottom: 18px;">It's quick and easy.</p>
+
+                        <form method="POST" action="<?= BASE_URL ?>/auth/register.php">
+                            <?= getCsrfInput() ?>
+
+                            <div class="fb-input-wrapper">
+                                <input type="text" name="full_name" class="fb-field-input" placeholder="Full legal name" required autocomplete="name">
+                            </div>
+
+                            <div class="fb-input-wrapper">
+                                <input type="email" name="email" class="fb-field-input" placeholder="Email address" required autocomplete="email">
+                            </div>
+
+                            <div class="fb-input-wrapper">
+                                <input type="tel" name="phone" class="fb-field-input" placeholder="Mobile phone" required autocomplete="tel">
+                            </div>
+
+                            <div class="fb-input-wrapper" style="position: relative;">
+                                <input type="password" id="firstPageRegPassword" name="password" class="fb-field-input" placeholder="Password (min. 6 characters)" required autocomplete="new-password" style="padding-right: 44px;">
+                                <button type="button" onclick="togglePasswordVisibility('firstPageRegPassword', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 16px;" title="Show/Hide Password">
+                                    👁️
+                                </button>
+                            </div>
+
+                            <div class="fb-input-wrapper" style="position: relative;">
+                                <input type="password" id="firstPageRegConfirm" name="confirm_password" class="fb-field-input" placeholder="Confirm password" required autocomplete="new-password" style="padding-right: 44px;">
+                                <button type="button" onclick="togglePasswordVisibility('firstPageRegConfirm', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 16px;" title="Show/Hide Password">
+                                    👁️
+                                </button>
+                            </div>
+
+                            <button type="submit" class="fb-submit-btn" id="btnSubmitFirstPageRegister" style="background-color: #00a400;">
+                                Sign Up
+                            </button>
+
+                            <div class="fb-line-sep"></div>
+
+                            <button type="button" class="fb-create-acc-btn" id="btnBackToLogin" onclick="toggleAuthForm('login')">
+                                Already have an account? Log in
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="fb-guest-link-wrap">
+                        <a href="<?= BASE_URL ?>/index.php?guest=1#propertiesCatalogSection" class="fb-guest-link">
+                            Explore properties as guest &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Facebook Minimal Language & Copyright Footer -->
+        <div style="width: 100%; border-top: 1px solid #e5e7eb; padding: 22px 20px; text-align: center; font-size: 13px; color: #65676b; margin-top: 40px;">
+            <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 8px;">
+                <a href="<?= buildLangUrl('en') ?>" style="color: #65676b; text-decoration: none;">English (US)</a>
+                <a href="<?= buildLangUrl('am') ?>" style="color: #65676b; text-decoration: none;">አማርኛ</a>
+                <a href="<?= buildLangUrl('om') ?>" style="color: #65676b; text-decoration: none;">Afaan Oromoo</a>
+            </div>
+            <div>EstateCraft &copy; 2026 &bull; Verified Real Estate Marketplace Ethiopia</div>
+        </div>
+    </section>
+
+    <script>
+    function toggleAuthForm(mode) {
+        const loginCard = document.getElementById('firstPageLoginCard');
+        const regCard = document.getElementById('firstPageRegisterCard');
+        if (mode === 'register') {
+            loginCard.style.display = 'none';
+            regCard.style.display = 'block';
+        } else {
+            regCard.style.display = 'none';
+            loginCard.style.display = 'block';
+        }
+    }
+
+    function togglePasswordVisibility(fieldId, btn) {
+        const pw = document.getElementById(fieldId);
+        if (!pw) return;
+        if (pw.type === 'password') {
+            pw.type = 'text';
+            btn.textContent = '🙈';
+        } else {
+            pw.type = 'password';
+            btn.textContent = '👁️';
+        }
+    }
+    </script>
+
+    <?php
+    require_once __DIR__ . '/includes/footer.php';
+    exit;
+}
+
 require_once __DIR__ . '/includes/header.php';
 ?>
 

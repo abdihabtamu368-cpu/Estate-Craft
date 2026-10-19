@@ -57,6 +57,7 @@ $googleAuthUrl = isGoogleAuthReady()
     ])
     : BASE_URL . "/auth/google_callback.php?notice=config_required";
 
+$hideHeaderNavbar = true;
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
