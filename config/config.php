@@ -43,8 +43,8 @@ $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (isset(
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 
-// Find root of the project by stripping subdirectories if inside auth/, properties/, user/, api/
-$cleanDir = preg_replace('#/(auth|properties|user|api|config|includes)$#i', '', $scriptDir);
+// Find root of the project by stripping subdirectories if inside auth/, properties/, user/, api/, admin/
+$cleanDir = preg_replace('#/(auth|properties|user|api|config|includes|admin)$#i', '', $scriptDir);
 $cleanDir = rtrim($cleanDir, '/');
 
 define('BASE_URL', $protocol . $host . $cleanDir);
