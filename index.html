@@ -965,110 +965,8 @@
     </header>
 
     <main>
-        <!-- Facebook-Style Split Landing Hero (Visible on first opening website) -->
-        <section class="fb-landing-section" id="welcomeAuthSection">
-            <div class="fb-landing-container">
-                <!-- Left Column: Branding, Tagline & Photo Cards Collage -->
-                <div class="fb-left-col">
-                    <div class="fb-brand-circle">
-                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                            <polyline points="9 22 9 12 15 12 15 22"/>
-                        </svg>
-                    </div>
-
-                    <h1 class="fb-headline">
-                        Explore<br>
-                        the homes<br>
-                        <span class="accent-blue">you love.</span>
-                    </h1>
-
-                    <!-- Visual Collage -->
-                    <div class="fb-collage">
-                        <!-- Phone-style story card (Main top right) -->
-                        <div class="fb-card-story">
-                            <div class="fb-story-time">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                16:45
-                            </div>
-                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Modern Villa in Addis Ababa">
-                            <div class="fb-story-bottom-bar">
-                                <div class="fb-story-circle"></div>
-                                <div class="fb-story-circle"></div>
-                                <div class="fb-story-circle"></div>
-                            </div>
-                        </div>
-
-                        <!-- Middle left square card with star badge -->
-                        <div class="fb-card-square">
-                            <div class="fb-card-badge">★</div>
-                            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=500&q=80" alt="Modern Interior">
-                        </div>
-
-                        <!-- Bottom card -->
-                        <div class="fb-card-bottom">
-                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=500&q=80" alt="Luxury Compound">
-                        </div>
-
-                        <!-- Avatar circle -->
-                        <div class="fb-avatar-circle">
-                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Verified Broker">
-                        </div>
-
-                        <!-- Floating Reactions -->
-                        <div class="fb-reaction-laugh" title="Excited">😆</div>
-                        <div class="fb-reaction-heart" title="Love this home">❤️</div>
-                    </div>
-                </div>
-
-                <!-- Center Divider Line -->
-                <div class="fb-center-divider"></div>
-
-                <!-- Right Column: Login Card -->
-                <div class="fb-right-col">
-                    <div class="fb-auth-box">
-                        <h2 class="fb-login-heading">Log into EstateCraft</h2>
-
-                        <form id="fbStaticLoginForm" onsubmit="handleFbStaticLogin(event)">
-                            <div class="fb-input-wrapper">
-                                <input type="text" id="fbStaticEmail" class="fb-field-input" placeholder="Email or mobile number" required autocomplete="username">
-                            </div>
-
-                            <div class="fb-input-wrapper">
-                                <input type="password" id="fbStaticPassword" class="fb-field-input" placeholder="Password" required autocomplete="current-password">
-                            </div>
-
-                            <button type="submit" class="fb-submit-btn" id="fbBtnStaticLogin">
-                                Log in
-                            </button>
-
-                            <div class="fb-forgot-link-wrap">
-                                <a href="javascript:void(0)" onclick="handleForgotPwClick()" class="fb-forgot-link">Forgot password?</a>
-                            </div>
-
-                            <div class="fb-line-sep"></div>
-
-                            <button type="button" class="fb-create-acc-btn" id="fbBtnStaticRegister" onclick="openSignUpModal()">
-                                Create new account
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Facebook-Style Minimal Language & Copyright Footer on Login Screen -->
-            <div style="width: 100%; border-top: 1px solid #e5e7eb; padding: 22px 20px; text-align: center; font-size: 13px; color: #65676b; margin-top: 40px;">
-                <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 8px;">
-                    <a href="javascript:void(0)" onclick="changeLanguage('en')" style="color: #65676b; text-decoration: none;">English (US)</a>
-                    <a href="javascript:void(0)" onclick="changeLanguage('am')" style="color: #65676b; text-decoration: none;">አማርኛ</a>
-                    <a href="javascript:void(0)" onclick="changeLanguage('om')" style="color: #65676b; text-decoration: none;">Afaan Oromoo</a>
-                </div>
-                <div>EstateCraft &copy; 2026 &bull; Verified Real Estate Marketplace Ethiopia</div>
-            </div>
-        </section>
-
-        <!-- Home Page Wrapper (Displayed ONLY when user logs in) -->
-        <div id="homePageSections" style="display: none;">
+        <!-- Home Page Catalog & Sections (Directly accessible on homepage) -->
+        <div id="homePageSections">
             <!-- Hero Section -->
             <section class="hero-section" id="catalogSearchSection">
 
@@ -2774,40 +2672,43 @@
        ========================================================================= */
     function syncAuthState() {
       const isLoggedIn = localStorage.getItem('estate_craft_logged_in') === 'true';
-      const authSec = document.getElementById('welcomeAuthSection');
       const header = document.getElementById('mainSiteHeader');
       const homeSec = document.getElementById('homePageSections');
       const footer = document.getElementById('mainSiteFooter');
 
-      if (isLoggedIn) {
-        if (authSec) authSec.style.display = 'none';
-        if (header) header.style.display = 'block';
-        if (homeSec) homeSec.style.display = 'block';
-        if (footer) footer.style.display = 'block';
+      if (header) header.style.display = 'block';
+      if (homeSec) homeSec.style.display = 'block';
+      if (footer) footer.style.display = 'block';
 
+      const btnIn = document.getElementById('btnNavSignIn');
+      const btnUp = document.getElementById('btnNavSignUp');
+
+      if (isLoggedIn) {
         const userName = localStorage.getItem('estate_craft_user_name') || 'Member';
-        const btnIn = document.getElementById('btnNavSignIn');
         if (btnIn) {
           btnIn.innerHTML = `<span>👤 ${userName}</span>`;
           btnIn.onclick = (e) => { e.preventDefault(); showToast(`Signed in as ${userName}`); };
         }
-        const btnUp = document.getElementById('btnNavSignUp');
         if (btnUp) {
           btnUp.innerHTML = `<span>🚪 Sign Out</span>`;
           btnUp.className = 'btn btn-outline btn-sm';
           btnUp.onclick = (e) => { e.preventDefault(); handleStaticLogout(); };
         }
-        // Invalidate leaflet map size when unhidden
-        setTimeout(() => {
-          if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
-            window.catalogMap.invalidateSize();
-          }
-        }, 200);
       } else {
-        if (authSec) authSec.style.display = 'flex';
-        if (header) header.style.display = 'none';
-        if (homeSec) homeSec.style.display = 'none';
-        if (footer) footer.style.display = 'none';
+        if (btnIn) {
+          btnIn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg><span>Sign In</span>`;
+          btnIn.className = 'btn btn-secondary btn-sm';
+          btnIn.onclick = (e) => handleNavSignIn(e);
+        }
+        if (btnUp) {
+          btnUp.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span>Create Account</span>`;
+          btnUp.className = 'btn btn-primary btn-sm';
+          btnUp.onclick = (e) => handleNavSignUp(e);
+        }
+      }
+
+      if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
+        window.catalogMap.invalidateSize();
       }
     }
 
