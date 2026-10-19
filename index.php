@@ -1,13 +1,213 @@
 <?php
 /**
- * EstateCraft - Homepage
- * Buy, Sell, and Rent Real Estate with Interactive Map, Transparent Broker Fees & Verified Accounts
+ * EstateCraft - Homepage / Entry Portal
+ * When logged out: displays ONLY the Facebook-style login/create account page
+ * When logged in: displays the full Real Estate Marketplace Home Page
  */
 
-$pageTitle = "Find, Buy, Sell & Rent Exceptional Homes";
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/csrf.php';
+
+$currentUser = getCurrentUser();
+
+// ============================================================================
+// 1. UNLOGGED VISITOR: Show ONLY the Facebook Login & Create Account screen
+// ============================================================================
+if (!$currentUser) {
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log into EstateCraft | Explore the homes you love</title>
+    
+    <!-- Meta SEO -->
+    <meta name="description" content="Log into EstateCraft or create an account to discover verified real estate across Ethiopia.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f0f2f5;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #1c1e21;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .fb-standalone-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 24px;
+      }
+      .fb-footer-bar {
+        background-color: #ffffff;
+        border-top: 1px solid #e5e7eb;
+        padding: 24px 20px;
+        text-align: center;
+        font-size: 13px;
+        color: #65676b;
+      }
+      .fb-footer-langs {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      .fb-footer-langs a {
+        color: #65676b;
+        text-decoration: none;
+      }
+      .fb-footer-langs a:hover {
+        text-decoration: underline;
+      }
+    </style>
+</head>
+<body>
+    <div class="fb-standalone-wrapper">
+        <div class="fb-landing-container">
+            <!-- Left Column: Branding, Tagline & Photo Cards Collage -->
+            <div class="fb-left-col">
+                <div class="fb-brand-circle">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </div>
+
+                <h1 class="fb-headline">
+                    Explore<br>
+                    the homes<br>
+                    <span class="accent-blue">you love.</span>
+                </h1>
+
+                <!-- Visual Collage -->
+                <div class="fb-collage">
+                    <!-- Phone-style story card (Main top right) -->
+                    <div class="fb-card-story">
+                        <div class="fb-story-time">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            16:45
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Modern Villa in Addis Ababa">
+                        <div class="fb-story-bottom-bar">
+                            <div class="fb-story-circle"></div>
+                            <div class="fb-story-circle"></div>
+                            <div class="fb-story-circle"></div>
+                        </div>
+                    </div>
+
+                    <!-- Middle left square card with star badge -->
+                    <div class="fb-card-square">
+                        <div class="fb-card-badge">★</div>
+                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=500&q=80" alt="Modern Interior">
+                    </div>
+
+                    <!-- Bottom card -->
+                    <div class="fb-card-bottom">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=500&q=80" alt="Luxury Compound">
+                    </div>
+
+                    <!-- Avatar circle -->
+                    <div class="fb-avatar-circle">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Verified Broker">
+                    </div>
+
+                    <!-- Floating Reactions -->
+                    <div class="fb-reaction-laugh" title="Excited">😆</div>
+                    <div class="fb-reaction-heart" title="Love this home">❤️</div>
+                </div>
+            </div>
+
+            <!-- Center Divider Line -->
+            <div class="fb-center-divider"></div>
+
+            <!-- Right Column: Login Card -->
+            <div class="fb-right-col">
+                <div class="fb-auth-box">
+                    <h2 class="fb-login-heading">Log into EstateCraft</h2>
+
+                    <form method="POST" action="<?= BASE_URL ?>/auth/login.php">
+                        <?= getCsrfInput() ?>
+
+                        <div class="fb-input-wrapper">
+                            <input type="text" name="email" id="fbHomeEmail" class="fb-field-input" placeholder="Email or mobile number" required autocomplete="username">
+                        </div>
+
+                        <div class="fb-input-wrapper" style="position: relative;">
+                            <input type="password" name="password" id="fbHomePassword" class="fb-field-input" placeholder="Password" required autocomplete="current-password" style="padding-right: 44px;">
+                            <button type="button" onclick="togglePasswordVisibility()" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 16px;" id="togglePwBtn" title="Show/Hide Password">
+                                👁️
+                            </button>
+                        </div>
+
+                        <button type="submit" class="fb-submit-btn" id="fbBtnHomeLogin">
+                            Log in
+                        </button>
+
+                        <div class="fb-forgot-link-wrap">
+                            <a href="<?= BASE_URL ?>/auth/forgot_password.php" class="fb-forgot-link">Forgot password?</a>
+                        </div>
+
+                        <div class="fb-line-sep"></div>
+
+                        <a href="<?= BASE_URL ?>/auth/register.php" class="fb-create-acc-btn" id="fbBtnHomeRegister">
+                            Create new account
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Minimal Facebook Footer -->
+    <footer class="fb-footer-bar">
+        <div class="fb-footer-langs">
+            <a href="?lang=en">English (US)</a>
+            <a href="?lang=am">አማርኛ</a>
+            <a href="?lang=om">Afaan Oromoo</a>
+        </div>
+        <div>
+            EstateCraft &copy; <?= date('Y') ?> &bull; Verified Real Estate Marketplace Ethiopia &bull; <a href="<?= BASE_URL ?>/privacy.php" style="color: #65676b; text-decoration: none;">Privacy</a> &bull; <a href="<?= BASE_URL ?>/terms.php" style="color: #65676b; text-decoration: none;">Terms</a>
+        </div>
+    </footer>
+
+    <script>
+    function togglePasswordVisibility() {
+        const pw = document.getElementById('fbHomePassword');
+        const btn = document.getElementById('togglePwBtn');
+        if (pw.type === 'password') {
+            pw.type = 'text';
+            btn.textContent = '🙈';
+        } else {
+            pw.type = 'password';
+            btn.textContent = '👁️';
+        }
+    }
+    </script>
+</body>
+</html>
+<?php
+    exit;
+}
+
+// ============================================================================
+// 2. LOGGED IN MEMBER: Render the full EstateCraft Home Page
+// ============================================================================
 require_once __DIR__ . '/includes/upload.php';
 
 $pdo = getDB();
@@ -33,112 +233,11 @@ $featuredProperties = $stmtFeatured->fetchAll();
 $stmtCities = $pdo->query("SELECT city, COUNT(*) as count FROM properties WHERE status = 'active' GROUP BY city ORDER BY count DESC LIMIT 4");
 $topCities = $stmtCities->fetchAll();
 
+$pageTitle = "Find, Buy, Sell & Rent Exceptional Homes";
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<?php if (!$currentUser): ?>
-<!-- Facebook-Style Welcome & Auth Hero (Displayed on first visit) -->
-<section class="fb-landing-section" id="welcomeAuthSection">
-    <div class="fb-landing-container">
-        <!-- Left Column: Branding, Tagline & Photo Cards Collage -->
-        <div class="fb-left-col">
-            <div class="fb-brand-circle">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
-            </div>
-
-            <h1 class="fb-headline">
-                Explore<br>
-                the homes<br>
-                <span class="accent-blue">you love.</span>
-            </h1>
-
-            <!-- Visual Collage -->
-            <div class="fb-collage">
-                <!-- Phone-style story card (Main top right) -->
-                <div class="fb-card-story">
-                    <div class="fb-story-time">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        16:45
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Modern Villa in Addis Ababa">
-                    <div class="fb-story-bottom-bar">
-                        <div class="fb-story-circle"></div>
-                        <div class="fb-story-circle"></div>
-                        <div class="fb-story-circle"></div>
-                    </div>
-                </div>
-
-                <!-- Middle left square card with star badge -->
-                <div class="fb-card-square">
-                    <div class="fb-card-badge">★</div>
-                    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=500&q=80" alt="Modern Interior">
-                </div>
-
-                <!-- Bottom card -->
-                <div class="fb-card-bottom">
-                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=500&q=80" alt="Luxury Compound">
-                </div>
-
-                <!-- Avatar circle -->
-                <div class="fb-avatar-circle">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Verified Broker">
-                </div>
-
-                <!-- Floating Reactions -->
-                <div class="fb-reaction-laugh" title="Excited">😆</div>
-                <div class="fb-reaction-heart" title="Love this home">❤️</div>
-            </div>
-        </div>
-
-        <!-- Center Divider Line -->
-        <div class="fb-center-divider"></div>
-
-        <!-- Right Column: Login Card -->
-        <div class="fb-right-col">
-            <div class="fb-auth-box">
-                <h2 class="fb-login-heading">Log into EstateCraft</h2>
-
-                <form method="POST" action="<?= BASE_URL ?>/auth/login.php">
-                    <?= getCsrfInput() ?>
-
-                    <div class="fb-input-wrapper">
-                        <input type="text" name="email" id="fbHomeEmail" class="fb-field-input" placeholder="Email or mobile number" required autocomplete="username">
-                    </div>
-
-                    <div class="fb-input-wrapper">
-                        <input type="password" name="password" id="fbHomePassword" class="fb-field-input" placeholder="Password" required autocomplete="current-password">
-                    </div>
-
-                    <button type="submit" class="fb-submit-btn" id="fbBtnHomeLogin">
-                        Log in
-                    </button>
-
-                    <div class="fb-forgot-link-wrap">
-                        <a href="<?= BASE_URL ?>/auth/forgot_password.php" class="fb-forgot-link">Forgot password?</a>
-                    </div>
-
-                    <div class="fb-line-sep"></div>
-
-                    <a href="<?= BASE_URL ?>/auth/register.php" class="fb-create-acc-btn" id="fbBtnHomeRegister">
-                        Create new account
-                    </a>
-                </form>
-
-                <div class="fb-guest-link-wrap">
-                    <a href="#propertiesCatalogSection" class="fb-guest-link" onclick="document.getElementById('propertiesCatalogSection').scrollIntoView({behavior: 'smooth'}); return false;">
-                        Explore properties as guest &darr;
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<!-- Hero Search & Catalog Section -->
+<!-- Hero Section (Home Page) -->
 <section class="hero-section" id="propertiesCatalogSection">
 
         <!-- Search Bar Card -->

@@ -919,7 +919,7 @@
 <body>
 
     <!-- Header Navigation -->
-    <header class="site-header">
+    <header class="site-header" id="mainSiteHeader" style="display: none;">
         <div class="nav-container">
             <a href="index.html" class="brand-logo" id="headerBrandLogo">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1052,19 +1052,25 @@
                                 Create new account
                             </button>
                         </form>
-
-                        <div class="fb-guest-link-wrap">
-                            <a href="#catalogSearchSection" class="fb-guest-link" onclick="document.getElementById('catalogSearchSection').scrollIntoView({behavior: 'smooth'}); return false;">
-                                Explore properties as guest &darr;
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Facebook-Style Minimal Language & Copyright Footer on Login Screen -->
+            <div style="width: 100%; border-top: 1px solid #e5e7eb; padding: 22px 20px; text-align: center; font-size: 13px; color: #65676b; margin-top: 40px;">
+                <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 8px;">
+                    <a href="javascript:void(0)" onclick="changeLanguage('en')" style="color: #65676b; text-decoration: none;">English (US)</a>
+                    <a href="javascript:void(0)" onclick="changeLanguage('am')" style="color: #65676b; text-decoration: none;">አማርኛ</a>
+                    <a href="javascript:void(0)" onclick="changeLanguage('om')" style="color: #65676b; text-decoration: none;">Afaan Oromoo</a>
+                </div>
+                <div>EstateCraft &copy; 2026 &bull; Verified Real Estate Marketplace Ethiopia</div>
+            </div>
         </section>
 
-        <!-- Hero Section -->
-        <section class="hero-section" id="catalogSearchSection">
+        <!-- Home Page Wrapper (Displayed ONLY when user logs in) -->
+        <div id="homePageSections" style="display: none;">
+            <!-- Hero Section -->
+            <section class="hero-section" id="catalogSearchSection">
 
                 <!-- Search Bar Card -->
                 <div class="search-box-card">
@@ -1223,6 +1229,7 @@
                 </div>
             </div>
         </section>
+        </div><!-- end #homePageSections -->
     </main>
 
     <!-- Property Details Modal -->
@@ -1643,7 +1650,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer" id="mainSiteFooter" style="display: none;">
         <div class="footer-container">
             <div class="footer-brand">
                 <h3>
@@ -2765,29 +2772,42 @@
     /* =========================================================================
        5. Authentication & Login (Dual WampServer / Vercel Static Support)
        ========================================================================= */
-    function handleNavSignIn(e) {
-      // If deployed on Vercel, static preview, or local file without PHP server
-      if (location.protocol === 'file:' || location.hostname.includes('vercel.app') || location.hostname.includes('github.io')) {
-        e.preventDefault();
-        openLoginModal();
-      }
-    }
+    function syncAuthState() {
+      const isLoggedIn = localStorage.getItem('estate_craft_logged_in') === 'true';
+      const authSec = document.getElementById('welcomeAuthSection');
+      const header = document.getElementById('mainSiteHeader');
+      const homeSec = document.getElementById('homePageSections');
+      const footer = document.getElementById('mainSiteFooter');
 
-    function openLoginModal() {
-      closeModal();
-      const m = document.getElementById('loginModal');
-      if (m) m.classList.add('active');
-    }
+      if (isLoggedIn) {
+        if (authSec) authSec.style.display = 'none';
+        if (header) header.style.display = 'block';
+        if (homeSec) homeSec.style.display = 'block';
+        if (footer) footer.style.display = 'block';
 
-    function handleStaticLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById('staticLoginEmail').value;
-      closeModal();
-      showToast(`👋 Welcome back! Signed in as ${email}`);
-      const btn = document.getElementById('btnNavSignIn');
-      if (btn) {
-        btn.innerHTML = `<span>👤 ${email.split('@')[0]}</span>`;
-        btn.onclick = () => { showToast(`Currently signed in as ${email}`); };
+        const userName = localStorage.getItem('estate_craft_user_name') || 'Member';
+        const btnIn = document.getElementById('btnNavSignIn');
+        if (btnIn) {
+          btnIn.innerHTML = `<span>👤 ${userName}</span>`;
+          btnIn.onclick = (e) => { e.preventDefault(); showToast(`Signed in as ${userName}`); };
+        }
+        const btnUp = document.getElementById('btnNavSignUp');
+        if (btnUp) {
+          btnUp.innerHTML = `<span>🚪 Sign Out</span>`;
+          btnUp.className = 'btn btn-outline btn-sm';
+          btnUp.onclick = (e) => { e.preventDefault(); handleStaticLogout(); };
+        }
+        // Invalidate leaflet map size when unhidden
+        setTimeout(() => {
+          if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
+            window.catalogMap.invalidateSize();
+          }
+        }, 200);
+      } else {
+        if (authSec) authSec.style.display = 'flex';
+        if (header) header.style.display = 'none';
+        if (homeSec) homeSec.style.display = 'none';
+        if (footer) footer.style.display = 'none';
       }
     }
 
@@ -2799,21 +2819,53 @@
         alert("Please enter both your email/phone and password.");
         return;
       }
-      showToast(`👋 Welcome back! Logged into EstateCraft as ${email}`);
-      const btn = document.getElementById('btnNavSignIn');
-      if (btn) {
-        btn.innerHTML = `<span>👤 ${email.split('@')[0]}</span>`;
-        btn.onclick = () => { showToast(`Currently signed in as ${email}`); };
-      }
-      const signUpBtn = document.getElementById('btnNavSignUp');
-      if (signUpBtn) signUpBtn.style.display = 'none';
-
-      const cat = document.getElementById('catalogSearchSection');
-      if (cat) cat.scrollIntoView({ behavior: 'smooth' });
+      const displayName = email.split('@')[0];
+      localStorage.setItem('estate_craft_logged_in', 'true');
+      localStorage.setItem('estate_craft_user_name', displayName);
+      showToast(`👋 Welcome, ${displayName}! You are now on the Home page.`);
+      syncAuthState();
     }
 
-    function handleForgotPwClick() {
-      openForgotModal();
+    function handleStaticLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('staticLoginEmail').value.trim();
+      closeModal();
+      const displayName = email.split('@')[0];
+      localStorage.setItem('estate_craft_logged_in', 'true');
+      localStorage.setItem('estate_craft_user_name', displayName);
+      showToast(`👋 Welcome back, ${displayName}!`);
+      syncAuthState();
+    }
+
+    function handleStaticRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regStaticName').value.trim();
+      closeModal();
+      const displayName = name || 'New Member';
+      localStorage.setItem('estate_craft_logged_in', 'true');
+      localStorage.setItem('estate_craft_user_name', displayName);
+      showToast(`🎉 Account created! Welcome, ${displayName}!`);
+      syncAuthState();
+    }
+
+    function handleStaticLogout() {
+      localStorage.removeItem('estate_craft_logged_in');
+      localStorage.removeItem('estate_craft_user_name');
+      showToast("👋 You have signed out.");
+      syncAuthState();
+    }
+
+    function handleNavSignIn(e) {
+      if (location.protocol === 'file:' || location.hostname.includes('vercel.app') || location.hostname.includes('github.io')) {
+        e.preventDefault();
+        openLoginModal();
+      }
+    }
+
+    function openLoginModal() {
+      closeModal();
+      const m = document.getElementById('loginModal');
+      if (m) m.classList.add('active');
     }
 
     function handleNavSignUp(e) {
@@ -2829,21 +2881,8 @@
       if (m) m.classList.add('active');
     }
 
-    function handleStaticRegister(e) {
-      e.preventDefault();
-      const name = document.getElementById('regStaticName').value;
-      const email = document.getElementById('regStaticEmail').value;
-      closeModal();
-      showToast(`🎉 Account created! Welcome, ${name}!`);
-      const btn = document.getElementById('btnNavSignIn');
-      if (btn) {
-        btn.innerHTML = `<span>👤 ${name.split(' ')[0]}</span>`;
-        btn.onclick = () => { showToast(`Currently signed in as ${name}`); };
-      }
-      const signUpBtn = document.getElementById('btnNavSignUp');
-      if (signUpBtn) signUpBtn.style.display = 'none';
-      const heroBtn = document.getElementById('heroBtnCreateAccount');
-      if (heroBtn) heroBtn.style.display = 'none';
+    function handleForgotPwClick() {
+      openForgotModal();
     }
 
     /* =========================================================================
@@ -2956,6 +2995,9 @@
         setTimeout(() => toast.remove(), 400);
       }, 3500);
     }
+
+    // Initialize Auth state on initial page load (Shows ONLY login if unauthenticated)
+    syncAuthState();
     </script>
 </body>
 </html>

@@ -18,7 +18,7 @@
 <body>
 
     <!-- Header Navigation -->
-    <header class="site-header">
+    <header class="site-header" id="frontSiteHeader" style="display: none;">
         <div class="nav-container">
             <a href="index.html" class="brand-logo" id="headerBrandLogo">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -150,19 +150,24 @@
                                 Create new account
                             </a>
                         </form>
-
-                        <div class="fb-guest-link-wrap">
-                            <a href="#catalogSearchSection" class="fb-guest-link" onclick="document.getElementById('catalogSearchSection').scrollIntoView({behavior: 'smooth'}); return false;">
-                                Explore properties as guest &darr;
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
+
+            <div style="width: 100%; border-top: 1px solid #e5e7eb; padding: 22px 20px; text-align: center; font-size: 13px; color: #65676b; margin-top: 40px;">
+                <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 8px;">
+                    <a href="javascript:void(0)" style="color: #65676b; text-decoration: none;">English (US)</a>
+                    <a href="javascript:void(0)" style="color: #65676b; text-decoration: none;">አማርኛ</a>
+                    <a href="javascript:void(0)" style="color: #65676b; text-decoration: none;">Afaan Oromoo</a>
+                </div>
+                <div>EstateCraft &copy; 2026 &bull; Verified Real Estate Marketplace Ethiopia</div>
+            </div>
         </section>
 
-        <!-- Hero Section -->
-        <section class="hero-section" id="catalogSearchSection">
+        <!-- Home Page Wrapper (Displayed ONLY when user logs in) -->
+        <div id="homePageSections" style="display: none;">
+            <!-- Hero Section -->
+            <section class="hero-section" id="catalogSearchSection">
 
                 <!-- Search Bar Card -->
                 <div class="search-box-card">
@@ -320,6 +325,7 @@
                 </div>
             </div>
         </section>
+        </div><!-- end #homePageSections -->
     </main>
 
     <!-- Property Details Modal -->
@@ -434,7 +440,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer" id="frontSiteFooter" style="display: none;">
         <div class="footer-container">
             <div class="footer-brand">
                 <h3>
@@ -485,5 +491,51 @@
 
     <!-- External Modular JS File -->
     <script src="js/main.js"></script>
+
+    <script>
+    function syncFrontendAuthState() {
+      const isLoggedIn = localStorage.getItem('estate_craft_logged_in') === 'true';
+      const authSec = document.getElementById('welcomeAuthSection');
+      const header = document.getElementById('frontSiteHeader');
+      const homeSec = document.getElementById('homePageSections');
+      const footer = document.getElementById('frontSiteFooter');
+
+      if (isLoggedIn) {
+        if (authSec) authSec.style.display = 'none';
+        if (header) header.style.display = 'block';
+        if (homeSec) homeSec.style.display = 'block';
+        if (footer) footer.style.display = 'block';
+
+        const userName = localStorage.getItem('estate_craft_user_name') || 'Member';
+        const btnIn = document.getElementById('btnSignInFrontend');
+        if (btnIn) {
+          btnIn.innerHTML = `<span>👤 ${userName}</span>`;
+          btnIn.onclick = (e) => { e.preventDefault(); alert(`Signed in as ${userName}`); };
+        }
+        const btnUp = document.getElementById('btnSignUpFrontend');
+        if (btnUp) {
+          btnUp.innerHTML = `<span>🚪 Sign Out</span>`;
+          btnUp.className = 'btn btn-outline btn-sm';
+          btnUp.onclick = (e) => {
+            e.preventDefault();
+            localStorage.removeItem('estate_craft_logged_in');
+            localStorage.removeItem('estate_craft_user_name');
+            syncFrontendAuthState();
+          };
+        }
+        setTimeout(() => {
+          if (window.homeMap && typeof window.homeMap.invalidateSize === 'function') {
+            window.homeMap.invalidateSize();
+          }
+        }, 200);
+      } else {
+        if (authSec) authSec.style.display = 'flex';
+        if (header) header.style.display = 'none';
+        if (homeSec) homeSec.style.display = 'none';
+        if (footer) footer.style.display = 'none';
+      }
+    }
+    syncFrontendAuthState();
+    </script>
 </body>
 </html>

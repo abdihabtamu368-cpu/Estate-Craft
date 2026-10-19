@@ -11,7 +11,7 @@ require_once __DIR__ . '/../includes/csrf.php';
 
 // Redirect if already logged in
 if (isLoggedIn()) {
-    header("Location: " . BASE_URL . "/user/dashboard.php");
+    header("Location: " . BASE_URL . "/index.php");
     exit;
 }
 
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             loginUser($user);
             $_SESSION['flash_success'] = "Welcome back, " . htmlspecialchars($user['full_name']) . "!";
             
-            $redirectTo = $_SESSION['redirect_after_login'] ?? (BASE_URL . '/user/dashboard.php');
+            $redirectTo = $_SESSION['redirect_after_login'] ?? (BASE_URL . '/index.php');
             unset($_SESSION['redirect_after_login']);
             header("Location: " . $redirectTo);
             exit;
