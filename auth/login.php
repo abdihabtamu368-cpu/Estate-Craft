@@ -101,7 +101,12 @@ require_once __DIR__ . '/../includes/header.php';
                     <label class="form-label" for="loginPassword" style="margin-bottom: 0;">Password</label>
                     <a href="<?= BASE_URL ?>/auth/forgot_password.php" style="font-size: 13px; font-weight: 600;">Forgot Password?</a>
                 </div>
-                <input type="password" id="loginPassword" name="password" class="form-input" placeholder="••••••••" required style="margin-top: 6px;">
+                <div style="position: relative; margin-top: 6px;">
+                    <input type="password" id="loginPassword" name="password" class="form-input" placeholder="••••••••" required style="padding-right: 42px;">
+                    <button type="button" onclick="togglePasswordVisibility()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 16px;" id="togglePwBtn" title="Show/Hide Password">
+                        👁️
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitLoginBtn">Sign In</button>
@@ -115,9 +120,12 @@ require_once __DIR__ . '/../includes/header.php';
         <!-- Quick Demo Accounts Helper for Local WampServer Testing -->
         <div style="margin-top: 30px; padding: 16px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px;">
             <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">
-                ⚡ Local WampServer Quick Fill:
+                ⚡ Quick Fill (Password: <code>Password123!</code>):
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('abdihabtamu368@gmail.com')">
+                    Fill My Account (Abdi Habtamu)
+                </button>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('sara.broker@realestate.local')">
                     Fill Verified Broker (Sara Tefera - Addis Premier)
                 </button>
@@ -136,6 +144,18 @@ require_once __DIR__ . '/../includes/header.php';
 function quickFill(email) {
     document.getElementById('loginEmail').value = email;
     document.getElementById('loginPassword').value = 'Password123!';
+}
+
+function togglePasswordVisibility() {
+    const pw = document.getElementById('loginPassword');
+    const btn = document.getElementById('togglePwBtn');
+    if (pw.type === 'password') {
+        pw.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        pw.type = 'password';
+        btn.textContent = '👁️';
+    }
 }
 </script>
 

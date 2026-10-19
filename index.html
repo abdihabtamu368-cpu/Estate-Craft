@@ -560,6 +560,12 @@
             </ul>
 
             <div class="nav-actions">
+                <!-- Sign In Link -->
+                <a href="auth/login.php" class="btn btn-secondary btn-sm" id="btnNavSignIn" onclick="handleNavSignIn(event)" title="Sign In to Your Account" style="padding: 7px 16px; border-radius: var(--radius-full); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                    <span>Sign In</span>
+                </a>
+
                 <!-- Single Unified Settings Button -->
                 <button type="button" class="btn btn-secondary btn-sm" onclick="openSettingsModal()" title="Settings, Language & Password" style="padding: 7px 16px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 8px; font-weight: 700;">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -1088,6 +1094,50 @@
                                 <strong id="calcGrandTotal">ETB 31,705,200</strong>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal (Supported on Vercel & Static) -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-card" style="max-width: 440px;">
+            <div class="modal-header">
+                <div class="modal-title">🔐 Sign In to EstateCraft</div>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <form id="staticLoginForm" onsubmit="handleStaticLogin(event)">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="staticLoginEmail" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="staticLoginPassword" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="width: 100%;">Sign In</button>
+                </form>
+
+                <!-- Quick Fill Helpers -->
+                <div style="margin-top: 24px; padding: 14px; background: var(--bg-main); border: 1px dashed var(--border-color); border-radius: 10px;">
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
+                        ⚡ 1-Click Quick Fill (Password: <code>Password123!</code>):
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFillStatic('abdihabtamu368@gmail.com')">
+                            Fill My Account (Abdi Habtamu)
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFillStatic('sara.broker@realestate.local')">
+                            Fill Verified Broker (Sara Tefera)
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFillStatic('dawit.owner@example.com')">
+                            Fill Direct Owner (Dawit Bekele)
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFillStatic('admin@realestate.local')">
+                            Fill Administrator
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2218,7 +2268,41 @@
     }
 
     /* =========================================================================
-       5. Settings Modal, Mortgage Calculator, AI Assistant & Feedback
+       5. Authentication & Login (Dual WampServer / Vercel Static Support)
+       ========================================================================= */
+    function handleNavSignIn(e) {
+      // If deployed on Vercel, static preview, or local file without PHP server
+      if (location.protocol === 'file:' || location.hostname.includes('vercel.app') || location.hostname.includes('github.io')) {
+        e.preventDefault();
+        openLoginModal();
+      }
+    }
+
+    function openLoginModal() {
+      closeModal();
+      const m = document.getElementById('loginModal');
+      if (m) m.classList.add('active');
+    }
+
+    function quickFillStatic(email) {
+      document.getElementById('staticLoginEmail').value = email;
+      document.getElementById('staticLoginPassword').value = 'Password123!';
+    }
+
+    function handleStaticLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('staticLoginEmail').value;
+      closeModal();
+      showToast(`👋 Welcome back! Signed in as ${email}`);
+      const btn = document.getElementById('btnNavSignIn');
+      if (btn) {
+        btn.innerHTML = `<span>👤 ${email.split('@')[0]}</span>`;
+        btn.onclick = () => { showToast(`Currently signed in as ${email}`); };
+      }
+    }
+
+    /* =========================================================================
+       6. Settings Modal, Mortgage Calculator, AI Assistant & Feedback
        ========================================================================= */
     function openSettingsModal(defaultTab = 'lang') {
       closeModal();

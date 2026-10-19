@@ -4,7 +4,9 @@
 -- =======================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `user_feedback`;
 DROP TABLE IF EXISTS `listing_reports`;
+DROP TABLE IF EXISTS `password_resets`;
 DROP TABLE IF EXISTS `property_images`;
 DROP TABLE IF EXISTS `properties`;
 DROP TABLE IF EXISTS `users`;
@@ -14,7 +16,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Table: users
 -- Stores both regular buyers/renters/sellers and brokers
 -- -------------------------------------------------------
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `full_name` VARCHAR(100) NOT NULL,
   `email` VARCHAR(150) NOT NULL UNIQUE,
@@ -45,7 +47,7 @@ CREATE TABLE `users` (
 -- Table: properties
 -- Main listings table for Buy, Rent, Sell (Ethiopia)
 -- -------------------------------------------------------
-CREATE TABLE `properties` (
+CREATE TABLE IF NOT EXISTS `properties` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `user_id` INT UNSIGNED NOT NULL,
   `title` VARCHAR(200) NOT NULL,
@@ -82,7 +84,7 @@ CREATE TABLE `properties` (
 -- Table: property_images
 -- Multiple photo gallery for each listing
 -- -------------------------------------------------------
-CREATE TABLE `property_images` (
+CREATE TABLE IF NOT EXISTS `property_images` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `property_id` INT UNSIGNED NOT NULL,
   `image_path` VARCHAR(255) NOT NULL,
@@ -96,7 +98,7 @@ CREATE TABLE `property_images` (
 -- Table: password_resets
 -- Secure password recovery tokens and OTP
 -- -------------------------------------------------------
-CREATE TABLE `password_resets` (
+CREATE TABLE IF NOT EXISTS `password_resets` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `email` VARCHAR(150) NOT NULL,
   `token` VARCHAR(100) NOT NULL,
@@ -111,7 +113,7 @@ CREATE TABLE `password_resets` (
 -- Table: listing_reports
 -- Safety & Moderation reporting system
 -- -------------------------------------------------------
-CREATE TABLE `listing_reports` (
+CREATE TABLE IF NOT EXISTS `listing_reports` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `property_id` INT UNSIGNED NOT NULL,
   `reporter_user_id` INT UNSIGNED NULL COMMENT 'Null if anonymous reporter',
@@ -129,7 +131,7 @@ CREATE TABLE `listing_reports` (
 -- Table: user_feedback
 -- Customer feedback, ratings, and suggestions
 -- -------------------------------------------------------
-CREATE TABLE `user_feedback` (
+CREATE TABLE IF NOT EXISTS `user_feedback` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `user_id` INT UNSIGNED NULL,
   `name` VARCHAR(100) NOT NULL,
@@ -148,10 +150,11 @@ CREATE TABLE `user_feedback` (
 -- =======================================================
 
 INSERT INTO `users` (`id`, `full_name`, `email`, `password_hash`, `phone`, `phone_verified`, `role`, `broker_agency`, `broker_license_no`, `broker_fee_percentage`, `broker_fixed_fee`, `broker_fee_notes`) VALUES
-(1, 'Admin Moderator', 'admin@realestate.local', '$2y$10$4G8IhyX5Fv1Z6zW5F/u08.Z4K/E82E3M4VbIqZ0B6hHqQd4jF21tK', '+251 91 100 0001', 1, 'admin', NULL, NULL, NULL, NULL, NULL),
-(2, 'Sara Tefera (Verified Broker)', 'sara.broker@realestate.local', '$2y$10$4G8IhyX5Fv1Z6zW5F/u08.Z4K/E82E3M4VbIqZ0B6hHqQd4jF21tK', '+251 91 123 4567', 1, 'broker', 'Addis Premier Realty', 'BRE# ET-019283', 2.00, 5000.00, '2% sales commission upon contract closing; 1-month rental tenant placement fee.'),
-(3, 'Dawit Bekele (Direct Owner)', 'dawit.owner@example.com', '$2y$10$4G8IhyX5Fv1Z6zW5F/u08.Z4K/E82E3M4VbIqZ0B6hHqQd4jF21tK', '+251 92 234 5678', 1, 'user', NULL, NULL, NULL, NULL, NULL),
-(4, 'Bethlehem Tadesse (Commercial Broker)', 'bethlehem.broker@realestate.local', '$2y$10$4G8IhyX5Fv1Z6zW5F/u08.Z4K/E82E3M4VbIqZ0B6hHqQd4jF21tK', '+251 93 345 6789', 1, 'broker', 'Skyline Addis Commercial Properties', 'BRE# ET-084920', 1.80, 0.00, '1.8% negotiable commercial broker commission payable upon lease agreement.');
+(1, 'Admin Moderator', 'admin@realestate.local', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 91 100 0001', 1, 'admin', NULL, NULL, NULL, NULL, NULL),
+(2, 'Sara Tefera (Verified Broker)', 'sara.broker@realestate.local', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 91 123 4567', 1, 'broker', 'Addis Premier Realty', 'BRE# ET-019283', 2.00, 5000.00, '2% sales commission upon contract closing; 1-month rental tenant placement fee.'),
+(3, 'Dawit Bekele (Direct Owner)', 'dawit.owner@example.com', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 92 234 5678', 1, 'user', NULL, NULL, NULL, NULL, NULL),
+(4, 'Bethlehem Tadesse (Commercial Broker)', 'bethlehem.broker@realestate.local', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 93 345 6789', 1, 'broker', 'Skyline Addis Commercial Properties', 'BRE# ET-084920', 1.80, 0.00, '1.8% negotiable commercial broker commission payable upon lease agreement.'),
+(5, 'Abdi Habtamu', 'abdihabtamu368@gmail.com', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 90 909 0909', 1, 'user', NULL, NULL, NULL, NULL, NULL);
 
 -- Sample Ethiopian Properties (Centered in Addis Ababa, Bishoftu, Hawassa, Bahir Dar)
 INSERT INTO `properties` (`id`, `user_id`, `title`, `slug`, `description`, `purpose`, `property_type`, `price`, `price_frequency`, `bedrooms`, `bathrooms`, `area_sqft`, `address`, `city`, `state`, `postal_code`, `country`, `latitude`, `longitude`, `status`, `featured`, `contact_name`, `contact_phone`, `contact_email`, `has_broker`, `broker_fee_display`, `views_count`) VALUES
