@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EstateCraft Ethiopia | Find, Buy, Sell & Rent Exceptional Homes</title>
+    
+    <!-- Meta SEO -->
+    <meta name="description" content="Discover verified luxury homes, apartments, villas, and commercial real estate across Ethiopia with transparent broker fees and direct owner listings.">
+    
+    <!-- Leaflet OpenStreetMap CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- External Modular CSS File -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="brand-logo" id="headerBrandLogo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Estate</span>Craft <span class="brand-badge">ET</span>
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#propertiesSection" onclick="resetFilters()">All Properties</a></li>
+                <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[1].click()">Buy</a></li>
+                <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[2].click()">Rent</a></li>
+                <li><a href="#mapSection">Map Explorer</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <!-- Theme Mode Switcher (Day/Night) -->
+                <button type="button" class="theme-btn" id="themeToggleBtn" title="Toggle Day/Night Mode">
+                    <span id="themeHeaderIcon">☀️</span>
+                    <span id="themeHeaderLabel">Day</span>
+                </button>
+
+                <button type="button" class="btn btn-primary btn-sm" onclick="openPostModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Post Property
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-pattern"></div>
+            <div class="hero-content">
+                <div class="hero-tag">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    Transparent Real Estate &bull; Verified Broker &bull; Direct Owners
+                </div>
+
+                <h1 class="hero-title">
+                    The Smarter Way to Buy, Rent & Sell Exceptional Homes Across Ethiopia
+                </h1>
+                <p class="hero-subtitle">
+                    Browse verified listings, view upfront broker fees before contacting agents, and explore neighborhoods with satellite map search.
+                </p>
+
+                <!-- Search Bar Card -->
+                <div class="search-box-card">
+                    <div class="search-tabs">
+                        <button type="button" class="tab-btn active" data-purpose="">All Properties</button>
+                        <button type="button" class="tab-btn" data-purpose="sale">Buy a Home</button>
+                        <button type="button" class="tab-btn" data-purpose="rent">Rent a House</button>
+                    </div>
+
+                    <form id="mainSearchForm">
+                        <div class="search-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="searchLocation">Location / City in Ethiopia</label>
+                                <input type="text" id="searchLocation" class="form-input" placeholder="e.g. Bole, Kazanchis, CMC, Old Airport">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="searchType">Property Type</label>
+                                <select id="searchType" class="form-select">
+                                    <option value="">All Types</option>
+                                    <option value="house">Houses</option>
+                                    <option value="apartment">Apartments / Condos</option>
+                                    <option value="villa">Luxury Villas</option>
+                                    <option value="commercial">Commercial Space</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="searchPrice">Max Price (ETB)</label>
+                                <select id="searchPrice" class="form-select">
+                                    <option value="">Any Price</option>
+                                    <option value="100000">ETB 100,000 / mo</option>
+                                    <option value="300000">ETB 300,000 / mo</option>
+                                    <option value="30000000">ETB 30,000,000</option>
+                                    <option value="50000000">ETB 50,000,000</option>
+                                    <option value="70000000">ETB 70,000,000+</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg" id="btnMainSearch">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                Search Homes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Categories -->
+        <div class="quick-categories">
+            <div class="cat-card">
+                <div class="cat-icon cat-icon-blue">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <h3 class="cat-title">Buy a Home</h3>
+                <p class="cat-desc">Discover luxury villas, modern apartments, and compounds for sale with transparent prices.</p>
+                <button type="button" class="btn btn-outline btn-sm" onclick="document.querySelectorAll('.search-tabs .tab-btn')[1].click(); document.getElementById('propertiesSection').scrollIntoView({behavior: 'smooth'})">Find Homes for Sale &rarr;</button>
+            </div>
+
+            <div class="cat-card">
+                <div class="cat-icon cat-icon-green">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                </div>
+                <h3 class="cat-title">Rent a House</h3>
+                <p class="cat-desc">Browse downtown lofts, furnished apartments, and family residences available for flexible monthly terms.</p>
+                <button type="button" class="btn btn-outline btn-sm" onclick="document.querySelectorAll('.search-tabs .tab-btn')[2].click(); document.getElementById('propertiesSection').scrollIntoView({behavior: 'smooth'})">Browse Rental Properties &rarr;</button>
+            </div>
+
+            <div class="cat-card">
+                <div class="cat-icon cat-icon-amber">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <h3 class="cat-title">Sell Your Property</h3>
+                <p class="cat-desc">List your property with multiple photos, set your price, and connect directly with genuine buyers.</p>
+                <button type="button" class="btn btn-outline btn-sm" onclick="openPostModal()">List Your Property Now &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Featured Properties Section -->
+        <section class="section-wrapper" id="propertiesSection">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Featured Property Listings</h2>
+                    <p class="section-subtitle">Residential and commercial properties available right now across Ethiopia</p>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+            </div>
+
+            <!-- Dynamic Property Cards Container -->
+            <div class="property-grid" id="propertyGrid">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Interactive Map Explorer Section -->
+        <section class="section-wrapper" id="mapSection">
+            <div style="background: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-color); padding: 36px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: var(--primary); margin-bottom: 8px;">Interactive Geo-Search</span>
+                        <h2 style="font-size: 26px; font-weight: 800; color: var(--text-main);">Explore Listings on the Map</h2>
+                        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Search any city or neighborhood (e.g. Bole) or click any pin to preview properties.</p>
+                    </div>
+                </div>
+
+                <!-- Map Search Bar -->
+                <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+                    <div style="display: flex; gap: 10px;">
+                        <div style="position: relative; flex: 1;">
+                            <input type="text" id="frontMapSearchInput" list="frontMapLocationsList" class="form-input" placeholder="🔍 Search neighborhood on map (e.g. Bole, Kazanchis, Old Airport, CMC, Hawassa...)" onkeydown="if(event.key === 'Enter'){event.preventDefault(); searchMapLocation(this.value);}" onchange="searchMapLocation(this.value);" autocomplete="off">
+                            <datalist id="frontMapLocationsList">
+                                <option value="Bole">
+                                <option value="Bole Atlas">
+                                <option value="Kazanchis">
+                                <option value="Old Airport">
+                                <option value="CMC">
+                                <option value="Sarbet">
+                                <option value="Piazza">
+                                <option value="Megenagna">
+                                <option value="Hawassa">
+                            </datalist>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="searchMapLocation(document.getElementById('frontMapSearchInput').value)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            Search on Map
+                        </button>
+                    </div>
+
+                    <!-- Quick Jump Chips -->
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Explore:</span>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('frontMapSearchInput').value='Bole'; searchMapLocation('Bole');">📍 Bole</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('frontMapSearchInput').value='Kazanchis'; searchMapLocation('Kazanchis');">📍 Kazanchis</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('frontMapSearchInput').value='Old Airport'; searchMapLocation('Old Airport');">📍 Old Airport</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('frontMapSearchInput').value='CMC'; searchMapLocation('CMC');">📍 CMC</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('frontMapSearchInput').value='Sarbet'; searchMapLocation('Sarbet');">📍 Sarbet</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('frontMapSearchInput').value='Hawassa'; searchMapLocation('Hawassa');">📍 Hawassa</button>
+                    </div>
+                    <div id="frontMapSearchStatus" style="font-size: 13px; color: var(--primary); margin-top: 8px; font-weight: 600;"></div>
+                </div>
+
+                <div id="homeCatalogMap" style="height: 440px; border-radius: var(--radius-md); border: 1px solid var(--border-color); z-index: 10;"></div>
+            </div>
+        </section>
+
+        <!-- Call to Action Banner -->
+        <section class="cta-banner">
+            <div style="max-width: 700px; margin: 0 auto;">
+                <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em;">Ready to List Your Property?</h2>
+                <p style="color: #94a3b8; font-size: 16px; margin-bottom: 28px;">Connect directly with genuine buyers and tenants across Ethiopia with zero hassle.</p>
+                <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="openPostModal()">Post Your Property Now</button>
+                    <a href="#propertiesSection" class="btn btn-secondary btn-lg" style="color: #0f172a;" onclick="resetFilters()">Explore All Properties</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Property Details Modal -->
+    <div class="modal-overlay" id="propertyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Property Details</div>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Property Modal -->
+    <div class="modal-overlay" id="postPropertyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Post a New Property</div>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="postPropForm" onsubmit="handlePostProperty(event)">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                            <label class="form-label" for="newTitle" style="margin-bottom: 0;">Property Title *</label>
+                            <select id="modalTitlePreset" class="form-select" style="padding: 4px 10px; font-size: 12px; width: auto; max-width: 250px; height: auto;" onchange="if(this.value){document.getElementById('newTitle').value=this.value;}">
+                                <option value="">-- Choose from options --</option>
+                                <option value="Luxury 5-Bedroom Diplomatic Villa with Garden">🏡 Luxury Villa</option>
+                                <option value="Modern 3-Bedroom Furnished Penthouse">🏢 Furnished Penthouse</option>
+                                <option value="Contemporary 4-Bedroom Family Compound Residence">🏠 Family Compound</option>
+                                <option value="Spacious 2-Bedroom Luxury Apartment with Balcony">🛋️ 2-Bed Luxury Condo</option>
+                                <option value="Executive Grade-A Commercial Office Floor">🏬 Commercial Office</option>
+                                <option value="Prime Residential Land Plot with Ready Title">🌿 Land Plot</option>
+                            </select>
+                        </div>
+                        <input type="text" id="newTitle" list="modalTitleDatalist" class="form-input" placeholder="e.g. Sunny 3-Bedroom Villa with Swimming Pool and Mountain View" required autocomplete="off">
+                        <datalist id="modalTitleDatalist">
+                            <option value="Luxury 5-Bedroom Diplomatic Villa with Landscaped Garden">
+                            <option value="Modern 4-Bedroom Gated Villa with 24/7 Security & Parking">
+                            <option value="Modern 3-Bedroom Furnished Penthouse with Panoramic City Views">
+                            <option value="Spacious 2-Bedroom Luxury Apartment with Balcony & Elevator">
+                            <option value="Contemporary 4-Bedroom Family Compound Residence">
+                            <option value="Executive Grade-A Commercial Office Floor with Fiber Internet">
+                            <option value="Prime Residential Land Plot with Title Deed Ready">
+                        </datalist>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Luxury 5-Bedroom Diplomatic Villa with Garden'">🏡 Luxury Villa</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Modern 3-Bedroom Furnished Penthouse'">🏢 Penthouse</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Contemporary 4-Bedroom Family Compound'">🏠 Family Home</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Spacious 2-Bedroom Luxury Apartment'">🛋️ Apartment</button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newPurpose">Purpose *</label>
+                            <select id="newPurpose" class="form-select">
+                                <option value="sale">For Sale</option>
+                                <option value="rent">For Rent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newType">Property Type *</label>
+                            <select id="newType" class="form-select">
+                                <option value="house">House</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="villa">Villa</option>
+                                <option value="commercial">Commercial</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newPrice">Price (ETB) *</label>
+                            <input type="number" id="newPrice" class="form-input" placeholder="e.g. 25000000" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newCity">City / Subcity *</label>
+                            <input type="text" id="newCity" class="form-input" placeholder="e.g. Bole, Addis Ababa" required>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newBeds">Bedrooms</label>
+                            <input type="number" id="newBeds" class="form-input" value="3">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newBaths">Bathrooms</label>
+                            <input type="number" id="newBaths" class="form-input" value="2">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newSqft">Area (sqft)</label>
+                            <input type="number" id="newSqft" class="form-input" value="2200">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" for="newDesc">Description</label>
+                        <textarea id="newDesc" rows="3" class="form-input" style="height: auto;" placeholder="Highlight main features, compound details, parking, backup generator..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="width: 100%;">
+                        Submit & Publish Listing
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    EstateCraft Ethiopia
+                </h3>
+                <p>Find, Buy, Sell & Rent Exceptional Homes Across Ethiopia with complete transparency, verified accounts, and zero hidden fees.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[1].click()">Properties for Sale</a></li>
+                    <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[2].click()">Homes for Rent</a></li>
+                    <li><a href="#mapSection">Satellite Map View</a></li>
+                    <li><a href="#" onclick="openPostModal()">Post a Listing</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Popular Neighborhoods</h4>
+                <ul class="footer-links">
+                    <li><a href="#propertiesSection" onclick="document.getElementById('searchLocation').value='Bole'; filterProperties();">Bole Atlas & Medhanialem</a></li>
+                    <li><a href="#propertiesSection" onclick="document.getElementById('searchLocation').value='Old Airport'; filterProperties();">Old Airport (Diplomatic Zone)</a></li>
+                    <li><a href="#propertiesSection" onclick="document.getElementById('searchLocation').value='Kazanchis'; filterProperties();">Kazanchis Financial District</a></li>
+                    <li><a href="#propertiesSection" onclick="document.getElementById('searchLocation').value='CMC'; filterProperties();">CMC & Summit</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Platform Details</h4>
+                <ul class="footer-links">
+                    <li style="color:#94a3b8; font-size:13px;">Region: Ethiopia (Addis Ababa)</li>
+                    <li style="color:#cbd5e1; font-size:13px;">Currency: Ethiopian Birr (ETB)</li>
+                    <li style="color:#cbd5e1; font-size:13px;">Mapping: Leaflet & OpenStreetMap</li>
+                    <li style="color:#cbd5e1; font-size:13px;">Themes: Day ☀️ & Night 🌙</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>&copy; 2026 EstateCraft Ethiopia. All rights reserved.</div>
+            <div style="display:flex; gap:16px;">
+                <a href="#headerBrandLogo" style="color:#60a5fa;">Back to Top &uarr;</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- External Modular JS File -->
+    <script src="js/main.js"></script>
+</body>
+</html>

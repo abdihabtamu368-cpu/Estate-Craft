@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EstateCraft Ethiopia | Premium Real Estate Portal</title>
+    
+    <!-- Meta SEO -->
+    <meta name="description" content="Browse, search, and filter residential and commercial properties in Ethiopia with transparent broker fees and direct owner listings.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet OpenStreetMap CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Consolidated CSS in One Index -->
+    <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: rgba(37, 99, 235, 0.1);
+      --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      
+      --secondary: #0f172a;
+      --accent: #f59e0b;
+      --accent-light: rgba(245, 158, 11, 0.12);
+      --success: #10b981;
+      --success-light: rgba(16, 185, 129, 0.12);
+      --danger: #ef4444;
+      --danger-light: rgba(239, 68, 68, 0.12);
+      
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-dark: #0f172a;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --border-color: #e2e8f0;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+      
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.25s ease;
+    }
+
+    [data-theme="dark"], body.theme-dark {
+      --bg-main: #0b0f19;
+      --bg-card: #131c2e;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-light: #64748b;
+      --border-color: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color var(--transition-normal), color var(--transition-normal);
+    }
+    main { flex: 1; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: var(--primary); text-decoration: none; transition: color var(--transition-fast); }
+    a:hover { color: var(--primary-hover); }
+
+    /* Header */
+    .site-header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+    .brand-logo span { color: var(--primary); }
+    .brand-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 2px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 24px; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 15px;
+      padding: 6px 0;
+      transition: color var(--transition-fast);
+    }
+    .nav-links a:hover { color: var(--primary); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+      line-height: 1.2;
+    }
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: #ffffff !important;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+    .btn-secondary:hover { background-color: var(--bg-main); }
+    .btn-outline {
+      background: transparent;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .btn-outline:hover { background: var(--primary); color: #ffffff !important; }
+    .btn-sm { padding: 7px 13px; font-size: 13px; border-radius: var(--radius-sm); }
+    .btn-lg { padding: 14px 26px; font-size: 16px; border-radius: var(--radius-lg); }
+
+    .theme-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Hero */
+    .hero-section {
+      position: relative;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 70px 24px 90px;
+      text-align: center;
+    }
+    .hero-pattern {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .hero-content { position: relative; max-width: 860px; margin: 0 auto; z-index: 10; }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      color: #93c5fd;
+      margin-bottom: 20px;
+    }
+    .hero-title {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .hero-subtitle {
+      font-size: 18px;
+      color: #cbd5e1;
+      max-width: 680px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    /* Search Box */
+    .search-box-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: left;
+      color: var(--text-main);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .search-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 14px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .tab-btn:hover { color: var(--primary); background: var(--primary-light); }
+    .tab-btn.active { color: #ffffff; background: var(--primary); }
+
+    .search-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.5fr 1.5fr auto;
+      gap: 16px;
+      align-items: flex-end;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 700; color: var(--text-muted); }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      outline: none;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--primary);
+      background-color: var(--bg-card);
+    }
+
+    /* Categories */
+    .quick-categories {
+      max-width: 1280px;
+      margin: -40px auto 40px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      position: relative;
+      z-index: 20;
+    }
+    .cat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+      transition: transform var(--transition-normal);
+    }
+    .cat-card:hover { transform: translateY(-4px); }
+    .cat-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+    }
+    .cat-icon-blue { background: rgba(37, 99, 235, 0.12); color: var(--primary); }
+    .cat-icon-green { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+    .cat-icon-amber { background: rgba(245, 158, 11, 0.12); color: var(--accent); }
+    .cat-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
+    .cat-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px; }
+
+    /* Property Cards */
+    .section-wrapper { max-width: 1280px; margin: 0 auto 60px; padding: 0 24px; }
+    .section-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
+    }
+    .section-title { font-size: 28px; font-weight: 800; color: var(--text-main); }
+    .section-subtitle { font-size: 15px; color: var(--text-muted); margin-top: 4px; }
+    .property-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 28px;
+    }
+    .property-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+    }
+    .property-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .card-img-wrap { position: relative; height: 220px; background-color: #0f172a; overflow: hidden; }
+    .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .property-card:hover .card-img-wrap img { transform: scale(1.05); }
+    .card-badges { position: absolute; top: 14px; left: 14px; display: flex; gap: 8px; z-index: 5; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+      border-radius: var(--radius-full); font-size: 12px; font-weight: 700;
+      text-transform: capitalize;
+    }
+    .badge-sale { background-color: var(--primary); color: #ffffff; }
+    .badge-rent { background-color: #8b5cf6; color: #ffffff; }
+    .badge-verified { background-color: rgba(16, 185, 129, 0.15); color: #059669; }
+    .card-price-tag {
+      position: absolute; bottom: 14px; right: 14px;
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
+      color: #ffffff; padding: 6px 14px; border-radius: var(--radius-md);
+      font-weight: 800; font-size: 16px; z-index: 5;
+    }
+    .card-price-tag span { font-size: 12px; font-weight: 500; color: #94a3b8; }
+    .card-body { padding: 22px; display: flex; flex-direction: column; flex: 1; }
+    .card-title { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 6px; cursor: pointer; }
+    .card-title:hover { color: var(--primary); }
+    .card-location { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+    .card-features {
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
+      padding: 12px 0; margin-bottom: 14px;
+    }
+    .card-feat-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+    .card-broker-disclosure {
+      display: flex; align-items: center; gap: 6px; font-size: 12px;
+      color: var(--text-muted); background: var(--bg-main); padding: 8px 12px;
+      border-radius: var(--radius-md); margin-bottom: 16px;
+    }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 12px; }
+    .seller-info { display: flex; align-items: center; gap: 10px; }
+    .seller-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--primary-light); color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px;
+    }
+    .seller-name { font-size: 13px; font-weight: 700; color: var(--text-main); }
+
+    /* CTA Banner */
+    .cta-banner {
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+      color: #ffffff; padding: 60px 24px; text-align: center; margin-top: 40px;
+    }
+    .cta-banner h2 { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+    .cta-banner p { color: #94a3b8; font-size: 16px; margin-bottom: 28px; max-width: 650px; margin-left: auto; margin-right: auto; }
+
+    /* Footer */
+    .site-footer { background-color: var(--bg-dark); color: #cbd5e1; padding: 60px 24px 30px; margin-top: auto; }
+    .footer-container { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+    .footer-brand h3 { color: #ffffff; font-size: 20px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .footer-brand p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+    .footer-col h4 { color: #ffffff; font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { color: #94a3b8; font-size: 14px; }
+    .footer-links a:hover { color: #ffffff; }
+    .footer-bottom {
+      max-width: 1280px; margin: 40px auto 0; padding-top: 24px;
+      border-top: 1px solid #1e293b; display: flex; justify-content: space-between;
+      align-items: center; font-size: 13px; color: #64748b; flex-wrap: wrap; gap: 16px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: var(--bg-card); border-radius: var(--radius-xl); max-width: 640px; width: 100%;
+      max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+    }
+    .modal-header {
+      padding: 20px 24px; border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-size: 18px; font-weight: 800; color: var(--text-main); }
+    .modal-close {
+      background: transparent; border: none; cursor: pointer; font-size: 24px;
+      color: var(--text-muted);
+    }
+    .modal-close:hover { color: var(--danger); }
+    .modal-body { padding: 24px; }
+
+    @media (max-width: 900px) {
+      .hero-title { font-size: 34px; }
+      .search-grid { grid-template-columns: 1fr 1fr; }
+      .quick-categories { grid-template-columns: 1fr; margin-top: 20px; }
+      .footer-container { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .search-grid { grid-template-columns: 1fr; }
+      .footer-container { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="brand-logo" id="headerBrandLogo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Estate</span>Craft <span class="brand-badge">ET</span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="#propertiesSection" onclick="resetFilters()">All Properties</a></li>
+                <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[1].click()">Buy</a></li>
+                <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[2].click()">Rent</a></li>
+                <li><a href="#mapSection">Map Explorer</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button type="button" class="theme-btn" id="themeToggleBtn" title="Toggle Day/Night Mode">
+                    <span id="themeHeaderIcon">☀️</span>
+                    <span id="themeHeaderLabel">Day</span>
+                </button>
+
+                <button type="button" class="btn btn-primary btn-sm" onclick="openPostModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Post Property
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-pattern"></div>
+            <div class="hero-content">
+                <div class="hero-tag">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    Transparent Real Estate &bull; Verified Broker &bull; Direct Owners
+                </div>
+
+                <h1 class="hero-title">
+                    The Smarter Way to Buy, Rent & Sell Exceptional Homes Across Ethiopia
+                </h1>
+                <p class="hero-subtitle">
+                    Browse verified listings, view upfront broker fees before contacting agents, and explore neighborhoods with satellite map search.
+                </p>
+
+                <!-- Search Bar Card -->
+                <div class="search-box-card">
+                    <div class="search-tabs">
+                        <button type="button" class="tab-btn active" data-purpose="">All Properties</button>
+                        <button type="button" class="tab-btn" data-purpose="sale">Buy a Home</button>
+                        <button type="button" class="tab-btn" data-purpose="rent">Rent a House</button>
+                    </div>
+
+                    <form id="mainSearchForm">
+                        <div class="search-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="searchLocation">Location / City in Ethiopia</label>
+                                <input type="text" id="searchLocation" class="form-input" placeholder="e.g. Bole, Kazanchis, CMC, Old Airport">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="searchType">Property Type</label>
+                                <select id="searchType" class="form-select">
+                                    <option value="">All Types</option>
+                                    <option value="house">Houses</option>
+                                    <option value="apartment">Apartments / Condos</option>
+                                    <option value="villa">Luxury Villas</option>
+                                    <option value="commercial">Commercial Space</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="searchPrice">Max Price (ETB)</label>
+                                <select id="searchPrice" class="form-select">
+                                    <option value="">Any Price</option>
+                                    <option value="100000">ETB 100,000 / mo</option>
+                                    <option value="300000">ETB 300,000 / mo</option>
+                                    <option value="30000000">ETB 30,000,000</option>
+                                    <option value="50000000">ETB 50,000,000</option>
+                                    <option value="70000000">ETB 70,000,000+</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg" id="btnMainSearch">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                Search Homes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Categories -->
+        <div class="quick-categories">
+            <div class="cat-card">
+                <div class="cat-icon cat-icon-blue">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <h3 class="cat-title">Buy a Home</h3>
+                <p class="cat-desc">Discover luxury villas, modern apartments, and compounds for sale with transparent prices.</p>
+                <button type="button" class="btn btn-outline btn-sm" onclick="document.querySelectorAll('.search-tabs .tab-btn')[1].click(); document.getElementById('propertiesSection').scrollIntoView({behavior: 'smooth'})">Find Homes for Sale &rarr;</button>
+            </div>
+
+            <div class="cat-card">
+                <div class="cat-icon cat-icon-green">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                </div>
+                <h3 class="cat-title">Rent a House</h3>
+                <p class="cat-desc">Browse downtown lofts, furnished apartments, and family residences available for flexible monthly terms.</p>
+                <button type="button" class="btn btn-outline btn-sm" onclick="document.querySelectorAll('.search-tabs .tab-btn')[2].click(); document.getElementById('propertiesSection').scrollIntoView({behavior: 'smooth'})">Browse Rental Properties &rarr;</button>
+            </div>
+
+            <div class="cat-card">
+                <div class="cat-icon cat-icon-amber">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <h3 class="cat-title">Sell Your Property</h3>
+                <p class="cat-desc">List your property with multiple photos, set your price, and connect directly with genuine buyers.</p>
+                <button type="button" class="btn btn-outline btn-sm" onclick="openPostModal()">List Your Property Now &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Featured Properties Section -->
+        <section class="section-wrapper" id="propertiesSection">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Featured Property Listings</h2>
+                    <p class="section-subtitle">Residential and commercial properties available right now across Ethiopia</p>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+            </div>
+
+            <div class="property-grid" id="propertyGrid"></div>
+        </section>
+
+        <!-- Interactive Map Explorer Section -->
+        <section class="section-wrapper" id="mapSection">
+            <div style="background: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-color); padding: 36px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: var(--primary); margin-bottom: 8px;">Interactive Geo-Search</span>
+                        <h2 style="font-size: 26px; font-weight: 800; color: var(--text-main);">Explore Listings on the Map</h2>
+                        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Search any city or neighborhood (e.g. Bole) or click any pin to preview properties.</p>
+                    </div>
+                </div>
+
+                <!-- Map Search Bar -->
+                <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+                    <div style="display: flex; gap: 10px;">
+                        <div style="position: relative; flex: 1;">
+                            <input type="text" id="rootMapSearchInput" list="rootMapLocationsList" class="form-input" placeholder="🔍 Search neighborhood on map (e.g. Bole, Kazanchis, Old Airport, CMC, Hawassa...)" onkeydown="if(event.key === 'Enter'){event.preventDefault(); searchMapLocation(this.value);}" onchange="searchMapLocation(this.value);" autocomplete="off">
+                            <datalist id="rootMapLocationsList">
+                                <option value="Bole">
+                                <option value="Bole Atlas">
+                                <option value="Kazanchis">
+                                <option value="Old Airport">
+                                <option value="CMC">
+                                <option value="Sarbet">
+                                <option value="Piazza">
+                                <option value="Megenagna">
+                                <option value="Hawassa">
+                            </datalist>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="searchMapLocation(document.getElementById('rootMapSearchInput').value)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            Search on Map
+                        </button>
+                    </div>
+
+                    <!-- Quick Jump Chips -->
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Explore:</span>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Bole'; searchMapLocation('Bole');">📍 Bole</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Kazanchis'; searchMapLocation('Kazanchis');">📍 Kazanchis</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Old Airport'; searchMapLocation('Old Airport');">📍 Old Airport</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='CMC'; searchMapLocation('CMC');">📍 CMC</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Sarbet'; searchMapLocation('Sarbet');">📍 Sarbet</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Hawassa'; searchMapLocation('Hawassa');">📍 Hawassa</button>
+                    </div>
+                    <div id="rootMapSearchStatus" style="font-size: 13px; color: var(--primary); margin-top: 8px; font-weight: 600;"></div>
+                </div>
+
+                <div id="homeCatalogMap" style="height: 440px; border-radius: var(--radius-md); border: 1px solid var(--border-color); z-index: 10;"></div>
+            </div>
+        </section>
+
+        <!-- Call to Action Banner -->
+        <section class="cta-banner">
+            <div style="max-width: 700px; margin: 0 auto;">
+                <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em;">Ready to List Your Property?</h2>
+                <p style="color: #94a3b8; font-size: 16px; margin-bottom: 28px;">Connect directly with genuine buyers and tenants across Ethiopia with zero hassle.</p>
+                <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="openPostModal()">Post Your Property Now</button>
+                    <a href="#propertiesSection" class="btn btn-secondary btn-lg" style="color: #0f172a;" onclick="resetFilters()">Explore All Properties</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Property Details Modal -->
+    <div class="modal-overlay" id="propertyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Property Details</div>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Post Property Modal -->
+    <div class="modal-overlay" id="postPropertyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Post a New Property</div>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="postPropForm" onsubmit="handlePostProperty(event)">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                            <label class="form-label" for="newTitle" style="margin-bottom: 0;">Property Title *</label>
+                            <select id="modalTitlePreset" class="form-select" style="padding: 4px 10px; font-size: 12px; width: auto; max-width: 250px; height: auto;" onchange="if(this.value){document.getElementById('newTitle').value=this.value;}">
+                                <option value="">-- Choose from options --</option>
+                                <option value="Luxury 5-Bedroom Diplomatic Villa with Garden">🏡 Luxury Villa</option>
+                                <option value="Modern 3-Bedroom Furnished Penthouse">🏢 Furnished Penthouse</option>
+                                <option value="Contemporary 4-Bedroom Family Compound Residence">🏠 Family Compound</option>
+                                <option value="Spacious 2-Bedroom Luxury Apartment with Balcony">🛋️ 2-Bed Luxury Condo</option>
+                                <option value="Executive Grade-A Commercial Office Floor">🏬 Commercial Office</option>
+                                <option value="Prime Residential Land Plot with Ready Title">🌿 Land Plot</option>
+                            </select>
+                        </div>
+                        <input type="text" id="newTitle" list="modalTitleDatalist" class="form-input" placeholder="e.g. Sunny 3-Bedroom Villa with Swimming Pool and Mountain View" required autocomplete="off">
+                        <datalist id="modalTitleDatalist">
+                            <option value="Luxury 5-Bedroom Diplomatic Villa with Landscaped Garden">
+                            <option value="Modern 4-Bedroom Gated Villa with 24/7 Security & Parking">
+                            <option value="Modern 3-Bedroom Furnished Penthouse with Panoramic City Views">
+                            <option value="Spacious 2-Bedroom Luxury Apartment with Balcony & Elevator">
+                            <option value="Contemporary 4-Bedroom Family Compound Residence">
+                            <option value="Executive Grade-A Commercial Office Floor with Fiber Internet">
+                            <option value="Prime Residential Land Plot with Title Deed Ready">
+                        </datalist>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Luxury 5-Bedroom Diplomatic Villa with Garden'">🏡 Luxury Villa</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Modern 3-Bedroom Furnished Penthouse'">🏢 Penthouse</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Contemporary 4-Bedroom Family Compound'">🏠 Family Home</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Spacious 2-Bedroom Luxury Apartment'">🛋️ Apartment</button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newPurpose">Purpose *</label>
+                            <select id="newPurpose" class="form-select">
+                                <option value="sale">For Sale</option>
+                                <option value="rent">For Rent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newType">Property Type *</label>
+                            <select id="newType" class="form-select">
+                                <option value="house">House</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="villa">Villa</option>
+                                <option value="commercial">Commercial</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newPrice">Price (ETB) *</label>
+                            <input type="number" id="newPrice" class="form-input" placeholder="e.g. 25000000" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newCity">City / Subcity *</label>
+                            <input type="text" id="newCity" class="form-input" placeholder="e.g. Bole, Addis Ababa" required>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newBeds">Bedrooms</label>
+                            <input type="number" id="newBeds" class="form-input" value="3">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newBaths">Bathrooms</label>
+                            <input type="number" id="newBaths" class="form-input" value="2">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newSqft">Area (sqft)</label>
+                            <input type="number" id="newSqft" class="form-input" value="2200">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" for="newDesc">Description</label>
+                        <textarea id="newDesc" rows="3" class="form-input" style="height: auto;" placeholder="Highlight main features, compound details, parking, backup generator..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="width: 100%;">
+                        Submit & Publish Listing
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    EstateCraft Ethiopia
+                </h3>
+                <p>Find, Buy, Sell & Rent Exceptional Homes Across Ethiopia with complete transparency, verified accounts, and zero hidden fees.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[1].click()">Properties for Sale</a></li>
+                    <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[2].click()">Homes for Rent</a></li>
+                    <li><a href="#mapSection">Satellite Map View</a></li>
+                    <li><a href="#" onclick="openPostModal()">Post a Listing</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Popular Neighborhoods</h4>
+                <ul class="footer-links">
+                    <li><a href="#propertiesSection" onclick="document.getElementById('searchLocation').value='Bole'; filterProperties();">Bole Atlas & Medhanialem</a></li>
+                    <li><a href="#propertiesSection" onclick="document.getElementById('searchLocation').value='Old Airport'; filterProperties();">Old Airport (Diplomatic Zone)</a></li>
+                    <li><a href="#propertiesSection" onclick="document.getElementById('searchLocation').value='Kazanchis'; filterProperties();">Kazanchis Financial District</a></li>
+                    <li><a href="#propertiesSection" onclick="document.getElementById('searchLocation').value='CMC'; filterProperties();">CMC & Summit</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Platform Details</h4>
+                <ul class="footer-links">
+                    <li style="color:#94a3b8; font-size:13px;">Region: Ethiopia (Addis Ababa)</li>
+                    <li style="color:#cbd5e1; font-size:13px;">Currency: Ethiopian Birr (ETB)</li>
+                    <li style="color:#cbd5e1; font-size:13px;">Mapping: Leaflet & OpenStreetMap</li>
+                    <li style="color:#cbd5e1; font-size:13px;">Themes: Day ☀️ & Night 🌙</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>&copy; 2026 EstateCraft Ethiopia. All rights reserved.</div>
+            <div style="display:flex; gap:16px;">
+                <a href="#headerBrandLogo" style="color:#60a5fa;">Back to Top &uarr;</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Consolidated JavaScript in One Index -->
+    <script>
+    const initialProperties = [
+      {
+        id: 1,
+        title: "Luxury 5-Bedroom Diplomatic Villa",
+        purpose: "sale",
+        type: "villa",
+        price: 65000000,
+        priceFrequency: "total",
+        city: "Old Airport, Addis Ababa",
+        bedrooms: 5,
+        bathrooms: 6,
+        areaSqft: 6500,
+        image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80",
+        sellerName: "Sara Tefera (Apex Realty)",
+        sellerRole: "broker",
+        sellerPhone: "+251 91 123 4567",
+        sellerVerified: true,
+        hasBroker: true,
+        brokerFee: "2.0% commission upon closing",
+        description: "Exceptional luxury villa situated in the quiet diplomatic enclave of Old Airport. Features expansive landscaped gardens, backup generator, high security perimeter, modern kitchen with European appliances, and dedicated staff quarters."
+      },
+      {
+        id: 2,
+        title: "Modern 3-Bedroom Furnished Penthouse",
+        purpose: "rent",
+        type: "apartment",
+        price: 180000,
+        priceFrequency: "monthly",
+        city: "Bole Atlas, Addis Ababa",
+        bedrooms: 3,
+        bathrooms: 3,
+        areaSqft: 2400,
+        image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80",
+        sellerName: "Dawit Bekele",
+        sellerRole: "user",
+        sellerPhone: "+251 92 345 6789",
+        sellerVerified: true,
+        hasBroker: false,
+        brokerFee: "Zero Broker Fees (Direct Owner)",
+        description: "Fully furnished penthouse with panoramic city views over Bole. Modern open layout, high-speed fiber internet, elevator access with biometric keycard, underground parking, and 24/7 security."
+      },
+      {
+        id: 3,
+        title: "Executive Grade-A Commercial Office Floor",
+        purpose: "rent",
+        type: "commercial",
+        price: 450000,
+        priceFrequency: "monthly",
+        city: "Kazanchis, Addis Ababa",
+        bedrooms: 0,
+        bathrooms: 4,
+        areaSqft: 5200,
+        image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1000&q=80",
+        sellerName: "Elena Vance (Skyline Metro)",
+        sellerRole: "broker",
+        sellerPhone: "+251 93 456 7890",
+        sellerVerified: true,
+        hasBroker: true,
+        brokerFee: "One month rental placement fee",
+        description: "Centrally positioned in the financial district of Kazanchis, walking distance to UNECA and luxury hotels. Fitted with central HVAC, 10 dedicated parking bays, fiber optic backbone, and emergency dual-generators."
+      },
+      {
+        id: 4,
+        title: "Contemporary 4-Bedroom Family Residence",
+        purpose: "sale",
+        type: "house",
+        price: 34000000,
+        priceFrequency: "total",
+        city: "CMC Michael, Addis Ababa",
+        bedrooms: 4,
+        bathrooms: 4,
+        areaSqft: 3800,
+        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80",
+        sellerName: "Yonas Mengistu",
+        sellerRole: "user",
+        sellerPhone: "+251 94 567 8901",
+        sellerVerified: true,
+        hasBroker: false,
+        brokerFee: "Zero Broker Fees (Direct Owner)",
+        description: "Brand new contemporary compound residence in CMC Michael. Features high ceilings, hardwood flooring, solar water heating, 3-car gated parking, and quiet residential neighborhood with easy light rail access."
+      },
+      {
+        id: 5,
+        title: "Spacious 2-Bedroom Condo with Balcony",
+        purpose: "rent",
+        type: "apartment",
+        price: 75000,
+        priceFrequency: "monthly",
+        city: "Sarbet, Addis Ababa",
+        bedrooms: 2,
+        bathrooms: 2,
+        areaSqft: 1450,
+        image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80",
+        sellerName: "Sara Tefera (Apex Realty)",
+        sellerRole: "broker",
+        sellerPhone: "+251 91 123 4567",
+        sellerVerified: true,
+        hasBroker: true,
+        brokerFee: "Half-month rental placement fee",
+        description: "Bright and sunny modern apartment in Sarbet, near the African Union. Large balcony, contemporary open kitchen with breakfast bar, master suite with walk-in closet, and dependable water reservoir system."
+      },
+      {
+        id: 6,
+        title: "Scenic Waterfront Villa & Retreat",
+        purpose: "sale",
+        type: "villa",
+        price: 28000000,
+        priceFrequency: "total",
+        city: "Lake Awassa, Hawassa",
+        bedrooms: 4,
+        bathrooms: 4,
+        areaSqft: 4200,
+        image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80",
+        sellerName: "Michael Chang",
+        sellerRole: "user",
+        sellerPhone: "+251 95 678 9012",
+        sellerVerified: true,
+        hasBroker: false,
+        brokerFee: "Zero Broker Fees (Direct Owner)",
+        description: "Stunning lakeside retreat on the shores of Lake Hawassa. Features wrap-around terraces, lush tropical fruit garden, private boat dock access, solar power system, and tranquil bird sanctuary surroundings."
+      }
+    ];
+
+    let properties = [...initialProperties];
+    let currentTabFilter = "";
+
+    document.addEventListener('DOMContentLoaded', function () {
+      initTheme();
+      renderProperties(properties);
+      setupEventListeners();
+      initMap();
+    });
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('estate_theme') || 'default';
+      applyTheme(savedTheme);
+
+      const toggleBtn = document.getElementById('themeToggleBtn');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+          const current = document.documentElement.getAttribute('data-theme') || 'light';
+          const nextTheme = (current === 'dark') ? 'light' : 'dark';
+          applyTheme(nextTheme);
+          localStorage.setItem('estate_theme', nextTheme);
+        });
+      }
+    }
+
+    function applyTheme(theme) {
+      const isDark = (theme === 'dark');
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      if (isDark) {
+        document.body.classList.add('theme-dark');
+      } else {
+        document.body.classList.remove('theme-dark');
+      }
+
+      const icon = document.getElementById('themeHeaderIcon');
+      const label = document.getElementById('themeHeaderLabel');
+      if (icon && label) {
+        icon.textContent = isDark ? '🌙' : '☀️';
+        label.textContent = isDark ? 'Night' : 'Day';
+      }
+    }
+
+    function renderProperties(list) {
+      const grid = document.getElementById('propertyGrid');
+      if (!grid) return;
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">No Properties Match Your Search</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Try adjusting your keyword, changing the property type, or widening your price range.</p>
+            <button class="btn btn-primary btn-sm" onclick="resetFilters()">Reset All Filters</button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = list.map(prop => `
+        <div class="property-card" data-id="${prop.id}">
+          <div class="card-img-wrap">
+            <img src="${prop.image}" alt="${escapeHtml(prop.title)}" loading="lazy">
+            <div class="card-badges">
+              <span class="badge ${prop.purpose === 'sale' ? 'badge-sale' : 'badge-rent'}">
+                For ${prop.purpose === 'sale' ? 'Sale' : 'Rent'}
+              </span>
+              <span class="badge" style="background: rgba(15, 23, 42, 0.85); color: #fff;">
+                ${capitalize(prop.type)}
+              </span>
+            </div>
+            <div class="card-price-tag">
+              ETB ${formatNumber(prop.price)}
+              ${prop.priceFrequency === 'monthly' ? '<span>/mo</span>' : ''}
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="card-title" onclick="openDetailsModal(${prop.id})">
+              ${escapeHtml(prop.title)}
+            </div>
+
+            <div class="card-location">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              ${escapeHtml(prop.city)}
+            </div>
+
+            <div class="card-features">
+              <div class="card-feat-item" title="Bedrooms">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"/></svg>
+                <span>${prop.bedrooms} Beds</span>
+              </div>
+              <div class="card-feat-item" title="Bathrooms">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h6M9 10h6m-9 4h12a2 2 0 0 1 2 2v1a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-1a2 2 0 0 1 2-2z"/></svg>
+                <span>${prop.bathrooms} Baths</span>
+              </div>
+              <div class="card-feat-item" title="Area">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                <span>${formatNumber(prop.areaSqft)} sqft</span>
+              </div>
+            </div>
+
+            <div class="card-broker-disclosure">
+              ${prop.hasBroker 
+                ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                   <span><strong>Broker Listed:</strong> ${escapeHtml(prop.brokerFee)}</span>`
+                : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                   <span><strong>Direct Owner:</strong> Zero Broker Fees</span>`
+              }
+            </div>
+
+            <div class="card-footer">
+              <div class="seller-info">
+                <div class="seller-avatar">${prop.sellerName.charAt(0).toUpperCase()}</div>
+                <div>
+                  <div class="seller-name">${escapeHtml(prop.sellerName)}</div>
+                  ${prop.sellerVerified ? `
+                    <span class="badge badge-verified" style="font-size: 10px; padding: 1px 6px;">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      Verified
+                    </span>` : ''}
+                </div>
+              </div>
+
+              <button class="btn btn-outline btn-sm" onclick="openDetailsModal(${prop.id})">
+                View Details &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setupEventListeners() {
+      const tabs = document.querySelectorAll('.search-tabs .tab-btn');
+      tabs.forEach(btn => {
+        btn.addEventListener('click', function () {
+          tabs.forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          currentTabFilter = this.getAttribute('data-purpose') || "";
+          filterProperties();
+        });
+      });
+
+      const searchForm = document.getElementById('mainSearchForm');
+      if (searchForm) {
+        searchForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          filterProperties();
+        });
+      }
+
+      const locationInput = document.getElementById('searchLocation');
+      const typeSelect = document.getElementById('searchType');
+      const priceSelect = document.getElementById('searchPrice');
+
+      if (locationInput) locationInput.addEventListener('input', filterProperties);
+      if (typeSelect) typeSelect.addEventListener('change', filterProperties);
+      if (priceSelect) priceSelect.addEventListener('change', filterProperties);
+    }
+
+    function filterProperties() {
+      const query = (document.getElementById('searchLocation')?.value || "").toLowerCase().trim();
+      const type = document.getElementById('searchType')?.value || "";
+      const maxPrice = parseFloat(document.getElementById('searchPrice')?.value) || 0;
+
+      const filtered = properties.filter(prop => {
+        if (currentTabFilter && prop.purpose !== currentTabFilter) return false;
+        if (query && !prop.city.toLowerCase().includes(query) && !prop.title.toLowerCase().includes(query)) return false;
+        if (type && prop.type !== type) return false;
+        if (maxPrice > 0 && prop.price > maxPrice) return false;
+        return true;
+      });
+
+      renderProperties(filtered);
+    }
+
+    function resetFilters() {
+      currentTabFilter = "";
+      const tabs = document.querySelectorAll('.search-tabs .tab-btn');
+      tabs.forEach(t => t.classList.remove('active'));
+      if (tabs[0]) tabs[0].classList.add('active');
+
+      const loc = document.getElementById('searchLocation');
+      const type = document.getElementById('searchType');
+      const price = document.getElementById('searchPrice');
+
+      if (loc) loc.value = "";
+      if (type) type.value = "";
+      if (price) price.value = "";
+
+      renderProperties(properties);
+    }
+
+    function openDetailsModal(id) {
+      const prop = properties.find(p => p.id === id);
+      if (!prop) return;
+
+      const modal = document.getElementById('propertyModal');
+      const content = document.getElementById('modalContent');
+      if (!modal || !content) return;
+
+      content.innerHTML = `
+        <div style="position: relative; height: 300px; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
+          <img src="${prop.image}" alt="${escapeHtml(prop.title)}" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; top: 16px; left: 16px; display: flex; gap: 8px;">
+            <span class="badge ${prop.purpose === 'sale' ? 'badge-sale' : 'badge-rent'}">
+              For ${prop.purpose === 'sale' ? 'Sale' : 'Rent'}
+            </span>
+            <span class="badge" style="background: rgba(15, 23, 42, 0.85); color: #fff;">
+              ${capitalize(prop.type)}
+            </span>
+          </div>
+          <div style="position: absolute; bottom: 16px; right: 16px; background: rgba(15, 23, 42, 0.9); color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 20px;">
+            ETB ${formatNumber(prop.price)} ${prop.priceFrequency === 'monthly' ? '<span style="font-size: 13px; font-weight: 400; color: #94a3b8;">/month</span>' : ''}
+          </div>
+        </div>
+
+        <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px; color: var(--text-main);">${escapeHtml(prop.title)}</h2>
+        <div style="display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          ${escapeHtml(prop.city)}
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: var(--bg-main); padding: 14px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+          <div>
+            <div style="font-size: 18px; font-weight: 800; color: var(--primary);">${prop.bedrooms}</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Bedrooms</div>
+          </div>
+          <div>
+            <div style="font-size: 18px; font-weight: 800; color: var(--primary);">${prop.bathrooms}</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Bathrooms</div>
+          </div>
+          <div>
+            <div style="font-size: 18px; font-weight: 800; color: var(--primary);">${formatNumber(prop.areaSqft)}</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Sq. Footage</div>
+          </div>
+        </div>
+
+        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text-main);">About This Property</h3>
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+          ${escapeHtml(prop.description)}
+        </p>
+
+        <div style="background: ${prop.hasBroker ? '#fffbeb' : '#ecfdf5'}; border: 1px solid ${prop.hasBroker ? '#fde68a' : '#a7f3d0'}; border-radius: 10px; padding: 12px 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 20px;">${prop.hasBroker ? '📋' : '🛡️'}</div>
+          <div>
+            <div style="font-size: 13px; font-weight: 700; color: ${prop.hasBroker ? '#92400e' : '#065f46'};">
+              ${prop.hasBroker ? 'Broker Representation & Fee Disclosure' : 'Direct Owner Listing - No Broker Fees'}
+            </div>
+            <div style="font-size: 12px; color: ${prop.hasBroker ? '#78350f' : '#047857'};">
+              ${escapeHtml(prop.brokerFee)}
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="seller-avatar" style="width: 44px; height: 44px; font-size: 18px;">${prop.sellerName.charAt(0).toUpperCase()}</div>
+            <div>
+              <div style="font-weight: 700; font-size: 15px;">${escapeHtml(prop.sellerName)}</div>
+              <div style="font-size: 13px; color: var(--text-muted);">${escapeHtml(prop.sellerPhone)}</div>
+            </div>
+          </div>
+
+          <a href="tel:${prop.sellerPhone.replace(/\\s+/g, '')}" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            Call Contact
+          </a>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('propertyModal');
+      if (modal) modal.classList.remove('active');
+
+      const postModal = document.getElementById('postPropertyModal');
+      if (postModal) postModal.classList.remove('active');
+    }
+
+    function openPostModal() {
+      const postModal = document.getElementById('postPropertyModal');
+      if (postModal) postModal.classList.add('active');
+    }
+
+    function handlePostProperty(event) {
+      event.preventDefault();
+      const title = document.getElementById('newTitle').value.trim();
+      const purpose = document.getElementById('newPurpose').value;
+      const type = document.getElementById('newType').value;
+      const price = parseFloat(document.getElementById('newPrice').value) || 0;
+      const city = document.getElementById('newCity').value.trim();
+      const beds = parseInt(document.getElementById('newBeds').value) || 1;
+      const baths = parseInt(document.getElementById('newBaths').value) || 1;
+      const sqft = parseInt(document.getElementById('newSqft').value) || 1000;
+      const desc = document.getElementById('newDesc').value.trim();
+
+      const newProp = {
+        id: Date.now(),
+        title: title || "Modern Property",
+        purpose: purpose,
+        type: type,
+        price: price,
+        priceFrequency: purpose === 'rent' ? 'monthly' : 'total',
+        city: city || "Addis Ababa, Ethiopia",
+        bedrooms: beds,
+        bathrooms: baths,
+        areaSqft: sqft,
+        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80",
+        sellerName: "Direct Property Owner",
+        sellerRole: "user",
+        sellerPhone: "+251 91 000 0000",
+        sellerVerified: true,
+        hasBroker: false,
+        brokerFee: "Zero Broker Fees (Direct Owner)",
+        description: desc || "Newly listed property in Ethiopia."
+      };
+
+      properties.unshift(newProp);
+      renderProperties(properties);
+      closeModal();
+      alert("Success! Your property has been added to the catalog.");
+    }
+
+    let staticMarkersLayer = null;
+
+    function initMap() {
+      const mapElement = document.getElementById('homeCatalogMap');
+      if (!mapElement) return;
+      if (typeof L === 'undefined') {
+        setTimeout(initMap, 150);
+        return;
+      }
+
+      if (mapElement._leaflet_id && window.homeMap) {
+        try { window.homeMap.remove(); } catch(e) {}
+        window.homeMap = null;
+      }
+
+      const map = L.map('homeCatalogMap', {
+        center: [9.0108, 38.7613],
+        zoom: 12,
+        minZoom: 5,
+        maxZoom: 19
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      staticMarkersLayer = L.layerGroup().addTo(map);
+
+      const locations = [
+        { name: "Old Airport Luxury Villa", coords: [8.9880, 38.7300], price: "ETB 65,000,000", id: 1, type: "Villa", city: "Old Airport, Addis Ababa" },
+        { name: "Bole Atlas Penthouse", coords: [9.0020, 38.7840], price: "ETB 180,000/mo", id: 2, type: "Apartment", city: "Bole Atlas, Addis Ababa" },
+        { name: "Kazanchis Commercial Space", coords: [9.0190, 38.7690], price: "ETB 450,000/mo", id: 3, type: "Commercial", city: "Kazanchis, Addis Ababa" },
+        { name: "CMC Michael Family Home", coords: [9.0260, 38.8250], price: "ETB 34,000,000", id: 4, type: "House", city: "CMC, Addis Ababa" },
+        { name: "Sarbet 2-Bed Condo", coords: [8.9950, 38.7450], price: "ETB 75,000/mo", id: 5, type: "Apartment", city: "Sarbet, Addis Ababa" }
+      ];
+
+      locations.forEach(loc => {
+        const marker = L.marker(loc.coords);
+        marker.bindPopup(`
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; min-width: 180px;">
+            <div style="font-weight: 800; color: #2563eb; font-size: 15px;">${loc.price}</div>
+            <div style="font-weight: 700; color: #0f172a; font-size: 13px; margin: 3px 0;">${loc.name}</div>
+            <div style="font-size: 12px; color: #64748b; margin-bottom: 6px;">📍 ${loc.city}</div>
+            <button onclick="openDetailsModal(${loc.id})" style="background: #2563eb; color: #ffffff; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; width: 100%;">View Details</button>
+          </div>
+        `);
+        staticMarkersLayer.addLayer(marker);
+        loc._marker = marker;
+      });
+
+      // Save map instance
+      window.homeMap = map;
+      window.staticMapLocations = locations;
+      window.staticMarkersLayer = staticMarkersLayer;
+
+      setTimeout(function() {
+        if (window.homeMap) window.homeMap.invalidateSize();
+      }, 300);
+    }
+
+    const ETHIOPIAN_MAP_LOCATIONS = {
+      'bole': { lat: 8.9954, lng: 38.7884, zoom: 15, name: 'Bole Subcity, Addis Ababa' },
+      'bole atlas': { lat: 9.0020, lng: 38.7840, zoom: 16, name: 'Bole Atlas, Addis Ababa' },
+      'kazanchis': { lat: 9.0190, lng: 38.7690, zoom: 16, name: 'Kazanchis, Kirkos, Addis Ababa' },
+      'old airport': { lat: 8.9880, lng: 38.7300, zoom: 15, name: 'Old Airport, Nefas Silk, Addis Ababa' },
+      'cmc': { lat: 9.0260, lng: 38.8250, zoom: 15, name: 'CMC Michael, Yeka, Addis Ababa' },
+      'sarbet': { lat: 8.9950, lng: 38.7450, zoom: 15, name: 'Sarbet (African Union), Addis Ababa' },
+      'piazza': { lat: 9.0345, lng: 38.7523, zoom: 16, name: 'Piazza / Arada, Addis Ababa' },
+      'megenagna': { lat: 9.0188, lng: 38.8023, zoom: 16, name: 'Megenagna, Yeka, Addis Ababa' },
+      'hawassa': { lat: 7.0504, lng: 38.4764, zoom: 14, name: 'Hawassa, Sidama' }
+    };
+
+    let rootSearchMarker = null;
+
+    function searchMapLocation(query) {
+      if (!query || !window.homeMap) return;
+      const clean = query.toLowerCase().trim();
+
+      let match = null;
+      if (ETHIOPIAN_MAP_LOCATIONS[clean]) {
+        match = ETHIOPIAN_MAP_LOCATIONS[clean];
+      } else {
+        for (const [key, loc] of Object.entries(ETHIOPIAN_MAP_LOCATIONS)) {
+          if (clean.includes(key) || key.includes(clean)) {
+            match = loc;
+            break;
+          }
+        }
+      }
+
+      const applyRootResult = (lat, lng, name, zoom) => {
+        window.homeMap.flyTo([lat, lng], zoom || 15, { duration: 1.2 });
+        if (rootSearchMarker) {
+          window.homeMap.removeLayer(rootSearchMarker);
+        }
+        const pulseIcon = L.divIcon({
+          className: 'root-search-pulse-icon',
+          html: `<div style="background: #2563eb; color: #ffffff; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 0 0 4px rgba(37,99,235,0.35), 0 4px 10px rgba(0,0,0,0.3); border: 2px solid #ffffff;">📍</div>`,
+          iconSize: [34, 34],
+          iconAnchor: [17, 17]
+        });
+        rootSearchMarker = L.marker([lat, lng], { icon: pulseIcon }).addTo(window.homeMap);
+        rootSearchMarker.bindPopup(`
+          <div style="font-family: inherit; font-size: 13px;">
+            <strong style="color: #2563eb; font-size: 14px;">📍 ${name}</strong><br>
+            <span style="font-size: 12px; color: #475569;">Centered on searched location.</span>
+          </div>
+        `).openPopup();
+
+        // Check if any sample property is near this location and open its popup
+        if (window.staticMapLocations) {
+          const matchProp = window.staticMapLocations.find(l => 
+            l.city.toLowerCase().includes(clean) || 
+            clean.includes(l.city.toLowerCase().split(',')[0].trim()) ||
+            l.name.toLowerCase().includes(clean)
+          );
+          if (matchProp && matchProp._marker) {
+            setTimeout(() => matchProp._marker.openPopup(), 600);
+          }
+        }
+
+        const statusEl = document.getElementById('rootMapSearchStatus');
+        if (statusEl) {
+          statusEl.innerHTML = `📍 Located: <strong>${name}</strong>`;
+        }
+      };
+
+      if (match) {
+        applyRootResult(match.lat, match.lng, match.name, match.zoom);
+        return;
+      }
+
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Ethiopia')}&countrycodes=et&limit=1`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            applyRootResult(parseFloat(data[0].lat), parseFloat(data[0].lon), data[0].display_name, 15);
+          } else {
+            const statusEl = document.getElementById('rootMapSearchStatus');
+            if (statusEl) {
+              statusEl.textContent = `Location "${query}" not found. Try searching Bole, Kazanchis, CMC, or Hawassa.`;
+              setTimeout(() => { statusEl.textContent = ''; }, 4500);
+            } else {
+              alert(`Location "${query}" not found. Try searching Bole, Kazanchis, CMC, or Hawassa.`);
+            }
+          }
+        })
+        .catch(() => {
+          if (clean.includes('bole')) {
+            const b = ETHIOPIAN_MAP_LOCATIONS['bole'];
+            applyRootResult(b.lat, b.lng, b.name, b.zoom);
+          }
+        });
+    }
+
+    function formatNumber(num) { return Number(num).toLocaleString(); }
+    function capitalize(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1) : ''; }
+    function escapeHtml(text) {
+      return text ? String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : '';
+    }
+    </script>
+</body>
+</html>
