@@ -1119,27 +1119,6 @@
                     </div>
                     <button type="submit" class="btn btn-primary btn-block btn-lg" style="width: 100%;">Sign In</button>
                 </form>
-
-                <!-- Quick Fill Helpers -->
-                <div style="margin-top: 24px; padding: 14px; background: var(--bg-main); border: 1px dashed var(--border-color); border-radius: 10px;">
-                    <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
-                        ⚡ 1-Click Quick Fill (Password: <code>Password123!</code>):
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 6px;">
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFillStatic('abdihabtamu368@gmail.com')">
-                            Fill My Account (Abdi Habtamu)
-                        </button>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFillStatic('sara.broker@realestate.local')">
-                            Fill Verified Broker (Sara Tefera)
-                        </button>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFillStatic('dawit.owner@example.com')">
-                            Fill Direct Owner (Dawit Bekele)
-                        </button>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="quickFillStatic('admin@realestate.local')">
-                            Fill Administrator
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -2282,11 +2261,6 @@
       closeModal();
       const m = document.getElementById('loginModal');
       if (m) m.classList.add('active');
-    }
-
-    function quickFillStatic(email) {
-      document.getElementById('staticLoginEmail').value = email;
-      document.getElementById('staticLoginPassword').value = 'Password123!';
     }
 
     function handleStaticLogin(e) {

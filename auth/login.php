@@ -116,36 +116,10 @@ require_once __DIR__ . '/../includes/header.php';
             Don't have an account yet? 
             <a href="<?= BASE_URL ?>/auth/register.php" style="font-weight: 700;">Create Account</a>
         </p>
-
-        <!-- Quick Demo Accounts Helper for Local WampServer Testing -->
-        <div style="margin-top: 30px; padding: 16px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px;">
-            <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">
-                ⚡ Quick Fill (Password: <code>Password123!</code>):
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('abdihabtamu368@gmail.com')">
-                    Fill My Account (Abdi Habtamu)
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('sara.broker@realestate.local')">
-                    Fill Verified Broker (Sara Tefera - Addis Premier)
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('dawit.owner@example.com')">
-                    Fill Direct Owner (Dawit Bekele)
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="quickFill('admin@realestate.local')">
-                    Fill Safety Moderator / Admin
-                </button>
-            </div>
-        </div>
     </div>
 </div>
 
 <script>
-function quickFill(email) {
-    document.getElementById('loginEmail').value = email;
-    document.getElementById('loginPassword').value = 'Password123!';
-}
-
 function togglePasswordVisibility() {
     const pw = document.getElementById('loginPassword');
     const btn = document.getElementById('togglePwBtn');
