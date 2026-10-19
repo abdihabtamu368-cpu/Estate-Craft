@@ -566,6 +566,12 @@
                     <span>Sign In</span>
                 </a>
 
+                <!-- Create Account Link -->
+                <a href="auth/register.php" class="btn btn-primary btn-sm" id="btnNavSignUp" onclick="handleNavSignUp(event)" title="Create Free Account" style="padding: 7px 18px; border-radius: var(--radius-full); font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                    <span>Create Account</span>
+                </a>
+
                 <!-- Single Unified Settings Button -->
                 <button type="button" class="btn btn-secondary btn-sm" onclick="openSettingsModal()" title="Settings, Language & Password" style="padding: 7px 16px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 8px; font-weight: 700;">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -597,6 +603,18 @@
                 <p class="hero-subtitle">
                     Browse verified listings, view upfront broker fees before contacting agents, and explore neighborhoods with satellite map search.
                 </p>
+
+                <!-- First View Call to Action: Sign In, Sign Up & Create Account -->
+                <div style="display: flex; gap: 14px; justify-content: center; align-items: center; margin: 22px 0 32px; flex-wrap: wrap;">
+                    <a href="auth/register.php" onclick="handleNavSignUp(event)" class="btn btn-primary btn-lg" id="heroBtnCreateAccount" style="font-weight: 800; padding: 13px 28px; border-radius: var(--radius-full); box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; font-size: 15px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                        <span>Create Free Account / Sign Up</span>
+                    </a>
+                    <a href="auth/login.php" onclick="handleNavSignIn(event)" class="btn btn-secondary btn-lg" id="heroBtnSignIn" style="font-weight: 700; padding: 13px 26px; border-radius: var(--radius-full); background: rgba(255, 255, 255, 0.95); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; border: 1px solid var(--border-color); color: var(--secondary);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                        <span>Sign In</span>
+                    </a>
+                </div>
 
                 <!-- Search Bar Card -->
                 <div class="search-box-card">
@@ -1119,6 +1137,54 @@
                     </div>
                     <button type="submit" class="btn btn-primary btn-block btn-lg" style="width: 100%;">Sign In</button>
                 </form>
+
+                <p style="text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted); margin-bottom: 0;">
+                    Don't have an account yet? 
+                    <a href="javascript:void(0)" onclick="openSignUpModal()" style="font-weight: 700; color: var(--primary);">Create Account / Sign Up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign Up / Create Account Modal (Supported on Vercel & Static) -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal-card" style="max-width: 480px;">
+            <div class="modal-header">
+                <div class="modal-title">✨ Create an Account</div>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <form id="staticRegisterForm" onsubmit="handleStaticRegister(event)">
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="regStaticName" class="form-input" placeholder="e.g. Abebe Bikila" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="regStaticEmail" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Phone Number (Ethiopia)</label>
+                        <input type="tel" id="regStaticPhone" class="form-input" placeholder="+251 91 123 4567" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">Create Password</label>
+                        <input type="password" id="regStaticPassword" class="form-input" placeholder="••••••••" minlength="6" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label">I am joining as</label>
+                        <select id="regStaticRole" class="form-select">
+                            <option value="user">Home Buyer / Renter / Direct Owner</option>
+                            <option value="broker">Verified Real Estate Broker</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="width: 100%;">Create Account</button>
+                </form>
+
+                <p style="text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted); margin-bottom: 0;">
+                    Already have an account? 
+                    <a href="javascript:void(0)" onclick="openLoginModal()" style="font-weight: 700; color: var(--primary);">Sign In</a>
+                </p>
             </div>
         </div>
     </div>
@@ -2273,6 +2339,36 @@
         btn.innerHTML = `<span>👤 ${email.split('@')[0]}</span>`;
         btn.onclick = () => { showToast(`Currently signed in as ${email}`); };
       }
+    }
+
+    function handleNavSignUp(e) {
+      if (location.protocol === 'file:' || location.hostname.includes('vercel.app') || location.hostname.includes('github.io')) {
+        e.preventDefault();
+        openSignUpModal();
+      }
+    }
+
+    function openSignUpModal() {
+      closeModal();
+      const m = document.getElementById('registerModal');
+      if (m) m.classList.add('active');
+    }
+
+    function handleStaticRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regStaticName').value;
+      const email = document.getElementById('regStaticEmail').value;
+      closeModal();
+      showToast(`🎉 Account created! Welcome, ${name}!`);
+      const btn = document.getElementById('btnNavSignIn');
+      if (btn) {
+        btn.innerHTML = `<span>👤 ${name.split(' ')[0]}</span>`;
+        btn.onclick = () => { showToast(`Currently signed in as ${name}`); };
+      }
+      const signUpBtn = document.getElementById('btnNavSignUp');
+      if (signUpBtn) signUpBtn.style.display = 'none';
+      const heroBtn = document.getElementById('heroBtnCreateAccount');
+      if (heroBtn) heroBtn.style.display = 'none';
     }
 
     /* =========================================================================

@@ -81,7 +81,7 @@ function getTranslations(): array {
         'nav_dashboard'        => ['en' => 'Dashboard', 'am' => 'ዳሽቦርድ', 'om' => 'Daashboordii'],
         'nav_settings'         => ['en' => 'Settings', 'am' => 'ቅንብሮች', 'om' => 'Qindaa’inoota'],
         'nav_signin'           => ['en' => 'Sign In', 'am' => 'ግባ', 'om' => 'Seeni'],
-        'nav_register'         => ['en' => 'Get Started', 'am' => 'ተመዝገብ', 'om' => 'Jalqabi'],
+        'nav_register'         => ['en' => 'Create Account', 'am' => 'ተመዝገብ', 'om' => 'Akkaawuntii Uumi'],
         'nav_signout'          => ['en' => 'Sign Out', 'am' => 'ውጣ', 'om' => 'Ba’i'],
         'nav_safety_reports'   => ['en' => 'Safety Reports', 'am' => 'የደህንነት ሪፖርቶች', 'om' => 'Gabaasa Nageenyaa'],
 
@@ -95,6 +95,16 @@ function getTranslations(): array {
             'en' => 'Browse verified listings, view upfront broker fees before contacting agents, and explore neighborhoods with satellite map search.',
             'am' => 'የተረጋገጡ የቤት ማስታወቂያዎችን ይመልከቱ፣ ወኪሎችን ከማነጋገርዎ በፊት የደላላ ክፍያን በግልጽ ይወቁ እና በሳተላይት ካርታ አካባቢዎችን ያስሱ።',
             'om' => 'Manneen mirkanaa’an ilaalaa, dilaalota qunnamuun dura kaffaltii ifatti beekaa, fi kaartaa saatalaayitiin naannoo daawwadhaa.'
+        ],
+        'hero_btn_register'    => [
+            'en' => 'Create Free Account / Sign Up',
+            'am' => 'ነፃ አካውንት ክፈት / ተመዝገብ',
+            'om' => 'Akkaawuntii Bilisaa Uumi / Galmaa’i'
+        ],
+        'hero_btn_signin'      => [
+            'en' => 'Sign In',
+            'am' => 'ግባ',
+            'om' => 'Seeni'
         ],
         'tab_all'              => ['en' => 'All Properties', 'am' => 'ሁሉም ቤቶች', 'om' => 'Manneen Hunda'],
         'tab_buy'              => ['en' => 'Buy a Home', 'am' => 'ቤት ይግዙ', 'om' => 'Mana Biti'],

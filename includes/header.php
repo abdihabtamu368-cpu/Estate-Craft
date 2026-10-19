@@ -175,7 +175,7 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
                 </div>
             <?php else: ?>
                 <a href="<?= BASE_URL ?>/auth/login.php" class="btn btn-secondary btn-sm" id="btnSignIn"><?= __('nav_signin', 'Sign In') ?></a>
-                <a href="<?= BASE_URL ?>/auth/register.php" class="btn btn-primary btn-sm" id="btnRegister"><?= __('nav_register', 'Get Started') ?></a>
+                <a href="<?= BASE_URL ?>/auth/register.php" class="btn btn-primary btn-sm" id="btnRegister"><?= __('nav_register', 'Create Account') ?></a>
             <?php endif; ?>
 
             <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">

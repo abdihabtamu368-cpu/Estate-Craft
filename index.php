@@ -51,6 +51,20 @@ require_once __DIR__ . '/includes/header.php';
             <?= __('hero_subtitle', 'Browse verified listings, view upfront broker fees before contacting agents, and explore neighborhoods with satellite map search.') ?>
         </p>
 
+        <?php if (!$currentUser): ?>
+        <!-- First View Call to Action: Sign In, Sign Up & Create Account -->
+        <div style="display: flex; gap: 14px; justify-content: center; align-items: center; margin: 22px 0 32px; flex-wrap: wrap;">
+            <a href="<?= BASE_URL ?>/auth/register.php" class="btn btn-primary btn-lg" id="heroBtnCreateAccount" style="font-weight: 800; padding: 13px 28px; border-radius: var(--radius-full); box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; font-size: 15px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                <span><?= __('hero_btn_register', 'Create Free Account / Sign Up') ?></span>
+            </a>
+            <a href="<?= BASE_URL ?>/auth/login.php" class="btn btn-secondary btn-lg" id="heroBtnSignIn" style="font-weight: 700; padding: 13px 26px; border-radius: var(--radius-full); background: rgba(255, 255, 255, 0.95); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; border: 1px solid var(--border-color); color: var(--secondary);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                <span><?= __('hero_btn_signin', 'Sign In') ?></span>
+            </a>
+        </div>
+        <?php endif; ?>
+
         <!-- Search Bar Card -->
         <div class="search-box-card">
             <div class="search-tabs">
