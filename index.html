@@ -557,36 +557,13 @@
                 <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[1].click()" data-i18n="nav_buy">Buy</a></li>
                 <li><a href="#propertiesSection" onclick="document.querySelectorAll('.search-tabs .tab-btn')[2].click()" data-i18n="nav_rent">Rent</a></li>
                 <li><a href="#mapSection" data-i18n="nav_map">Map Explorer</a></li>
-                <li><a href="javascript:void(0)" onclick="openResetPasswordModal()" style="color: var(--primary); font-weight: 600;" data-i18n="nav_reset">🔑 Reset Password</a></li>
             </ul>
 
             <div class="nav-actions">
-                <!-- Quick Language Selector -->
-                <select id="headerLangSelect" class="form-select" onchange="changeLanguage(this.value)" style="padding: 6px 10px; font-size: 12px; font-weight: 700; border-radius: var(--radius-full); cursor: pointer; width: auto; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color);" title="Change Language / ቋንቋ ይቀይሩ">
-                    <option value="en">🇬🇧 English</option>
-                    <option value="am">🇪🇹 አማርኛ</option>
-                    <option value="om">🌳 Oromoo</option>
-                </select>
-
-                <!-- Favorites Heart Counter -->
-                <button type="button" class="btn btn-secondary btn-sm" onclick="openFavoritesModal()" title="Saved Properties" style="padding: 6px 12px; border-radius: var(--radius-full);">
-                    ❤️ <span id="favCountBadge" style="font-weight: 800;">0</span>
-                </button>
-
-                <!-- Loan / Mortgage Calculator -->
-                <button type="button" class="btn btn-secondary btn-sm" onclick="openMortgageModal()" title="Ethiopian Mortgage & Loan Calculator" style="padding: 6px 12px; border-radius: var(--radius-full);">
-                    🧮 <span data-i18n="nav_calc">Calculator</span>
-                </button>
-
-                <!-- Settings Button -->
-                <button type="button" class="btn btn-secondary btn-sm" onclick="openSettingsModal()" title="Settings & Language Preferences" style="padding: 6px 12px; border-radius: var(--radius-full);">
-                    ⚙️ <span data-i18n="nav_settings">Settings</span>
-                </button>
-
-                <!-- Theme Toggle Button -->
-                <button type="button" class="theme-btn" id="themeToggleBtn" title="Toggle Day/Night Mode">
-                    <span id="themeHeaderIcon">☀️</span>
-                    <span id="themeHeaderLabel">Day</span>
+                <!-- Single Unified Settings Button -->
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openSettingsModal()" title="Settings, Language & Password" style="padding: 7px 16px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 8px; font-weight: 700;">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <span data-i18n="nav_settings">Settings</span>
                 </button>
 
                 <!-- Post Property Button -->
@@ -881,30 +858,30 @@
                 </form>
             </div>
         </div>
-    <!-- Settings Modal -->
+    <!-- Unified All-in-One Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-card modal-card-lg">
             <div class="modal-header">
-                <div class="modal-title" data-i18n="settings_title">⚙️ Account & Application Settings</div>
+                <div class="modal-title" data-i18n="settings_title">⚙️ Settings & Preferences</div>
                 <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             
             <!-- Settings Tabs -->
             <div class="settings-tabs">
                 <button type="button" class="settings-tab-btn active" onclick="switchSettingsTab('lang')">
-                    🌐 <span data-i18n="tab_lang">Language & Regional</span>
+                    🌐 <span data-i18n="tab_lang">Language & Currency</span>
                 </button>
                 <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('security')">
-                    🔑 <span data-i18n="tab_security">Password & Security</span>
+                    🔑 <span data-i18n="tab_security">Reset Password</span>
+                </button>
+                <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('theme'); updateThemeCardUI();">
+                    ☀️ <span data-i18n="tab_theme">Day / Night Mode</span>
+                </button>
+                <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('favorites'); renderSettingsFavorites();">
+                    ❤️ <span data-i18n="tab_favs">Saved Properties</span>
                 </button>
                 <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('mortgage')">
-                    🧮 <span data-i18n="tab_calc">Mortgage Calc</span>
-                </button>
-                <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('ai')">
-                    🤖 <span data-i18n="tab_ai">AI Assistant</span>
-                </button>
-                <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('feedback')">
-                    ⭐ <span data-i18n="tab_feedback">User Feedback</span>
+                    🧮 <span data-i18n="tab_calc">Loan Calculator</span>
                 </button>
             </div>
 
@@ -947,43 +924,120 @@
                 </div>
             </div>
 
-            <!-- Tab 2: Password & Security -->
+            <!-- Tab 2: Reset Password & Security (Directly Embedded) -->
             <div class="settings-pane" id="pane-security">
-                <div style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.2); border-radius: 12px; padding: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-                    <div>
-                        <h4 style="font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 4px;">Forgot or need to Reset Password?</h4>
-                        <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Launch the step-by-step verification code & password reset recovery wizard.</p>
+                <div style="max-width: 580px; margin: 0 auto;">
+                    <h3 style="font-size: 17px; font-weight: 800; margin-bottom: 6px;">🔑 Reset Account Password</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Easily recover or update your password via SMS OTP or Email verification.</p>
+
+                    <!-- Step Wizard Header -->
+                    <div class="step-wizard" style="margin-bottom: 20px;">
+                        <div class="step-item active" id="step-nav-1">
+                            <div class="step-circle">1</div>
+                            <span class="step-label">Request</span>
+                        </div>
+                        <div class="step-item" id="step-nav-2">
+                            <div class="step-circle">2</div>
+                            <span class="step-label">Verify</span>
+                        </div>
+                        <div class="step-item" id="step-nav-3">
+                            <div class="step-circle">3</div>
+                            <span class="step-label">New Password</span>
+                        </div>
+                        <div class="step-item" id="step-nav-4">
+                            <div class="step-circle">4</div>
+                            <span class="step-label">Complete</span>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="closeModal(); openResetPasswordModal();">
-                        🔑 Launch Reset Wizard &rarr;
-                    </button>
+
+                    <!-- Wizard Step 1: Request Code -->
+                    <div id="resetStep1" class="wizard-step-pane">
+                        <form onsubmit="handleSendResetOtp(event)">
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label class="form-label">Email or Ethiopian Phone Number (+251...)</label>
+                                <input type="text" id="resetIdentifier" class="form-input" placeholder="e.g. abdi@example.com or +251 91 123 4567" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">
+                                Send Verification Code &rarr;
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Wizard Step 2: Verify Code -->
+                    <div id="resetStep2" class="wizard-step-pane" style="display: none;">
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">A verification code was sent to <strong id="resetTargetDisplay" style="color: var(--primary);"></strong>.</p>
+                        <form onsubmit="handleVerifyResetOtp(event)">
+                            <div class="form-group" style="margin-bottom: 14px;">
+                                <input type="text" id="resetOtpInput" maxlength="6" class="form-input" placeholder="123456" style="text-align: center; font-size: 24px; letter-spacing: 6px; font-weight: 800;" required>
+                            </div>
+                            <div style="background: rgba(16,185,129,0.08); border: 1px dashed #10b981; border-radius: 8px; padding: 10px; margin-bottom: 16px; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                <span>📱 Simulated SMS OTP: <strong>742918</strong></span>
+                                <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px;" onclick="document.getElementById('resetOtpInput').value='742918'">Auto-Fill</button>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">
+                                Verify & Continue &rarr;
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Wizard Step 3: Enter New Password -->
+                    <div id="resetStep3" class="wizard-step-pane" style="display: none;">
+                        <form onsubmit="handleFinalResetPassword(event)">
+                            <div class="form-group" style="margin-bottom: 14px;">
+                                <label class="form-label">New Password</label>
+                                <input type="password" id="resetNewPw" class="form-input" placeholder="Min. 8 characters" required oninput="checkStrength(this.value, 'pwStrengthReset', 'pwLabelReset')">
+                                <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwStrengthReset"></div></div>
+                                <span id="pwLabelReset" style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-top: 4px; display: block;"></span>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 18px;">
+                                <label class="form-label">Confirm Password</label>
+                                <input type="password" id="resetConfirmPw" class="form-input" placeholder="Confirm new password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">
+                                Confirm & Save Password
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Wizard Step 4: Success -->
+                    <div id="resetStep4" class="wizard-step-pane" style="display: none; text-align: center; padding: 20px 0;">
+                        <div style="width: 54px; height: 54px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;">✓</div>
+                        <h3 style="font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">Password Reset Complete!</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Your password has been securely updated.</p>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="setWizardNav(1); document.getElementById('resetStep4').style.display='none'; document.getElementById('resetStep1').style.display='block'; showToast('Password reset complete!');">
+                            Reset Another or Done
+                        </button>
+                    </div>
                 </div>
-
-                <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">Change Current Password</h3>
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Update your password regularly to protect your property listings and profile.</p>
-
-                <form onsubmit="handleDirectPasswordChange(event)">
-                    <div class="form-group" style="margin-bottom: 14px;">
-                        <label class="form-label">Current Password</label>
-                        <input type="password" class="form-input" id="currPw" placeholder="••••••••" required>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
-                        <div class="form-group">
-                            <label class="form-label">New Password</label>
-                            <input type="password" class="form-input" id="newPwDirect" placeholder="Min. 8 characters" required oninput="checkStrength(this.value, 'pwStrengthDirect', 'pwLabelDirect')">
-                            <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwStrengthDirect"></div></div>
-                            <span id="pwLabelDirect" style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-top: 4px; display: block;"></span>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-input" id="confirmPwDirect" placeholder="Confirm password" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-sm">Update Password</button>
-                </form>
             </div>
 
-            <!-- Tab 3: Mortgage & Loan Calculator -->
+            <!-- Tab 3: Appearance & Theme -->
+            <div class="settings-pane" id="pane-theme">
+                <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">Theme Mode (Day / Night)</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Toggle daytime high clarity mode or sleek nighttime dark mode.</p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px;">
+                    <div onclick="applyTheme('light'); localStorage.setItem('estate_theme', 'light'); updateThemeCardUI();" style="border: 2px solid var(--border-color); border-radius: 12px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s;" id="themeCardLight">
+                        <div style="font-size: 36px; margin-bottom: 8px;">☀️</div>
+                        <strong style="font-size: 15px; display: block;">Day Mode (Light)</strong>
+                        <span style="font-size: 12px; color: var(--text-muted);">Clean, bright interface</span>
+                    </div>
+                    <div onclick="applyTheme('dark'); localStorage.setItem('estate_theme', 'dark'); updateThemeCardUI();" style="border: 2px solid var(--border-color); border-radius: 12px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s;" id="themeCardDark">
+                        <div style="font-size: 36px; margin-bottom: 8px;">🌙</div>
+                        <strong style="font-size: 15px; display: block;">Night Mode (Dark)</strong>
+                        <span style="font-size: 12px; color: var(--text-muted);">Deep slate dark theme</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Saved Properties -->
+            <div class="settings-pane" id="pane-favorites">
+                <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">Your Saved Favorite Properties</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Quickly browse properties you bookmarked with the ❤️ heart button.</p>
+                <div id="settingsFavoritesContainer"></div>
+            </div>
+
+            <!-- Tab 5: Mortgage & Loan Calculator -->
             <div class="settings-pane" id="pane-mortgage">
                 <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">Ethiopian Bank Mortgage & Loan Calculator</h3>
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Calculate estimated monthly loan payments with prevailing Ethiopian bank interest rates.</p>
@@ -1016,7 +1070,7 @@
 
                     <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; justify-content: center;">
                         <span style="font-size: 12px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Estimated Monthly Payment</span>
-                        <div style="font-size: 32px; font-weight: 900; color: var(--primary); margin: 6px 0 16px;" id="calcMonthlyResult">ETB 176,140</div>
+                        <div style="font-size: 30px; font-weight: 900; color: var(--primary); margin: 6px 0 16px;" id="calcMonthlyResult">ETB 176,140</div>
 
                         <div style="border-top: 1px solid var(--border-color); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
                             <div style="display: flex; justify-content: space-between;">
@@ -1034,213 +1088,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Tab 4: AI Smart Assistant -->
-            <div class="settings-pane" id="pane-ai">
-                <span class="badge" style="background: rgba(37,99,235,0.1); color: var(--primary); margin-bottom: 8px;">✨ Antigravity Smart Engine</span>
-                <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 6px;">AI Real Estate Assistant</h3>
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Use localized AI algorithms to estimate property values or optimize listing descriptions.</p>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px;">
-                        <h4 style="font-size: 15px; font-weight: 800; margin-bottom: 10px;">🏷️ Addis Ababa Price Estimator</h4>
-                        <div class="form-group" style="margin-bottom: 10px;">
-                            <label class="form-label">Subcity / Area</label>
-                            <select id="aiSubcity" class="form-select">
-                                <option value="Bole">Bole / Bole Atlas</option>
-                                <option value="Old Airport">Old Airport (Diplomatic)</option>
-                                <option value="Kazanchis">Kazanchis</option>
-                                <option value="CMC">CMC / Summit</option>
-                                <option value="Sarbet">Sarbet / AU Area</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 12px;">
-                            <label class="form-label">Property Type</label>
-                            <select id="aiPropType" class="form-select">
-                                <option value="villa">Luxury Villa</option>
-                                <option value="apartment">Modern Apartment</option>
-                                <option value="house">Family House</option>
-                            </select>
-                        </div>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="runAiValuation()">Estimate Market Value</button>
-                        <div id="aiValuationResult" style="margin-top: 14px; font-size: 14px; font-weight: 700; color: var(--primary);"></div>
-                    </div>
-
-                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px;">
-                        <h4 style="font-size: 15px; font-weight: 800; margin-bottom: 10px;">✍️ AI Description Enhancer</h4>
-                        <textarea id="aiDraftInput" rows="3" class="form-input" style="height: auto; margin-bottom: 10px;" placeholder="e.g. 4 beds in bole, backup generator, garden, modern kitchen"></textarea>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="runAiEnhanceText()">✨ Polish with AI</button>
-                        <div id="aiEnhancedResult" style="margin-top: 12px; font-size: 13px; color: var(--text-main); font-style: italic; max-height: 120px; overflow-y: auto;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab 5: User Feedback -->
-            <div class="settings-pane" id="pane-feedback">
-                <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">Share Your Feedback</h3>
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Rate your experience with EstateCraft Ethiopia to help us keep improving.</p>
-
-                <form onsubmit="handleFeedbackSubmit(event)">
-                    <div style="margin-bottom: 16px;">
-                        <label class="form-label">Your Rating</label>
-                        <div style="display: flex; gap: 8px; font-size: 26px; cursor: pointer;" id="starRatingGroup">
-                            <span onclick="setRating(1)">★</span>
-                            <span onclick="setRating(2)">★</span>
-                            <span onclick="setRating(3)">★</span>
-                            <span onclick="setRating(4)">★</span>
-                            <span onclick="setRating(5)" style="color: #f59e0b;">★</span>
-                        </div>
-                        <input type="hidden" id="selectedRating" value="5">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 14px;">
-                        <label class="form-label">Category</label>
-                        <select id="feedbackCategory" class="form-select">
-                            <option value="General">General Experience</option>
-                            <option value="Satellite Map">Satellite Map & Navigation</option>
-                            <option value="Listings">Property Listings & Brokers</option>
-                            <option value="Feature Request">Feature Request</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label class="form-label">Your Comments / Suggestions</label>
-                        <textarea id="feedbackText" rows="3" class="form-input" style="height: auto;" placeholder="What do you think about our Ethiopian real estate platform?" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-sm">Submit Feedback</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reset Password Modal (Multi-Step Wizard) -->
-    <div class="modal-overlay" id="resetPasswordModal">
-        <div class="modal-card" style="max-width: 500px;">
-            <div class="modal-header">
-                <div class="modal-title">🔑 Reset Account Password</div>
-                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <!-- Step Wizard Header -->
-                <div class="step-wizard">
-                    <div class="step-item active" id="step-nav-1">
-                        <div class="step-circle">1</div>
-                        <span class="step-label">Request</span>
-                    </div>
-                    <div class="step-item" id="step-nav-2">
-                        <div class="step-circle">2</div>
-                        <span class="step-label">Verify</span>
-                    </div>
-                    <div class="step-item" id="step-nav-3">
-                        <div class="step-circle">3</div>
-                        <span class="step-label">New Password</span>
-                    </div>
-                    <div class="step-item" id="step-nav-4">
-                        <div class="step-circle">4</div>
-                        <span class="step-label">Complete</span>
-                    </div>
-                </div>
-
-                <!-- Wizard Step 1: Request Code -->
-                <div id="resetStep1" class="wizard-step-pane">
-                    <h4 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">Find Your Account</h4>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Enter your registered Email address or Ethiopian phone number to receive a verification code.</p>
-                    
-                    <form onsubmit="handleSendResetOtp(event)">
-                        <div class="form-group" style="margin-bottom: 16px;">
-                            <label class="form-label">Email or Phone Number (+251...)</label>
-                            <input type="text" id="resetIdentifier" class="form-input" placeholder="e.g. abdi@example.com or +251 91 123 4567" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">
-                            Send Verification Code &rarr;
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Wizard Step 2: Verify Code -->
-                <div id="resetStep2" class="wizard-step-pane" style="display: none;">
-                    <h4 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">Enter 6-Digit OTP Code</h4>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">A verification code was sent to <strong id="resetTargetDisplay" style="color: var(--primary);"></strong>.</p>
-
-                    <form onsubmit="handleVerifyResetOtp(event)">
-                        <div class="form-group" style="margin-bottom: 14px;">
-                            <input type="text" id="resetOtpInput" maxlength="6" class="form-input" placeholder="123456" style="text-align: center; font-size: 24px; letter-spacing: 6px; font-weight: 800;" required>
-                        </div>
-
-                        <!-- Auto-fill simulation helper for testing -->
-                        <div style="background: rgba(16,185,129,0.08); border: 1px dashed #10b981; border-radius: 8px; padding: 10px; margin-bottom: 16px; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
-                            <span>📱 Simulated OTP: <strong>742918</strong></span>
-                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px;" onclick="document.getElementById('resetOtpInput').value='742918'">Auto-Fill</button>
-                        </div>
-
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-                            <span style="font-size: 12px; color: var(--text-muted);">Didn't receive code? <a href="javascript:void(0)" onclick="handleSendResetOtp(event)" style="color: var(--primary); font-weight: 700;">Resend OTP</a></span>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">
-                            Verify & Continue &rarr;
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Wizard Step 3: Enter New Password -->
-                <div id="resetStep3" class="wizard-step-pane" style="display: none;">
-                    <h4 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">Set New Password</h4>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Create a secure password with at least 8 characters, numbers, and symbols.</p>
-
-                    <form onsubmit="handleFinalResetPassword(event)">
-                        <div class="form-group" style="margin-bottom: 14px;">
-                            <label class="form-label">New Password</label>
-                            <input type="password" id="resetNewPw" class="form-input" placeholder="Min. 8 characters" required oninput="checkStrength(this.value, 'pwStrengthReset', 'pwLabelReset')">
-                            <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwStrengthReset"></div></div>
-                            <span id="pwLabelReset" style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-top: 4px; display: block;"></span>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 18px;">
-                            <label class="form-label">Confirm Password</label>
-                            <input type="password" id="resetConfirmPw" class="form-input" placeholder="Confirm new password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">
-                            Confirm & Save Password
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Wizard Step 4: Success -->
-                <div id="resetStep4" class="wizard-step-pane" style="display: none; text-align: center; padding: 20px 0;">
-                    <div style="width: 64px; height: 64px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 32px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                        ✓
-                    </div>
-                    <h3 style="font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">Password Reset Complete!</h3>
-                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Your password has been successfully updated. You can now use your new password to manage listings and save properties.</p>
-                    <button type="button" class="btn btn-primary" onclick="closeModal(); showToast('🎉 Welcome back! Password reset successfully.');">
-                        Done & Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Saved Favorites Modal -->
-    <div class="modal-overlay" id="favoritesModal">
-        <div class="modal-card" style="max-width: 680px;">
-            <div class="modal-header">
-                <div class="modal-title">❤️ Saved Favorite Properties</div>
-                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body" id="favoritesModalBody">
-                <!-- Dynamically populated -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Mortgage Modal -->
-    <div class="modal-overlay" id="mortgageModal">
-        <div class="modal-card modal-card-lg">
-            <div class="modal-header">
-                <div class="modal-title">🧮 Ethiopian Mortgage & Loan Calculator</div>
-                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body" id="mortgageModalBody">
-                <div id="mortgageStandaloneContent"></div>
             </div>
         </div>
     </div>
@@ -2197,42 +2044,64 @@
     }
 
     function openFavoritesModal() {
-      closeModal();
-      const modal = document.getElementById('favoritesModal');
-      const body = document.getElementById('favoritesModalBody');
+      openSettingsModal();
+      switchSettingsTab('favorites');
+      renderSettingsFavorites();
+    }
+
+    function renderSettingsFavorites() {
+      const container = document.getElementById('settingsFavoritesContainer');
+      if (!container) return;
       const favIds = getFavorites();
       const favList = properties.filter(p => favIds.includes(p.id));
 
       if (favList.length === 0) {
-        body.innerHTML = `
-          <div style="text-align: center; padding: 40px 20px;">
-            <div style="font-size: 48px; margin-bottom: 12px;">❤️</div>
-            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 6px;">No Saved Properties Yet</h3>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Click the heart icon on any property listing to save it here for quick access.</p>
-            <button class="btn btn-primary btn-sm" onclick="closeModal()">Explore Properties</button>
+        container.innerHTML = `
+          <div style="text-align: center; padding: 36px 20px; background: var(--bg-main); border: 1px dashed var(--border-color); border-radius: 12px;">
+            <div style="font-size: 38px; margin-bottom: 8px;">❤️</div>
+            <h4 style="font-size: 15px; font-weight: 800; margin-bottom: 4px;">No Saved Properties Yet</h4>
+            <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Click the heart icon on any property listing to save it here for quick access.</p>
           </div>
         `;
       } else {
-        body.innerHTML = `
-          <div style="display: flex; flex-direction: column; gap: 14px;">
+        container.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
             ${favList.map(p => `
               <div style="display: flex; gap: 14px; align-items: center; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px;">
-                <img src="${p.image}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                <img src="${p.image}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;">
                 <div style="flex: 1;">
-                  <h4 style="font-size: 14px; font-weight: 800; margin-bottom: 4px; cursor: pointer;" onclick="closeModal(); openDetailsModal(${p.id})">${escapeHtml(p.title)}</h4>
-                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">📍 ${escapeHtml(p.city)}</div>
-                  <div style="font-weight: 800; color: var(--primary); font-size: 14px;">${formatDisplayPrice(p.price)}</div>
+                  <h4 style="font-size: 14px; font-weight: 800; margin-bottom: 3px; cursor: pointer;" onclick="closeModal(); openDetailsModal(${p.id})">${escapeHtml(p.title)}</h4>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 3px;">📍 ${escapeHtml(p.city)}</div>
+                  <div style="font-weight: 800; color: var(--primary); font-size: 13px;">${formatDisplayPrice(p.price)}</div>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; gap: 8px;">
                   <button class="btn btn-primary btn-sm" onclick="closeModal(); openDetailsModal(${p.id})">View</button>
-                  <button class="btn btn-secondary btn-sm" onclick="toggleFavorite(${p.id}); openFavoritesModal();" style="color: var(--danger);">Remove</button>
+                  <button class="btn btn-secondary btn-sm" onclick="toggleFavorite(${p.id}); renderSettingsFavorites();" style="color: var(--danger);">Remove</button>
                 </div>
               </div>
             `).join('')}
           </div>
         `;
       }
-      modal.classList.add('active');
+    }
+
+    function updateThemeCardUI() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const cLight = document.getElementById('themeCardLight');
+      const cDark = document.getElementById('themeCardDark');
+      if (cLight && cDark) {
+        if (current === 'dark') {
+          cDark.style.borderColor = 'var(--primary)';
+          cDark.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.2)';
+          cLight.style.borderColor = 'var(--border-color)';
+          cLight.style.boxShadow = 'none';
+        } else {
+          cLight.style.borderColor = 'var(--primary)';
+          cLight.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.2)';
+          cDark.style.borderColor = 'var(--border-color)';
+          cDark.style.boxShadow = 'none';
+        }
+      }
     }
 
     /* =========================================================================
@@ -2241,13 +2110,8 @@
     let currentResetTarget = "";
 
     function openResetPasswordModal() {
-      closeModal();
-      document.getElementById('resetStep1').style.display = 'block';
-      document.getElementById('resetStep2').style.display = 'none';
-      document.getElementById('resetStep3').style.display = 'none';
-      document.getElementById('resetStep4').style.display = 'none';
-      setWizardNav(1);
-      document.getElementById('resetPasswordModal').classList.add('active');
+      openSettingsModal();
+      switchSettingsTab('security');
     }
 
     function setWizardNav(step) {
@@ -2354,17 +2218,29 @@
     /* =========================================================================
        5. Settings Modal, Mortgage Calculator, AI Assistant & Feedback
        ========================================================================= */
-    function openSettingsModal() {
+    function openSettingsModal(defaultTab = 'lang') {
       closeModal();
+      switchSettingsTab(defaultTab);
+      highlightLangCard(localStorage.getItem('estate_lang') || 'en');
+      updateThemeCardUI();
       document.getElementById('settingsModal').classList.add('active');
     }
 
     function switchSettingsTab(tabName) {
-      document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.settings-tab-btn').forEach(b => {
+        b.classList.remove('active');
+        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(tabName)) {
+          b.classList.add('active');
+        }
+      });
       document.querySelectorAll('.settings-pane').forEach(p => p.classList.remove('active'));
-      if (event && event.currentTarget) event.currentTarget.classList.add('active');
       const pane = document.getElementById(`pane-${tabName}`);
       if (pane) pane.classList.add('active');
+    }
+
+    function openMortgageModal() {
+      openSettingsModal('mortgage');
+      runMortgageCalc();
     }
 
     function runMortgageCalc() {
@@ -2394,16 +2270,6 @@
       setEl('calcLoanTotal', `ETB ${formatNumber(Math.round(loanAmount))}`);
       setEl('calcInterestTotal', `ETB ${formatNumber(Math.round(totalInterest))}`);
       setEl('calcGrandTotal', `ETB ${formatNumber(Math.round(totalRepay))}`);
-    }
-
-    function openMortgageModal() {
-      closeModal();
-      const source = document.getElementById('pane-mortgage');
-      const target = document.getElementById('mortgageStandaloneContent');
-      if (source && target) {
-        target.innerHTML = source.innerHTML;
-      }
-      document.getElementById('mortgageModal').classList.add('active');
     }
 
     function runAiValuation() {
