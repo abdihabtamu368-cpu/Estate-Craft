@@ -537,6 +537,383 @@
       from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Facebook-Style Split Landing Hero */
+    .fb-landing-section {
+      background-color: #ffffff;
+      min-height: calc(100vh - 75px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px 60px;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+    .fb-landing-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .fb-left-col {
+      flex: 1.1;
+      max-width: 580px;
+      padding-right: 20px;
+    }
+    .fb-brand-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #0866ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 8px 22px rgba(8, 102, 255, 0.35);
+      margin-bottom: 26px;
+    }
+    .fb-headline {
+      font-size: 58px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      color: #111827;
+      margin-bottom: 30px;
+      font-family: inherit;
+    }
+    .fb-headline .accent-blue {
+      color: #0866ff;
+    }
+    .fb-collage {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      height: 350px;
+      margin-top: 15px;
+    }
+    .fb-card-story {
+      position: absolute;
+      right: 20px;
+      top: 0;
+      width: 210px;
+      height: 320px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #f1f5f9;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+      border: 4px solid #ffffff;
+      z-index: 2;
+    }
+    .fb-card-story img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .fb-story-time {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .fb-story-bottom-bar {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      right: 14px;
+      height: 22px;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      gap: 6px;
+    }
+    .fb-story-circle {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      border: 1.5px solid #ffffff;
+    }
+    .fb-card-square {
+      position: absolute;
+      left: 0;
+      top: 55px;
+      width: 175px;
+      height: 185px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #e2e8f0;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
+      border: 4px solid #ffffff;
+      z-index: 3;
+    }
+    .fb-card-square img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .fb-card-square .fb-card-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: #0866ff;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      box-shadow: 0 4px 10px rgba(8, 102, 255, 0.4);
+    }
+    .fb-card-bottom {
+      position: absolute;
+      left: 35px;
+      bottom: 0;
+      width: 145px;
+      height: 145px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #cbd5e1;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14);
+      border: 4px solid #ffffff;
+      z-index: 4;
+    }
+    .fb-card-bottom img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .fb-avatar-circle {
+      position: absolute;
+      left: 120px;
+      bottom: -8px;
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid #ffffff;
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+      z-index: 5;
+      background: #fef08a;
+    }
+    .fb-avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .fb-reaction-laugh {
+      position: absolute;
+      top: 14px;
+      left: -8px;
+      font-size: 34px;
+      z-index: 6;
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
+      user-select: none;
+    }
+    .fb-reaction-heart {
+      position: absolute;
+      right: 0;
+      bottom: 85px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff3b5c, #e11d48);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 22px;
+      box-shadow: 0 8px 22px rgba(225, 29, 72, 0.5);
+      border: 3px solid #ffffff;
+      z-index: 6;
+      user-select: none;
+    }
+    .fb-center-divider {
+      width: 1px;
+      background: #e5e7eb;
+      height: 500px;
+      align-self: center;
+    }
+    .fb-right-col {
+      flex: 0.9;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .fb-auth-box {
+      width: 100%;
+      padding: 10px 0;
+    }
+    .fb-login-heading {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1c1e21;
+      margin-bottom: 22px;
+      letter-spacing: -0.01em;
+    }
+    .fb-input-wrapper {
+      margin-bottom: 14px;
+    }
+    .fb-field-input {
+      width: 100%;
+      height: 52px;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 1px solid #dddfe2;
+      border-radius: 10px;
+      background-color: #ffffff;
+      color: #1c1e21;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      font-family: inherit;
+    }
+    .fb-field-input:focus {
+      outline: none;
+      border-color: #0866ff;
+      box-shadow: 0 0 0 2px rgba(8, 102, 255, 0.2);
+    }
+    .fb-field-input::placeholder {
+      color: #8a8d91;
+      font-size: 15px;
+    }
+    .fb-submit-btn {
+      width: 100%;
+      height: 48px;
+      background-color: #0866ff;
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 700;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fb-submit-btn:hover {
+      background-color: #166fe5;
+    }
+    .fb-submit-btn:active {
+      transform: scale(0.99);
+    }
+    .fb-forgot-link-wrap {
+      text-align: center;
+      margin: 18px 0 16px;
+    }
+    .fb-forgot-link {
+      color: #0866ff;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .fb-forgot-link:hover {
+      text-decoration: underline;
+    }
+    .fb-line-sep {
+      border-bottom: 1px solid #dadde1;
+      margin: 18px 0 22px;
+    }
+    .fb-create-acc-btn {
+      width: 100%;
+      height: 48px;
+      background-color: #ffffff;
+      color: #0866ff;
+      border: 1px solid #0866ff;
+      border-radius: 9999px;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      box-sizing: border-box;
+    }
+    .fb-create-acc-btn:hover {
+      background-color: #f0f7ff;
+    }
+    .fb-guest-link-wrap {
+      text-align: center;
+      margin-top: 24px;
+    }
+    .fb-guest-link {
+      font-size: 14px;
+      color: #65676b;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.15s ease;
+    }
+    .fb-guest-link:hover {
+      color: #0866ff;
+    }
+    @media (max-width: 900px) {
+      .fb-landing-container {
+        flex-direction: column;
+        gap: 36px;
+        text-align: center;
+      }
+      .fb-left-col {
+        padding-right: 0;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .fb-headline {
+        font-size: 38px;
+      }
+      .fb-center-divider {
+        display: none;
+      }
+      .fb-right-col {
+        max-width: 400px;
+        width: 100%;
+      }
+      .fb-collage {
+        max-width: 360px;
+        height: 300px;
+      }
+      .fb-card-story {
+        width: 170px;
+        height: 260px;
+        right: 10px;
+      }
+      .fb-card-square {
+        width: 140px;
+        height: 150px;
+      }
+      .fb-card-bottom {
+        width: 120px;
+        height: 120px;
+      }
+    }
     </style>
 </head>
 <body>
@@ -588,33 +965,106 @@
     </header>
 
     <main>
+        <!-- Facebook-Style Split Landing Hero (Visible on first opening website) -->
+        <section class="fb-landing-section" id="welcomeAuthSection">
+            <div class="fb-landing-container">
+                <!-- Left Column: Branding, Tagline & Photo Cards Collage -->
+                <div class="fb-left-col">
+                    <div class="fb-brand-circle">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                    </div>
+
+                    <h1 class="fb-headline">
+                        Explore<br>
+                        the homes<br>
+                        <span class="accent-blue">you love.</span>
+                    </h1>
+
+                    <!-- Visual Collage -->
+                    <div class="fb-collage">
+                        <!-- Phone-style story card (Main top right) -->
+                        <div class="fb-card-story">
+                            <div class="fb-story-time">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                16:45
+                            </div>
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Modern Villa in Addis Ababa">
+                            <div class="fb-story-bottom-bar">
+                                <div class="fb-story-circle"></div>
+                                <div class="fb-story-circle"></div>
+                                <div class="fb-story-circle"></div>
+                            </div>
+                        </div>
+
+                        <!-- Middle left square card with star badge -->
+                        <div class="fb-card-square">
+                            <div class="fb-card-badge">★</div>
+                            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=500&q=80" alt="Modern Interior">
+                        </div>
+
+                        <!-- Bottom card -->
+                        <div class="fb-card-bottom">
+                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=500&q=80" alt="Luxury Compound">
+                        </div>
+
+                        <!-- Avatar circle -->
+                        <div class="fb-avatar-circle">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Verified Broker">
+                        </div>
+
+                        <!-- Floating Reactions -->
+                        <div class="fb-reaction-laugh" title="Excited">😆</div>
+                        <div class="fb-reaction-heart" title="Love this home">❤️</div>
+                    </div>
+                </div>
+
+                <!-- Center Divider Line -->
+                <div class="fb-center-divider"></div>
+
+                <!-- Right Column: Login Card -->
+                <div class="fb-right-col">
+                    <div class="fb-auth-box">
+                        <h2 class="fb-login-heading">Log into EstateCraft</h2>
+
+                        <form id="fbStaticLoginForm" onsubmit="handleFbStaticLogin(event)">
+                            <div class="fb-input-wrapper">
+                                <input type="text" id="fbStaticEmail" class="fb-field-input" placeholder="Email or mobile number" required autocomplete="username">
+                            </div>
+
+                            <div class="fb-input-wrapper">
+                                <input type="password" id="fbStaticPassword" class="fb-field-input" placeholder="Password" required autocomplete="current-password">
+                            </div>
+
+                            <button type="submit" class="fb-submit-btn" id="fbBtnStaticLogin">
+                                Log in
+                            </button>
+
+                            <div class="fb-forgot-link-wrap">
+                                <a href="javascript:void(0)" onclick="handleForgotPwClick()" class="fb-forgot-link">Forgot password?</a>
+                            </div>
+
+                            <div class="fb-line-sep"></div>
+
+                            <button type="button" class="fb-create-acc-btn" id="fbBtnStaticRegister" onclick="openSignUpModal()">
+                                Create new account
+                            </button>
+                        </form>
+
+                        <div class="fb-guest-link-wrap">
+                            <a href="#catalogSearchSection" class="fb-guest-link" onclick="document.getElementById('catalogSearchSection').scrollIntoView({behavior: 'smooth'}); return false;">
+                                Explore properties as guest &darr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Hero Section -->
-        <section class="hero-section">
-            <div class="hero-pattern"></div>
-            <div class="hero-content">
-                <div class="hero-tag">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    Transparent Real Estate &bull; Verified Broker &bull; Direct Owners
-                </div>
-
-                <h1 class="hero-title">
-                    The Smarter Way to Buy, Rent & Sell Exceptional Homes Across Ethiopia
-                </h1>
-                <p class="hero-subtitle">
-                    Browse verified listings, view upfront broker fees before contacting agents, and explore neighborhoods with satellite map search.
-                </p>
-
-                <!-- First View Call to Action: Sign In, Sign Up & Create Account -->
-                <div style="display: flex; gap: 14px; justify-content: center; align-items: center; margin: 22px 0 32px; flex-wrap: wrap;">
-                    <a href="auth/register.php" onclick="handleNavSignUp(event)" class="btn btn-primary btn-lg" id="heroBtnCreateAccount" style="font-weight: 800; padding: 13px 28px; border-radius: var(--radius-full); box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; font-size: 15px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                        <span>Create Free Account / Sign Up</span>
-                    </a>
-                    <a href="auth/login.php" onclick="handleNavSignIn(event)" class="btn btn-secondary btn-lg" id="heroBtnSignIn" style="font-weight: 700; padding: 13px 26px; border-radius: var(--radius-full); background: rgba(255, 255, 255, 0.95); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; border: 1px solid var(--border-color); color: var(--secondary);">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-                        <span>Sign In</span>
-                    </a>
-                </div>
+        <section class="hero-section" id="catalogSearchSection">
 
                 <!-- Search Bar Card -->
                 <div class="search-box-card">
@@ -2339,6 +2789,31 @@
         btn.innerHTML = `<span>👤 ${email.split('@')[0]}</span>`;
         btn.onclick = () => { showToast(`Currently signed in as ${email}`); };
       }
+    }
+
+    function handleFbStaticLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('fbStaticEmail').value.trim();
+      const pw = document.getElementById('fbStaticPassword').value;
+      if (!email || !pw) {
+        alert("Please enter both your email/phone and password.");
+        return;
+      }
+      showToast(`👋 Welcome back! Logged into EstateCraft as ${email}`);
+      const btn = document.getElementById('btnNavSignIn');
+      if (btn) {
+        btn.innerHTML = `<span>👤 ${email.split('@')[0]}</span>`;
+        btn.onclick = () => { showToast(`Currently signed in as ${email}`); };
+      }
+      const signUpBtn = document.getElementById('btnNavSignUp');
+      if (signUpBtn) signUpBtn.style.display = 'none';
+
+      const cat = document.getElementById('catalogSearchSection');
+      if (cat) cat.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function handleForgotPwClick() {
+      openForgotModal();
     }
 
     function handleNavSignUp(e) {

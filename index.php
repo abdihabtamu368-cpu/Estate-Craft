@@ -7,6 +7,7 @@
 $pageTitle = "Find, Buy, Sell & Rent Exceptional Homes";
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/upload.php';
 
 $pdo = getDB();
@@ -35,35 +36,110 @@ $topCities = $stmtCities->fetchAll();
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="hero-pattern"></div>
-    <div class="hero-content">
-        <div class="hero-tag">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            Transparent Real Estate &bull; Verified Brokers &bull; Direct Owners
+<?php if (!$currentUser): ?>
+<!-- Facebook-Style Welcome & Auth Hero (Displayed on first visit) -->
+<section class="fb-landing-section" id="welcomeAuthSection">
+    <div class="fb-landing-container">
+        <!-- Left Column: Branding, Tagline & Photo Cards Collage -->
+        <div class="fb-left-col">
+            <div class="fb-brand-circle">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+            </div>
+
+            <h1 class="fb-headline">
+                Explore<br>
+                the homes<br>
+                <span class="accent-blue">you love.</span>
+            </h1>
+
+            <!-- Visual Collage -->
+            <div class="fb-collage">
+                <!-- Phone-style story card (Main top right) -->
+                <div class="fb-card-story">
+                    <div class="fb-story-time">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        16:45
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Modern Villa in Addis Ababa">
+                    <div class="fb-story-bottom-bar">
+                        <div class="fb-story-circle"></div>
+                        <div class="fb-story-circle"></div>
+                        <div class="fb-story-circle"></div>
+                    </div>
+                </div>
+
+                <!-- Middle left square card with star badge -->
+                <div class="fb-card-square">
+                    <div class="fb-card-badge">★</div>
+                    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=500&q=80" alt="Modern Interior">
+                </div>
+
+                <!-- Bottom card -->
+                <div class="fb-card-bottom">
+                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=500&q=80" alt="Luxury Compound">
+                </div>
+
+                <!-- Avatar circle -->
+                <div class="fb-avatar-circle">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Verified Broker">
+                </div>
+
+                <!-- Floating Reactions -->
+                <div class="fb-reaction-laugh" title="Excited">😆</div>
+                <div class="fb-reaction-heart" title="Love this home">❤️</div>
+            </div>
         </div>
 
-        <h1 class="hero-title">
-            <?= __('hero_title', 'The Smarter Way to Buy, Rent & Sell Exceptional Homes Across Ethiopia') ?>
-        </h1>
-        <p class="hero-subtitle">
-            <?= __('hero_subtitle', 'Browse verified listings, view upfront broker fees before contacting agents, and explore neighborhoods with satellite map search.') ?>
-        </p>
+        <!-- Center Divider Line -->
+        <div class="fb-center-divider"></div>
 
-        <?php if (!$currentUser): ?>
-        <!-- First View Call to Action: Sign In, Sign Up & Create Account -->
-        <div style="display: flex; gap: 14px; justify-content: center; align-items: center; margin: 22px 0 32px; flex-wrap: wrap;">
-            <a href="<?= BASE_URL ?>/auth/register.php" class="btn btn-primary btn-lg" id="heroBtnCreateAccount" style="font-weight: 800; padding: 13px 28px; border-radius: var(--radius-full); box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; font-size: 15px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                <span><?= __('hero_btn_register', 'Create Free Account / Sign Up') ?></span>
-            </a>
-            <a href="<?= BASE_URL ?>/auth/login.php" class="btn btn-secondary btn-lg" id="heroBtnSignIn" style="font-weight: 700; padding: 13px 26px; border-radius: var(--radius-full); background: rgba(255, 255, 255, 0.95); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; border: 1px solid var(--border-color); color: var(--secondary);">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-                <span><?= __('hero_btn_signin', 'Sign In') ?></span>
-            </a>
+        <!-- Right Column: Login Card -->
+        <div class="fb-right-col">
+            <div class="fb-auth-box">
+                <h2 class="fb-login-heading">Log into EstateCraft</h2>
+
+                <form method="POST" action="<?= BASE_URL ?>/auth/login.php">
+                    <?= getCsrfInput() ?>
+
+                    <div class="fb-input-wrapper">
+                        <input type="text" name="email" id="fbHomeEmail" class="fb-field-input" placeholder="Email or mobile number" required autocomplete="username">
+                    </div>
+
+                    <div class="fb-input-wrapper">
+                        <input type="password" name="password" id="fbHomePassword" class="fb-field-input" placeholder="Password" required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="fb-submit-btn" id="fbBtnHomeLogin">
+                        Log in
+                    </button>
+
+                    <div class="fb-forgot-link-wrap">
+                        <a href="<?= BASE_URL ?>/auth/forgot_password.php" class="fb-forgot-link">Forgot password?</a>
+                    </div>
+
+                    <div class="fb-line-sep"></div>
+
+                    <a href="<?= BASE_URL ?>/auth/register.php" class="fb-create-acc-btn" id="fbBtnHomeRegister">
+                        Create new account
+                    </a>
+                </form>
+
+                <div class="fb-guest-link-wrap">
+                    <a href="#propertiesCatalogSection" class="fb-guest-link" onclick="document.getElementById('propertiesCatalogSection').scrollIntoView({behavior: 'smooth'}); return false;">
+                        Explore properties as guest &darr;
+                    </a>
+                </div>
+            </div>
         </div>
-        <?php endif; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<!-- Hero Search & Catalog Section -->
+<section class="hero-section" id="propertiesCatalogSection">
 
         <!-- Search Bar Card -->
         <div class="search-box-card">
