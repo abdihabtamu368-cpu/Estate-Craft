@@ -1108,12 +1108,6 @@
                                 </button>
                             </form>
                         </div>
-
-                        <div class="fb-guest-link-wrap">
-                            <a href="javascript:void(0)" onclick="enterAsGuest()" class="fb-guest-link">
-                                Explore properties as guest &rarr;
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -2836,13 +2830,13 @@
        ========================================================================= */
     function syncAuthState() {
       const isLoggedIn = localStorage.getItem('estate_craft_logged_in') === 'true';
-      const isGuest = sessionStorage.getItem('estate_craft_guest') === 'true';
       const authSec = document.getElementById('welcomeAuthSection');
       const header = document.getElementById('mainSiteHeader');
       const homeSec = document.getElementById('homePageSections');
       const footer = document.getElementById('mainSiteFooter');
 
-      if (isLoggedIn || isGuest) {
+      if (isLoggedIn) {
+        // User is authenticated: Show header, home catalog and footer
         if (authSec) authSec.style.display = 'none';
         if (header) header.style.display = 'block';
         if (homeSec) homeSec.style.display = 'block';
@@ -2851,31 +2845,18 @@
         const btnIn = document.getElementById('btnNavSignIn');
         const btnUp = document.getElementById('btnNavSignUp');
 
-        if (isLoggedIn) {
-          const userName = localStorage.getItem('estate_craft_user_name') || 'Member';
-          if (btnIn) {
-            btnIn.innerHTML = `<span>👤 ${userName}</span>`;
-            btnIn.onclick = (e) => { e.preventDefault(); showToast(`Signed in as ${userName}`); };
-          }
-          if (btnUp) {
-            btnUp.innerHTML = `<span>🚪 Sign Out</span>`;
-            btnUp.className = 'btn btn-outline btn-sm';
-            btnUp.onclick = (e) => { e.preventDefault(); handleStaticLogout(); };
-          }
-        } else {
-          if (btnIn) {
-            btnIn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg><span>Sign In</span>`;
-            btnIn.className = 'btn btn-secondary btn-sm';
-            btnIn.onclick = (e) => { e.preventDefault(); sessionStorage.removeItem('estate_craft_guest'); syncAuthState(); toggleStaticAuthForm('login'); };
-          }
-          if (btnUp) {
-            btnUp.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span>Create Account</span>`;
-            btnUp.className = 'btn btn-primary btn-sm';
-            btnUp.onclick = (e) => { e.preventDefault(); sessionStorage.removeItem('estate_craft_guest'); syncAuthState(); toggleStaticAuthForm('register'); };
-          }
+        const userName = localStorage.getItem('estate_craft_user_name') || 'Member';
+        if (btnIn) {
+          btnIn.innerHTML = `<span>👤 ${userName}</span>`;
+          btnIn.onclick = (e) => { e.preventDefault(); showToast(`Signed in as ${userName}`); };
+        }
+        if (btnUp) {
+          btnUp.innerHTML = `<span>🚪 Sign Out</span>`;
+          btnUp.className = 'btn btn-outline btn-sm';
+          btnUp.onclick = (e) => { e.preventDefault(); handleStaticLogout(); };
         }
       } else {
-        // Show First Page Facebook auth split screen, hide navbar and home sections!
+        // User NOT authenticated: Strictly lock down home page until they sign in or create an account
         if (authSec) authSec.style.display = 'flex';
         if (header) header.style.display = 'none';
         if (homeSec) homeSec.style.display = 'none';
@@ -2947,16 +2928,10 @@
       syncAuthState();
     }
 
-    function enterAsGuest() {
-      sessionStorage.setItem('estate_craft_guest', 'true');
-      syncAuthState();
-    }
-
     function handleStaticLogout() {
       localStorage.removeItem('estate_craft_logged_in');
       localStorage.removeItem('estate_craft_user_name');
-      sessionStorage.removeItem('estate_craft_guest');
-      showToast("👋 You have signed out.");
+      showToast("👋 You have signed out. Please sign in to view properties.");
       syncAuthState();
     }
 

@@ -34,10 +34,8 @@ $featuredProperties = $stmtFeatured->fetchAll();
 $stmtCities = $pdo->query("SELECT city, COUNT(*) as count FROM properties WHERE status = 'active' GROUP BY city ORDER BY count DESC LIMIT 4");
 $topCities = $stmtCities->fetchAll();
 
-// First Page check: If user is not logged in and not browsing as guest, show Facebook-style Sign In / Create Account page directly
-$isGuest = isset($_GET['guest']) && $_GET['guest'] == '1';
-
-if (!$currentUser && !$isGuest) {
+// Mandatory Auth Check: Users MUST log in or create an account before viewing the homepage or properties
+if (!$currentUser) {
     $hideHeaderNavbar = true;
     $pageTitle = "Log in or Sign up - EstateCraft";
 
@@ -197,12 +195,6 @@ if (!$currentUser && !$isGuest) {
                                 Already have an account? Log in
                             </button>
                         </form>
-                    </div>
-
-                    <div class="fb-guest-link-wrap">
-                        <a href="<?= BASE_URL ?>/index.php?guest=1#propertiesCatalogSection" class="fb-guest-link">
-                            Explore properties as guest &rarr;
-                        </a>
                     </div>
                 </div>
             </div>

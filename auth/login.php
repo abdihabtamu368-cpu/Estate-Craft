@@ -173,12 +173,6 @@ require_once __DIR__ . '/../includes/header.php';
                         Create new account
                     </a>
                 </form>
-
-                <div class="fb-guest-link-wrap">
-                    <a href="<?= BASE_URL ?>/index.php#propertiesCatalogSection" class="fb-guest-link">
-                        Explore properties as guest &rarr;
-                    </a>
-                </div>
             </div>
         </div>
     </div>
