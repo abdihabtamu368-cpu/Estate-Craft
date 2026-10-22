@@ -197,7 +197,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 </span>
                             </td>
                             <td style="font-weight: 700; color: var(--primary);">
-                                $<?= number_format($p['price']) ?>
+                                <?= CURRENCY_SYMBOL ?><?= number_format($p['price']) ?>
                                 <?php if ($p['price_frequency'] === 'monthly'): ?><small style="color: var(--text-muted); font-weight: normal;">/mo</small><?php endif; ?>
                             </td>
                             <td>
