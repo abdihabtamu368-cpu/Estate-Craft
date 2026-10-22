@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus &bull; Next-Gen Authentication</title>
+  
+  <!-- Modern Typography: Plus Jakarta Sans & Syne -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            display: ['"Syne"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            obsidian: {
+              DEFAULT: '#08090D',
+              surface: '#0E1118',
+              card: '#121622',
+              border: 'rgba(255, 255, 255, 0.08)',
+              glow: 'rgba(99, 102, 241, 0.15)',
+            }
+          },
+          animation: {
+            'glow-pulse': 'glowPulse 6s ease-in-out infinite alternate',
+            'shimmer': 'shimmer 2.5s infinite',
+            'spin-slow': 'spin 12s linear infinite',
+          },
+          keyframes: {
+            glowPulse: {
+              '0%': { opacity: '0.4', transform: 'scale(0.98)' },
+              '100%': { opacity: '0.8', transform: 'scale(1.02)' }
+            },
+            shimmer: {
+              '0%': { transform: 'translateX(-100%)' },
+              '100%': { transform: 'translateX(200%)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* CSS Variables & Obsidian Glow System */
+    :root {
+      --mouse-x: 50%;
+      --mouse-y: 50%;
+      --spotlight-color: rgba(120, 119, 198, 0.22);
+      --border-spotlight: rgba(168, 85, 247, 0.45);
+      --primary-accent: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: #08090D;
+      color: #f1f5f9;
+      overflow-x: hidden;
+      selection-background-color: #6366f1;
+      selection-color: #ffffff;
+    }
+
+    /* Ambient Noise Overlay to eliminate digital banding */
+    .bg-noise {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+    }
+
+    /* Spotlight Glow on Glassmorphism Card */
+    .spotlight-card {
+      position: relative;
+      background: rgba(14, 17, 24, 0.75);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 
+        0 30px 70px -15px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .spotlight-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1.5px;
+      background: radial-gradient(
+        360px circle at var(--mouse-x) var(--mouse-y),
+        var(--border-spotlight),
+        rgba(56, 189, 248, 0.2) 25%,
+        rgba(255, 255, 255, 0.06) 50%,
+        transparent 80%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0.9;
+      transition: opacity 0.4s ease;
+    }
+
+    /* Ambient Radial Glow following mouse inside the card */
+    .spotlight-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(
+        500px circle at var(--mouse-x) var(--mouse-y),
+        var(--spotlight-color),
+        transparent 65%
+      );
+      pointer-events: none;
+      opacity: 0.55;
+      mix-blend-mode: screen;
+      transition: opacity 0.4s ease;
+    }
+
+    /* Glass Input Styling */
+    .glass-input-wrapper {
+      position: relative;
+      background: rgba(20, 24, 35, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 14px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .glass-input-wrapper:focus-within {
+      background: rgba(23, 28, 42, 0.75);
+      border-color: rgba(129, 140, 248, 0.65);
+      box-shadow: 
+        0 0 0 3px rgba(99, 102, 241, 0.18),
+        0 8px 24px -4px rgba(99, 102, 241, 0.2),
+        inset 0 1px 2px rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-input-wrapper.input-error {
+      border-color: rgba(244, 63, 94, 0.75) !important;
+      box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.18) !important;
+    }
+
+    .glass-input-wrapper.input-success {
+      border-color: rgba(34, 197, 94, 0.7) !important;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
+    }
+
+    /* Input Floating Focus Glow Accent bar */
+    .input-accent-line {
+      position: absolute;
+      bottom: -1px;
+      left: 15%;
+      right: 15%;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, #818cf8, #c084fc, transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease, left 0.3s ease, right 0.3s ease;
+      pointer-events: none;
+    }
+
+    .glass-input-wrapper:focus-within .input-accent-line {
+      opacity: 1;
+      left: 10%;
+      right: 10%;
+    }
+
+    /* Primary CTA Button Polish */
+    .btn-shine-wrap {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 60%, #cbd5e1 100%);
+      color: #090a0f;
+      box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.3),
+        0 12px 28px -6px rgba(255, 255, 255, 0.18),
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-shine-wrap:hover {
+      transform: translateY(-1.5px);
+      box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.5),
+        0 16px 36px -6px rgba(255, 255, 255, 0.28),
+        0 6px 16px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 #ffffff;
+    }
+
+    .btn-shine-wrap:active {
+      transform: translateY(0.5px) scale(0.985);
+    }
+
+    .btn-shine-wrap::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 40%;
+      height: 200%;
+      background: linear-gradient(
+        60deg,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0) 80%
+      );
+      transform: rotate(25deg);
+      transition: left 0.75s ease;
+      pointer-events: none;
+    }
+
+    .btn-shine-wrap:hover::after {
+      left: 130%;
+    }
+
+    /* Ripple Click Effect */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: rippleAnim 0.6s linear;
+      background-color: rgba(255, 255, 255, 0.3);
+      pointer-events: none;
+    }
+
+    @keyframes rippleAnim {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* Social Button Lift & Light */
+    .social-btn {
+      position: relative;
+      background: rgba(20, 24, 35, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .social-btn:hover {
+      background: rgba(29, 35, 52, 0.65);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .social-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* Animated Tabs Pill Slider */
+    .tab-slider-bg {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    /* Smooth Height Transition Helper */
+    .form-switch-stage {
+      transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .form-panel {
+      transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), filter 0.28s ease;
+    }
+
+    .form-panel.panel-hidden-left {
+      opacity: 0;
+      transform: translateX(-24px);
+      filter: blur(4px);
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+
+    .form-panel.panel-hidden-right {
+      opacity: 0;
+      transform: translateX(24px);
+      filter: blur(4px);
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+
+    .form-panel.panel-active {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+      pointer-events: auto;
+      position: relative;
+    }
+
+    /* Custom Checkbox SVG Stroke Animation */
+    .custom-check-box {
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      border-radius: 5px;
+      background: rgba(15, 18, 28, 0.6);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .custom-check-input:checked + .custom-check-box {
+      background: #6366f1;
+      border-color: #818cf8;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.45);
+    }
+
+    .custom-check-input:checked + .custom-check-box svg path {
+      stroke-dashoffset: 0;
+    }
+
+    .custom-check-box svg path {
+      stroke-dasharray: 20;
+      stroke-dashoffset: 20;
+      transition: stroke-dashoffset 0.25s ease 0.05s;
+    }
+
+    /* Password Strength Dynamic Segment */
+    .strength-segment {
+      height: 3px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.1);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Ambient background canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Subtle Card Tilt 3D */
+    .card-perspective-wrap {
+      perspective: 1200px;
+    }
+
+    /* Modern subtle badge */
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: #94a3b8;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Custom Toast notification */
+    #toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast-msg {
+      pointer-events: auto;
+      background: rgba(14, 18, 28, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 18px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateY(-20px) scale(0.95);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-msg.show {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen relative flex items-center justify-center p-4 sm:p-6 lg:p-8 selection:bg-indigo-500/30 selection:text-white">
+
+  <!-- Interactive Canvas Background for Aurora/Mesh/Stardust Physics -->
+  <canvas id="ambient-canvas"></canvas>
+  <div class="fixed inset-0 bg-noise pointer-events-none z-10"></div>
+
+  <!-- Ambient Floating Colored Orbs for Depth -->
+  <div class="fixed top-[-15%] left-[10%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-indigo-600/15 to-purple-600/5 blur-[120px] pointer-events-none animate-glow-pulse"></div>
+  <div class="fixed bottom-[-15%] right-[10%] w-[550px] h-[550px] rounded-full bg-gradient-to-tr from-cyan-600/15 via-blue-600/10 to-indigo-600/5 blur-[140px] pointer-events-none animate-glow-pulse" style="animation-delay: -3s;"></div>
+
+  <!-- Header Action Bar (Brand, Environment Badge & Quick Helpers) -->
+  <header class="fixed top-0 left-0 right-0 z-30 px-6 py-4 flex items-center justify-between border-b border-white/[0.04] backdrop-blur-md bg-obsidian/40">
+    <div class="flex items-center gap-3">
+      <!-- Nexus Prism Emblem -->
+      <div class="relative w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-cyan-400 p-[1px] shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+        <div class="w-full h-full bg-[#0b0e17] rounded-[7px] flex items-center justify-center">
+          <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+      </div>
+      <div>
+        <span class="font-display font-bold tracking-tight text-white text-base">ESTATECRAFT</span>
+        <span class="text-xs text-zinc-500 ml-1.5 font-mono">v2.5</span>
+      </div>
+    </div>
+
+    <!-- Quick Utilities: Demo Autofill, Sound Effect Toggle & Status -->
+    <div class="flex items-center gap-2.5">
+      <div class="badge-live hidden sm:inline-flex">
+        <span class="pulse-dot"></span>
+        <span>Enterprise SSO Active</span>
+      </div>
+
+      <button id="btn-quick-fill" type="button" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-zinc-300 hover:text-white transition-all flex items-center gap-1.5" title="Auto-fill sample credentials for rapid review">
+        <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m18 15-6-6-6 6"/>
+        </svg>
+        <span>Fill Demo</span>
+      </button>
+
+      <button id="btn-audio-toggle" type="button" class="w-8 h-8 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-zinc-400 hover:text-white flex items-center justify-center transition-all" title="Toggle Haptic Synth Feedback (Muted by default)" aria-label="Toggle synth audio">
+        <svg id="icon-sound-off" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+          <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+          <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+        <svg id="icon-sound-on" class="w-4 h-4 hidden text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Card Container with 3D Tilt Wrapper -->
+  <main class="relative z-20 w-full max-w-[460px] mx-auto pt-16 sm:pt-12 pb-8 card-perspective-wrap">
+
+    <!-- Floating Obsidian Glassmorphism Card -->
+    <div id="auth-card" class="spotlight-card rounded-[28px] p-6 sm:p-8 overflow-hidden backdrop-blur-2xl">
+      
+      <!-- Card Top Brand & Heading -->
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500/20 via-purple-500/10 to-transparent border border-white/[0.08] shadow-[0_0_24px_rgba(99,102,241,0.25)] mb-3">
+          <svg class="w-6 h-6 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <h1 id="card-main-title" class="font-display text-2xl sm:text-[26px] font-bold text-white tracking-tight leading-snug">
+          Welcome back
+        </h1>
+        <p id="card-sub-title" class="text-xs sm:text-sm text-zinc-400 mt-1.5 font-normal">
+          Enter your credentials to access your luxury portfolio
+        </p>
+      </div>
+
+      <!-- Segmented Tab Pill Switcher -->
+      <div class="relative mb-6 p-1 rounded-xl bg-black/40 border border-white/[0.06] backdrop-blur-md">
+        <!-- Floating Active Tab Pill Slider -->
+        <div id="tab-slider" class="tab-slider-bg"></div>
+
+        <div class="grid grid-cols-2 relative z-10 text-xs font-semibold text-center select-none" role="tablist">
+          <button 
+            type="button" 
+            role="tab" 
+            id="tab-btn-signin" 
+            aria-selected="true" 
+            aria-controls="panel-signin"
+            class="py-2.5 px-4 rounded-lg transition-colors text-white focus:outline-none"
+            onclick="switchAuthTab('signin')"
+          >
+            Sign In
+          </button>
+          <button 
+            type="button" 
+            role="tab" 
+            id="tab-btn-signup" 
+            aria-selected="false" 
+            aria-controls="panel-signup"
+            class="py-2.5 px-4 rounded-lg transition-colors text-zinc-400 hover:text-zinc-200 focus:outline-none"
+            onclick="switchAuthTab('signup')"
+          >
+            Create Account
+          </button>
+        </div>
+      </div>
+
+      <!-- Social Authentication Buttons -->
+      <div class="space-y-3 mb-6">
+        <div class="grid grid-cols-3 gap-2.5">
+          <!-- Google -->
+          <button type="button" class="social-btn flex items-center justify-center py-2.5 px-3 group" title="Continue with Google" onclick="handleSocialAuth('Google')">
+            <svg class="w-4 h-4 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+              <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.8 7.3l3.7 2.9C6.4 7.2 8.9 5 12 5z"/>
+              <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
+              <path fill="#FBBC05" d="M5.5 14.8c-.2-.7-.4-1.5-.4-2.3 0-.8.1-1.6.4-2.3L1.8 7.3C.7 9.5 0 11.9 0 14.5s.7 5 1.8 7.2l3.7-2.9z"/>
+              <path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.6-2.2-6.5-5.2L1.8 16.5C3.7 20.3 7.5 23.5 12 23.5z"/>
+            </svg>
+            <span class="sr-only">Sign in with Google</span>
+          </button>
+
+          <!-- GitHub -->
+          <button type="button" class="social-btn flex items-center justify-center py-2.5 px-3 group" title="Continue with GitHub" onclick="handleSocialAuth('GitHub')">
+            <svg class="w-4 h-4 text-white transition-transform group-hover:scale-110 fill-current" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            <span class="sr-only">Sign in with GitHub</span>
+          </button>
+
+          <!-- Apple -->
+          <button type="button" class="social-btn flex items-center justify-center py-2.5 px-3 group" title="Continue with Apple" onclick="handleSocialAuth('Apple')">
+            <svg class="w-4 h-4 text-white transition-transform group-hover:scale-110 fill-current" viewBox="0 0 24 24">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.78 1.06-1.85.94-2.94-1 .04-2.17.67-2.82 1.44-.57.67-.99 1.74-.86 2.8 1.11.08 2.11-.52 2.74-1.3z"/>
+            </svg>
+            <span class="sr-only">Sign in with Apple</span>
+          </button>
+        </div>
+
+        <!-- Divider with clean radial fading -->
+        <div class="relative flex items-center justify-center my-4">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-white/[0.07]"></div>
+          </div>
+          <span class="relative px-3 text-[11px] uppercase tracking-wider font-semibold text-zinc-500 bg-[#0f121b] rounded-full">
+            or continue with email
+          </span>
+        </div>
+      </div>
+
+      <!-- Animated Form Switch Stage (Height Morphing) -->
+      <div id="form-stage" class="form-switch-stage relative">
+
+        <!-- ============================================== -->
+        <!-- PANEL 1: SIGN IN FORM                          -->
+        <!-- ============================================== -->
+        <div id="panel-signin" class="form-panel panel-active" role="tabpanel" aria-labelledby="tab-btn-signin">
+          <form id="form-signin" onsubmit="handleAuthSubmit(event, 'signin')" class="space-y-4" novalidate>
+            
+            <!-- Email Input Field -->
+            <div class="space-y-1.5">
+              <label for="signin-email" class="block text-xs font-medium text-zinc-300">
+                Email Address
+              </label>
+              <div class="glass-input-wrapper flex items-center px-3.5 py-2.5">
+                <svg class="w-4 h-4 text-zinc-400 mr-2.5 shrink-0 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                </svg>
+                <input 
+                  type="email" 
+                  id="signin-email" 
+                  name="email"
+                  placeholder="name@company.com" 
+                  required 
+                  autocomplete="username"
+                  class="w-full bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
+                  oninput="validateEmailField(this)"
+                >
+                <div class="input-accent-line"></div>
+                <span id="signin-email-status" class="opacity-0 transition-opacity">
+                  <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <p id="signin-email-err" class="text-[11px] text-rose-400 hidden mt-1">Please enter a valid email address.</p>
+            </div>
+
+            <!-- Password Input Field -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <label for="signin-password" class="block text-xs font-medium text-zinc-300">
+                  Password
+                </label>
+                <button type="button" onclick="showForgotPasswordModal()" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors hover:underline underline-offset-4 focus:outline-none">
+                  Forgot password?
+                </button>
+              </div>
+              <div class="glass-input-wrapper flex items-center px-3.5 py-2.5">
+                <svg class="w-4 h-4 text-zinc-400 mr-2.5 shrink-0 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <input 
+                  type="password" 
+                  id="signin-password" 
+                  name="password"
+                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" 
+                  required 
+                  autocomplete="current-password"
+                  class="w-full bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none tracking-wide"
+                >
+                <div class="input-accent-line"></div>
+                <!-- Toggle Password Visibility -->
+                <button type="button" class="text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none ml-1 p-0.5" onclick="togglePasswordVisibility('signin-password', this)" title="Show/hide password" aria-label="Toggle password visibility">
+                  <svg class="w-4 h-4 eye-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  <svg class="w-4 h-4 eye-icon-closed hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m9.88 9.88 4.24 4.24m-8.48 0 8.48-8.48"></path>
+                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                    <line x1="2" y1="2" x2="22" y2="22"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Custom Remember Me & Inline Security Note -->
+            <div class="flex items-center justify-between pt-1">
+              <label class="flex items-center gap-2.5 cursor-pointer select-none group">
+                <input type="checkbox" id="remember-me" name="remember" class="custom-check-input hidden">
+                <div class="custom-check-box flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <span class="text-xs text-zinc-400 group-hover:text-zinc-300 transition-colors">
+                  Remember me for 30 days
+                </span>
+              </label>
+              <div class="flex items-center gap-1 text-[11px] text-zinc-500 font-mono">
+                <svg class="w-3 h-3 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>SSL 256-bit</span>
+              </div>
+            </div>
+
+            <!-- Primary High-Contrast CTA Button with Magnetic Glow -->
+            <div class="pt-2">
+              <button 
+                type="submit" 
+                id="btn-submit-signin"
+                class="btn-shine-wrap magnetic-btn w-full py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 select-none"
+              >
+                <span class="btn-text">Sign In to Dashboard</span>
+                <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+                <!-- Spinner for Submitting State -->
+                <svg class="btn-spinner w-4 h-4 text-black animate-spin hidden" viewBox="0 0 24 24" fill="none">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- PANEL 2: CREATE ACCOUNT FORM                   -->
+        <!-- ============================================== -->
+        <div id="panel-signup" class="form-panel panel-hidden-right" role="tabpanel" aria-labelledby="tab-btn-signup">
+          <form id="form-signup" onsubmit="handleAuthSubmit(event, 'signup')" class="space-y-3.5" novalidate>
+            
+            <!-- Full Name -->
+            <div class="space-y-1">
+              <label for="signup-name" class="block text-xs font-medium text-zinc-300">
+                Full Name
+              </label>
+              <div class="glass-input-wrapper flex items-center px-3.5 py-2">
+                <svg class="w-4 h-4 text-zinc-400 mr-2.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <input 
+                  type="text" 
+                  id="signup-name" 
+                  name="fullname"
+                  placeholder="Eleanor Vance" 
+                  required 
+                  autocomplete="name"
+                  class="w-full bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
+                >
+                <div class="input-accent-line"></div>
+              </div>
+            </div>
+
+            <!-- Email Address -->
+            <div class="space-y-1">
+              <label for="signup-email" class="block text-xs font-medium text-zinc-300">
+                Work or Personal Email
+              </label>
+              <div class="glass-input-wrapper flex items-center px-3.5 py-2">
+                <svg class="w-4 h-4 text-zinc-400 mr-2.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                </svg>
+                <input 
+                  type="email" 
+                  id="signup-email" 
+                  name="email"
+                  placeholder="eleanor@vance-holdings.com" 
+                  required 
+                  autocomplete="username"
+                  class="w-full bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
+                  oninput="validateEmailField(this)"
+                >
+                <div class="input-accent-line"></div>
+              </div>
+            </div>
+
+            <!-- Role Selector (Buyer / Broker / Investor) -->
+            <div class="space-y-1">
+              <label class="block text-xs font-medium text-zinc-300">Account Type</label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <label class="relative flex items-center justify-center p-2 rounded-xl bg-black/40 border border-white/[0.08] cursor-pointer hover:border-indigo-400/50 transition-all has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-950/30">
+                  <input type="radio" name="account_role" value="client" checked class="sr-only">
+                  <span class="font-medium text-zinc-300">Buyer / Client</span>
+                </label>
+                <label class="relative flex items-center justify-center p-2 rounded-xl bg-black/40 border border-white/[0.08] cursor-pointer hover:border-indigo-400/50 transition-all has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-950/30">
+                  <input type="radio" name="account_role" value="broker" class="sr-only">
+                  <span class="font-medium text-zinc-300">Broker / Agent</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Password with Strength Meter -->
+            <div class="space-y-1">
+              <label for="signup-password" class="block text-xs font-medium text-zinc-300">
+                Choose Password
+              </label>
+              <div class="glass-input-wrapper flex items-center px-3.5 py-2">
+                <svg class="w-4 h-4 text-zinc-400 mr-2.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <input 
+                  type="password" 
+                  id="signup-password" 
+                  name="password"
+                  placeholder="Min. 8 characters" 
+                  required 
+                  autocomplete="new-password"
+                  class="w-full bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none tracking-wide"
+                  oninput="evaluatePasswordStrength(this.value)"
+                >
+                <div class="input-accent-line"></div>
+                <button type="button" class="text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none ml-1 p-0.5" onclick="togglePasswordVisibility('signup-password', this)" title="Show/hide password" aria-label="Toggle password visibility">
+                  <svg class="w-4 h-4 eye-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  <svg class="w-4 h-4 eye-icon-closed hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m9.88 9.88 4.24 4.24m-8.48 0 8.48-8.48"></path>
+                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                    <line x1="2" y1="2" x2="22" y2="22"></line>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Password Strength Bar Display -->
+              <div class="pt-1.5 space-y-1">
+                <div class="grid grid-cols-4 gap-1.5">
+                  <div id="str-seg-1" class="strength-segment"></div>
+                  <div id="str-seg-2" class="strength-segment"></div>
+                  <div id="str-seg-3" class="strength-segment"></div>
+                  <div id="str-seg-4" class="strength-segment"></div>
+                </div>
+                <div class="flex justify-between items-center text-[11px] text-zinc-500">
+                  <span id="strength-label">Password strength</span>
+                  <span id="strength-detail" class="text-zinc-400 font-mono text-[10px]">Enter 8+ chars</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terms acceptance checkbox -->
+            <div class="pt-1">
+              <label class="flex items-start gap-2.5 cursor-pointer select-none group">
+                <input type="checkbox" id="terms-agree" name="terms" required class="custom-check-input hidden">
+                <div class="custom-check-box shrink-0 mt-0.5 flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <span class="text-xs text-zinc-400 group-hover:text-zinc-300 leading-snug">
+                  I agree to the <a href="#" class="text-indigo-400 hover:underline">Terms of Service</a> and acknowledge the <a href="#" class="text-indigo-400 hover:underline">Privacy Policy</a>.
+                </span>
+              </label>
+            </div>
+
+            <!-- Submit Register Button -->
+            <div class="pt-2">
+              <button 
+                type="submit" 
+                id="btn-submit-signup"
+                class="btn-shine-wrap magnetic-btn w-full py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 select-none"
+              >
+                <span class="btn-text">Create Free Account</span>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+                <svg class="btn-spinner w-4 h-4 text-black animate-spin hidden" viewBox="0 0 24 24" fill="none">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Card Sub-Footer: Passkey / Magic Link Option -->
+      <div class="mt-6 pt-5 border-t border-white/[0.06] flex items-center justify-between text-xs text-zinc-500">
+        <button type="button" onclick="showPasskeyAuth()" class="flex items-center gap-1.5 hover:text-zinc-300 transition-colors focus:outline-none">
+          <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5z"></path>
+          </svg>
+          <span>Use Hardware Passkey</span>
+        </button>
+        <a href="index.php" class="hover:text-zinc-300 transition-colors flex items-center gap-1">
+          <span>Guest View</span>
+          <span>&rarr;</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Security & Trust Indicators Below Card -->
+    <div class="mt-6 flex flex-wrap items-center justify-center gap-6 text-[11px] text-zinc-500 font-medium">
+      <span class="flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        End-to-End Encrypted
+      </span>
+      <span class="flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        SOC2 Type II Certified
+      </span>
+      <span class="flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        Zero Telemetry Tracking
+      </span>
+    </div>
+
+  </main>
+
+  <!-- Modal: Sleek Inline Forgot Password / Magic Link Recovery -->
+  <div id="modal-forgot-password" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="spotlight-card rounded-2xl w-full max-w-md p-6 border border-white/10 relative transform scale-95 transition-transform duration-300" id="forgot-modal-box">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+          </div>
+          <h3 class="font-display font-semibold text-lg text-white">Reset Credentials</h3>
+        </div>
+        <button type="button" onclick="hideForgotPasswordModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors">
+          &times;
+        </button>
+      </div>
+
+      <p class="text-xs text-zinc-400 mb-5 leading-relaxed">
+        Enter the email associated with your account. We will dispatch a high-security cryptographic magic link to immediately regain access.
+      </p>
+
+      <form onsubmit="handleForgotSubmit(event)" class="space-y-4">
+        <div class="space-y-1.5">
+          <label for="recovery-email" class="block text-xs font-medium text-zinc-300">Registered Email</label>
+          <div class="glass-input-wrapper flex items-center px-3.5 py-2.5">
+            <input type="email" id="recovery-email" placeholder="you@estatecraft.com" required class="w-full bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="hideForgotPasswordModal()" class="w-1/2 py-2.5 rounded-xl border border-white/10 text-xs font-medium text-zinc-300 hover:bg-white/5 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 btn-shine-wrap py-2.5 rounded-xl text-xs font-semibold text-black flex items-center justify-center gap-1.5">
+            <span>Send Magic Link</span>
+            <span>&rarr;</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Sound Synthesis & Tactile Haptic Audio Engine -->
+  <script>
+    class HapticAudio {
+      constructor() {
+        this.ctx = null;
+        this.enabled = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+      }
+      playBlip(freq = 600, duration = 0.05, type = 'sine') {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.5, this.ctx.currentTime + duration);
+          gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e) {}
+      }
+      playSuccess() {
+        if (!this.enabled || !this.ctx) return;
+        this.playBlip(523.25, 0.08);
+        setTimeout(() => this.playBlip(659.25, 0.08), 80);
+        setTimeout(() => this.playBlip(783.99, 0.16), 160);
+      }
+    }
+    const soundEngine = new HapticAudio();
+
+    // Toggle Sound Engine
+    const soundBtn = document.getElementById('btn-audio-toggle');
+    soundBtn.addEventListener('click', () => {
+      soundEngine.init();
+      soundEngine.enabled = !soundEngine.enabled;
+      document.getElementById('icon-sound-off').classList.toggle('hidden', soundEngine.enabled);
+      document.getElementById('icon-sound-on').classList.toggle('hidden', !soundEngine.enabled);
+      showToast(soundEngine.enabled ? 'Haptic audio feedback enabled 🎵' : 'Audio feedback muted 🔇', 'info');
+      if (soundEngine.enabled) soundEngine.playBlip(700, 0.06);
+    });
+  </script>
+
+  <!-- Interactive Dynamic Background Canvas (Constellation & Atmospheric Glow) -->
+  <script>
+    (function initAmbientCanvas() {
+      const canvas = document.getElementById('ambient-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let mouseX = -1000, mouseY = -1000;
+      let targetMouseX = -1000, targetMouseY = -1000;
+
+      const particles = [];
+      const PARTICLE_COUNT = 45;
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      class Particle {
+        constructor() {
+          this.reset(true);
+        }
+        reset(randomStart = false) {
+          this.x = Math.random() * width;
+          this.y = randomStart ? Math.random() * height : height + 20;
+          this.vx = (Math.random() - 0.5) * 0.45;
+          this.vy = -(Math.random() * 0.35 + 0.15);
+          this.radius = Math.random() * 1.5 + 0.8;
+          this.baseAlpha = Math.random() * 0.35 + 0.15;
+          this.alpha = this.baseAlpha;
+          this.color = Math.random() > 0.4 ? '129, 140, 248' : '56, 189, 248';
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          // Gentle mouse push
+          const dx = this.x - mouseX;
+          const dy = this.y - mouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120 && dist > 0) {
+            const force = (120 - dist) / 120;
+            this.x += (dx / dist) * force * 1.5;
+            this.y += (dy / dist) * force * 1.5;
+          }
+
+          if (this.y < -30 || this.x < -30 || this.x > width + 30) {
+            this.reset();
+          }
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push(new Particle());
+      }
+
+      window.addEventListener('mousemove', (e) => {
+        targetMouseX = e.clientX;
+        targetMouseY = e.clientY;
+      });
+
+      function render() {
+        // Damping for mouse
+        mouseX += (targetMouseX - mouseX) * 0.1;
+        mouseY += (targetMouseY - mouseY) * 0.1;
+
+        ctx.clearRect(0, 0, width, height);
+
+        // Connect particles with subtle proximity lines
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 90) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(129, 140, 248, ${(1 - dist / 90) * 0.08})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+
+        requestAnimationFrame(render);
+      }
+      render();
+    })();
+  </script>
+
+  <!-- Card Spotlight Glow, 3D Physics Tilt & Tab Management -->
+  <script>
+    const card = document.getElementById('auth-card');
+    const tabSlider = document.getElementById('tab-slider');
+    const panelSignIn = document.getElementById('panel-signin');
+    const panelSignUp = document.getElementById('panel-signup');
+    const formStage = document.getElementById('form-stage');
+    const tabBtnSignIn = document.getElementById('tab-btn-signin');
+    const tabBtnSignUp = document.getElementById('tab-btn-signup');
+    const cardTitle = document.getElementById('card-main-title');
+    const cardSub = document.getElementById('card-sub-title');
+
+    // 1. Mouse-Tracking Spotlight & 3D Tilt Physics
+    let isHoveringCard = false;
+    card.addEventListener('mouseenter', () => isHoveringCard = true);
+    card.addEventListener('mouseleave', () => {
+      isHoveringCard = false;
+      card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+
+      if (isHoveringCard) {
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        // Subtle tilt: max ~3.5 deg for premium tactile feel
+        const rotateX = ((y - centerY) / centerY) * -3.5;
+        const rotateY = ((x - centerX) / centerX) * 3.5;
+        card.style.transform = `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+      }
+    });
+
+    // 2. Tab Switcher with Seamless Morph & Spring Physics
+    let currentTab = 'signin';
+
+    function setStageHeight() {
+      const activePanel = currentTab === 'signin' ? panelSignIn : panelSignUp;
+      formStage.style.height = activePanel.offsetHeight + 'px';
+    }
+
+    // Initialize initial stage height
+    window.addEventListener('DOMContentLoaded', () => {
+      setStageHeight();
+    });
+    window.addEventListener('resize', setStageHeight);
+
+    function switchAuthTab(tab) {
+      if (currentTab === tab) return;
+      currentTab = tab;
+      soundEngine.playBlip(550, 0.04);
+
+      if (tab === 'signin') {
+        // Tab slider slide to left
+        tabSlider.style.transform = 'translateX(0%)';
+        tabBtnSignIn.classList.add('text-white');
+        tabBtnSignIn.classList.remove('text-zinc-400');
+        tabBtnSignIn.setAttribute('aria-selected', 'true');
+
+        tabBtnSignUp.classList.remove('text-white');
+        tabBtnSignUp.classList.add('text-zinc-400');
+        tabBtnSignUp.setAttribute('aria-selected', 'false');
+
+        // Titles update
+        cardTitle.textContent = "Welcome back";
+        cardSub.textContent = "Enter your credentials to access your luxury portfolio";
+
+        // Transition panels
+        panelSignUp.classList.remove('panel-active');
+        panelSignUp.classList.add('panel-hidden-right');
+
+        panelSignIn.classList.remove('panel-hidden-left');
+        panelSignIn.classList.add('panel-active');
+      } else {
+        // Tab slider slide to right
+        tabSlider.style.transform = 'translateX(100%)';
+        tabBtnSignUp.classList.add('text-white');
+        tabBtnSignUp.classList.remove('text-zinc-400');
+        tabBtnSignUp.setAttribute('aria-selected', 'true');
+
+        tabBtnSignIn.classList.remove('text-white');
+        tabBtnSignIn.classList.add('text-zinc-400');
+        tabBtnSignIn.setAttribute('aria-selected', 'false');
+
+        // Titles update
+        cardTitle.textContent = "Create an account";
+        cardSub.textContent = "Join private investors and premier real estate brokers";
+
+        // Transition panels
+        panelSignIn.classList.remove('panel-active');
+        panelSignIn.classList.add('panel-hidden-left');
+
+        panelSignUp.classList.remove('panel-hidden-right');
+        panelSignUp.classList.add('panel-active');
+      }
+
+      // Smooth height recalculation
+      requestAnimationFrame(() => {
+        setStageHeight();
+      });
+    }
+
+    // 3. Password Visibility Toggle
+    function togglePasswordVisibility(inputId, btn) {
+      soundEngine.playBlip(750, 0.03);
+      const input = document.getElementById(inputId);
+      const openIcon = btn.querySelector('.eye-icon-open');
+      const closedIcon = btn.querySelector('.eye-icon-closed');
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        openIcon.classList.add('hidden');
+        closedIcon.classList.remove('hidden');
+      } else {
+        input.type = 'password';
+        openIcon.classList.remove('hidden');
+        closedIcon.classList.add('hidden');
+      }
+    }
+
+    // 4. Email Realtime Validation
+    function validateEmailField(input) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const isValid = emailRegex.test(input.value.trim());
+      const wrapper = input.closest('.glass-input-wrapper');
+      const statusIcon = document.getElementById('signin-email-status');
+
+      if (input.value.trim().length === 0) {
+        wrapper.classList.remove('input-error', 'input-success');
+        if (statusIcon) statusIcon.classList.add('opacity-0');
+        return;
+      }
+
+      if (isValid) {
+        wrapper.classList.remove('input-error');
+        wrapper.classList.add('input-success');
+        if (statusIcon) statusIcon.classList.remove('opacity-0');
+      } else {
+        wrapper.classList.remove('input-success');
+        if (input.value.length > 5) {
+          wrapper.classList.add('input-error');
+        }
+        if (statusIcon) statusIcon.classList.add('opacity-0');
+      }
+    }
+
+    // 5. Password Strength Meter Calculation
+    function evaluatePasswordStrength(password) {
+      let score = 0;
+      if (password.length >= 8) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+
+      const segs = [
+        document.getElementById('str-seg-1'),
+        document.getElementById('str-seg-2'),
+        document.getElementById('str-seg-3'),
+        document.getElementById('str-seg-4')
+      ];
+      const label = document.getElementById('strength-label');
+      const detail = document.getElementById('strength-detail');
+
+      // Reset segments
+      segs.forEach(s => {
+        s.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        s.style.boxShadow = 'none';
+      });
+
+      if (!password) {
+        label.textContent = "Password strength";
+        label.className = "text-[11px] text-zinc-500";
+        detail.textContent = "Enter 8+ chars";
+        return;
+      }
+
+      const colors = [
+        { name: 'Weak', color: '#f43f5e', shadow: 'rgba(244, 63, 94, 0.5)' },
+        { name: 'Fair', color: '#fbbf24', shadow: 'rgba(251, 191, 36, 0.5)' },
+        { name: 'Good', color: '#38bdf8', shadow: 'rgba(56, 189, 248, 0.5)' },
+        { name: 'Strong', color: '#10b981', shadow: 'rgba(16, 185, 129, 0.6)' }
+      ];
+
+      const current = colors[score - 1] || colors[0];
+
+      for (let i = 0; i < score; i++) {
+        segs[i].style.backgroundColor = current.color;
+        segs[i].style.boxShadow = `0 0 8px ${current.shadow}`;
+      }
+
+      label.textContent = `${current.name} password`;
+      label.style.color = current.color;
+
+      if (score === 4) {
+        detail.textContent = "Excellent security";
+      } else {
+        detail.textContent = `${score}/4 criteria met`;
+      }
+    }
+
+    // 6. Primary CTA Ripple Interaction
+    document.querySelectorAll('.magnetic-btn').forEach(btn => {
+      btn.addEventListener('click', function (e) {
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const circle = document.createElement('span');
+        circle.classList.add('ripple');
+        circle.style.left = `${x}px`;
+        circle.style.top = `${y}px`;
+        circle.style.width = circle.style.height = `${Math.max(rect.width, rect.height)}px`;
+        circle.style.marginLeft = circle.style.marginTop = `-${Math.max(rect.width, rect.height) / 2}px`;
+
+        this.appendChild(circle);
+        setTimeout(() => circle.remove(), 600);
+      });
+    });
+
+    // 7. Form Submission Handling with Micro-Interactions & Feedback
+    function handleAuthSubmit(event, type) {
+      event.preventDefault();
+      const form = event.target;
+      const btn = form.querySelector('button[type="submit"]');
+      const btnText = btn.querySelector('.btn-text');
+      const spinner = btn.querySelector('.btn-spinner');
+
+      soundEngine.playBlip(620, 0.05);
+
+      // Simple UI Validation
+      const inputs = form.querySelectorAll('input[required]');
+      let hasError = false;
+      inputs.forEach(input => {
+        if (!input.value.trim() || (input.type === 'checkbox' && !input.checked)) {
+          input.closest('.glass-input-wrapper')?.classList.add('input-error');
+          hasError = true;
+        }
+      });
+
+      if (hasError) {
+        soundEngine.playBlip(280, 0.12, 'sawtooth');
+        showToast('Please fill out all required credentials.', 'error');
+        // Card shake animation
+        card.classList.add('animate-bounce');
+        setTimeout(() => card.classList.remove('animate-bounce'), 500);
+        return;
+      }
+
+      // Enter Loading State
+      btn.disabled = true;
+      btn.style.opacity = '0.9';
+      btnText.textContent = type === 'signin' ? 'Authenticating...' : 'Provisioning Account...';
+      spinner.classList.remove('hidden');
+
+      setTimeout(() => {
+        spinner.classList.add('hidden');
+        btnText.textContent = type === 'signin' ? 'Welcome Back!' : 'Account Created!';
+        btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+        btn.style.color = '#ffffff';
+
+        soundEngine.playSuccess();
+        showToast(type === 'signin' ? 'Authentication successful! Redirecting...' : 'Welcome to EstateCraft! Setting up your workspace...', 'success');
+
+        setTimeout(() => {
+          btn.disabled = false;
+          btnText.textContent = type === 'signin' ? 'Sign In to Dashboard' : 'Create Free Account';
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 3000);
+      }, 1400);
+    }
+
+    // 8. Social Sign In Mock Trigger
+    function handleSocialAuth(provider) {
+      soundEngine.playBlip(680, 0.05);
+      showToast(`Initiating secure handshake with ${provider} OAuth 2.0...`, 'info');
+      setTimeout(() => {
+        soundEngine.playSuccess();
+        showToast(`Signed in via ${provider}! Welcome Eleanor.`, 'success');
+      }, 1200);
+    }
+
+    function showPasskeyAuth() {
+      soundEngine.playBlip(720, 0.05);
+      showToast('Requesting FIDO2 / WebAuthn hardware passkey prompt...', 'info');
+    }
+
+    // 9. Forgot Password Modal
+    const modalForgot = document.getElementById('modal-forgot-password');
+    const modalBox = document.getElementById('forgot-modal-box');
+
+    function showForgotPasswordModal() {
+      soundEngine.playBlip(600, 0.04);
+      modalForgot.classList.remove('opacity-0', 'pointer-events-none');
+      modalBox.classList.remove('scale-95');
+      modalBox.classList.add('scale-100');
+    }
+
+    function hideForgotPasswordModal() {
+      modalForgot.classList.add('opacity-0', 'pointer-events-none');
+      modalBox.classList.add('scale-95');
+      modalBox.classList.remove('scale-100');
+    }
+
+    function handleForgotSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('recovery-email').value;
+      hideForgotPasswordModal();
+      soundEngine.playSuccess();
+      showToast(`Magic sign-in link dispatched to ${email}`, 'success');
+    }
+
+    // 10. Quick Auto Fill Demo Helper
+    document.getElementById('btn-quick-fill').addEventListener('click', () => {
+      soundEngine.playBlip(800, 0.04);
+      if (currentTab === 'signin') {
+        document.getElementById('signin-email').value = 'eleanor.vance@estatecraft.luxury';
+        document.getElementById('signin-password').value = 'Obsidian2026!#';
+        validateEmailField(document.getElementById('signin-email'));
+        showToast('Injected demo credentials for Eleanor Vance', 'info');
+      } else {
+        document.getElementById('signup-name').value = 'Marcus Sterling';
+        document.getElementById('signup-email').value = 'marcus@sterling-capital.com';
+        const pwField = document.getElementById('signup-password');
+        pwField.value = 'QuantumAlpha#2026';
+        evaluatePasswordStrength(pwField.value);
+        document.getElementById('terms-agree').checked = true;
+        showToast('Injected demo registration profile for Marcus', 'info');
+      }
+    });
+
+    // 11. Toast System
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg text-xs text-white';
+
+      let icon = '';
+      if (type === 'success') {
+        icon = '<span class="text-emerald-400">✓</span>';
+      } else if (type === 'error') {
+        icon = '<span class="text-rose-400">✕</span>';
+      } else {
+        icon = '<span class="text-indigo-400">ℹ</span>';
+      }
+
+      toast.innerHTML = `
+        <div class="flex items-center gap-2">
+          ${icon}
+          <span class="font-medium">${message}</span>
+        </div>
+      `;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 350);
+      }, 3500);
+    }
+  </script>
+</body>
+</html>

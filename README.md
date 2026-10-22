@@ -1,201 +1,168 @@
-# EstateCraft &mdash; Premium Real Estate Portal (Buy, Sell & Rent)
+# EstateCraft &mdash; Premium Real Estate & Obsidian Auth Experience
 
-A modern, responsive real estate web application built with **PHP 8.x** and **MySQL**, designed to run locally with **WampServer**. It enables users to browse, search, and filter residential and commercial properties, post listings with photo galleries, view property locations on an interactive Leaflet map, hire verified brokers with transparent fee disclosures, and report suspicious listings.
+<div align="center">
 
----
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/abdihabtamu368-cpu/Estate-Craft)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/abdihabtamu368-cpu/Estate-Craft/ci.yml?branch=main&label=CI%20Build&logo=github&style=flat-square)](https://github.com/abdihabtamu368-cpu/Estate-Craft/actions)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://mysql.com)
+[![Leaflet](https://img.shields.io/badge/Leaflet-Maps-199900?style=flat-square&logo=leaflet&logoColor=white)](https://leafletjs.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
-## 🌟 Key Features
+<p align="center">
+  <b>A state-of-the-art real estate marketplace portal paired with a Linear & Stripe-caliber Obsidian Authentication experience.</b>
+</p>
 
-1. **Homepage & Smart Search**:
-   - Hero search bar with segmented control tabs (**All Properties**, **Buy a Home**, **Rent a House**).
-   - Multi-criteria filtering by Location / City, Property Type, and Price Range.
-   - Quick category shortcuts for Buy, Rent, and Sell.
-   - Featured properties showcase with price tags and amenities.
-   - Live Leaflet / OpenStreetMap interactive map explorer.
+[Explore Portal](#-portal-features) &bull; [Obsidian Auth Experience](#-next-gen-obsidian-auth-experience) &bull; [Deploy on Vercel](#-deploy-to-vercel-in-60-seconds) &bull; [Local WampServer Setup](#-local-development-wampserver) &bull; [Database Schema](#-database-architecture)
 
-2. **Authentication & User Profiles**:
-   - Registration and Login with secure `password_hash()` and `password_verify()`.
-   - **Continue with Google** (OAuth 2.0) with configurable credentials and informative fallback guides.
-   - Multi-role support: **Regular Buyers/Sellers/Renters**, **Licensed Real Estate Brokers**, and **Administrators / Moderators**.
-   - Verified Mobile Number workflow with **6-digit SMS OTP verification**.
-   - Transparent Dev/Demo mode: If SMS gateway credentials are not yet configured, the system transparently generates and displays the OTP code on-screen for frictionless local testing.
-
-3. **Broker Representation & Fee Disclosure (Prompt Highlight)**:
-   - Brokers must provide their License Number and agency.
-   - **Upfront Broker Fee Disclosure**: Every broker-represented listing explicitly calculates and displays the broker commission (e.g. `2.5% upon closing` or `$500 screening fee`) **before** a user contacts or hires them.
-   - Direct owner listings are clearly highlighted with a green badge: **"Direct Owner Listing &mdash; Zero Broker Fees"**.
-
-4. **Property Listings & Multi-Image Uploads**:
-   - Support for houses, apartments, luxury villas, condominiums, townhouses, commercial offices, and land.
-   - Multiple image uploads with MIME type validation (`image/jpeg`, `image/png`, `image/webp`), size enforcement (max 6MB each), and secure randomized filename generation.
-   - Interactive OpenStreetMap location picker: click or drag the pin to pinpoint exact GPS coordinates.
-   - Comprehensive details: bedrooms, bathrooms, square footage, address, pricing frequency (total, monthly, yearly), and public contact info.
-
-5. **User Dashboard & Listing Management**:
-   - View, edit, and delete user's own listings.
-   - Listing status indicators: `Active`, `Pending Review`, `Sold`, `Rented`, `Flagged`.
-   - Total views counter and verification status.
-
-6. **Safety & Moderation Features**:
-   - "Report Listing" modal on every listing page (Fraud/Scam, Incorrect Price, Fake Address, Offensive Content, etc.).
-   - Automatic protection: Listings receiving 3 or more reports are automatically flagged and quarantined for review.
-   - Admin / Moderator Safety Center (`user/reports.php`) to inspect flagged listings, dismiss reports, reinstate listings, or permanently delete fraudulent posts.
+</div>
 
 ---
 
-## 🗄️ Database Architecture
+## 🚀 Deploy to Vercel in 60 Seconds
 
-The application uses the `realestate_db` MySQL database containing 4 normalized tables:
+Deploy EstateCraft directly to your personal or team Vercel cloud with one click:
 
-### 1. `users`
-- `id` (INT PK Auto Increment)
-- `full_name` (VARCHAR 100)
-- `email` (VARCHAR 150 UNIQUE)
-- `password_hash` (VARCHAR 255)
-- `phone` (VARCHAR 30)
-- `phone_verified` (TINYINT 1)
-- `otp_code` (VARCHAR 10)
-- `otp_expires_at` (DATETIME)
-- `role` (`user`, `broker`, `admin`)
-- `google_id` (VARCHAR 100 UNIQUE)
-- `avatar`, `bio`
-- `broker_agency`, `broker_license_no`, `broker_fee_percentage`, `broker_fixed_fee`, `broker_fee_notes`
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/abdihabtamu368-cpu/Estate-Craft)
 
-### 2. `properties`
-- `id` (INT PK Auto Increment)
-- `user_id` (FK to `users.id`)
-- `title`, `slug`, `description`
-- `purpose` (`sale`, `rent`)
-- `property_type` (`house`, `apartment`, `villa`, `condo`, `townhouse`, `commercial`, `land`)
-- `price` (DECIMAL 12,2), `price_frequency` (`total`, `monthly`, `yearly`)
-- `bedrooms`, `bathrooms`, `area_sqft`
-- `address`, `city`, `state`, `postal_code`, `country`
-- `latitude`, `longitude` (DECIMAL for Leaflet GPS coordinates)
-- `status` (`active`, `pending_review`, `sold`, `rented`, `flagged`)
-- `featured` (TINYINT 1)
-- `contact_name`, `contact_phone`, `contact_email`
-- `has_broker` (TINYINT 1), `broker_fee_display` (VARCHAR 200)
-- `views_count` (INT)
-
-### 3. `property_images`
-- `id` (INT PK Auto Increment)
-- `property_id` (FK to `properties.id` ON DELETE CASCADE)
-- `image_path` (VARCHAR 255)
-- `is_primary` (TINYINT 1)
-- `caption` (VARCHAR 150)
-
-### 4. `listing_reports`
-- `id` (INT PK Auto Increment)
-- `property_id` (FK to `properties.id` ON DELETE CASCADE)
-- `reporter_user_id` (FK to `users.id` NULLABLE)
-- `reporter_email` (VARCHAR 150)
-- `reason` (`fraud_scam`, `incorrect_price`, `wrong_location`, `duplicate`, `offensive_content`, `other`)
-- `details` (TEXT)
-- `status` (`pending`, `reviewed`, `dismissed`, `action_taken`)
-- `moderator_notes` (TEXT)
+### What Vercel Configures Automatically:
+The repository includes a battle-tested [`vercel.json`](file:///vercel.json) that provisions:
+- **Clean URLs**: Access `/auth`, `/login`, `/register`, or `/preview` without `.html` extensions.
+- **Intelligent Rewrites**: Direct mapping of all authentication routes (`/auth`, `/login`, `/register`, `/signin`, `/signup`) to the next-gen `auth.html` interface.
+- **Enterprise Security Headers**: Automated delivery of `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `X-XSS-Protection`, and `Referrer-Policy`.
+- **Global Edge Asset Caching**: 1-year immutable caching for static images, vector assets, and CSS scripts.
 
 ---
 
-## 🚀 Setup Instructions for WampServer
+## 💎 Next-Gen Obsidian Auth Experience
 
-### Step 1: Start WampServer
-1. Launch **WampServer** from your Start Menu or Desktop shortcut.
-2. Wait until the WampServer tray icon turns **Green** (indicating Apache and MySQL are running).
+Awwwards & Linear-caliber dark authentication screen designed for ultra-modern digital platforms:
 
-### Step 2: Project Location in WampServer
-A directory junction has already been pre-configured linking your desktop folder directly to your WampServer `www` directory:
-- **WampServer Path**: `C:\wamp64\www\buy-and-sell`
-- **Browser URL**: `http://localhost/buy-and-sell/`
-
-*(Alternatively, if running on another computer, simply copy this entire project folder into your `c:\wamp64\www\` directory).*
-
-### Step 3: Initialize the Database
-
-You can initialize the database using either of the following two methods:
-
-#### Method A: One-Click Web Installer (Recommended)
-1. Open your web browser and navigate to:
-   ```
-   http://localhost/buy-and-sell/setup.php
-   ```
-2. Click **"Install Database & Seed Data Now"**.
-3. The wizard will automatically create the `realestate_db` database, execute `database/schema.sql`, and populate sample properties, verified brokers, direct owners, and safety reports.
-
-#### Method B: phpMyAdmin Import
-1. Open `http://localhost/phpmyadmin` in your browser.
-2. Log in with username `root` (leave password blank by default in WampServer).
-3. Click the **Import** tab at the top.
-4. Click **Choose File** and select `database/schema.sql`.
-5. Click **Import** at the bottom.
+* **Location:** [`auth.html`](file:///auth.html) (Live Web) & [`frontend/AuthScreen.tsx`](file:///frontend/AuthScreen.tsx) (React / TypeScript / Tailwind)
+* **Obsidian Palette:** Deep slate/zinc `#08090D` background with layered glassmorphism, 1px semi-transparent borders, and SVG anti-banding film grain.
+* **Dynamic Physics & Lighting:**
+  * **Interactive Ambient Stardust Canvas:** Micro-particles that gently form proximity constellations and respond dynamically to cursor velocity.
+  * **Mouse-Tracking Spotlight Border:** A radial cursor glow that tracks your mouse along the card boundary using CSS variables and mask composites.
+  * **3D Tactile Card Tilt:** Smooth perspective response (`perspective(1200px)`) that reacts to mouse coordinates.
+* **Component Innovations:**
+  * **Spring-Sliding Pill Switcher:** Seamless transition between *Sign In* and *Create Account* without page reload or layout shift.
+  * **Social Authentication:** Instant Google, GitHub, and Apple SSO buttons with hover lift and specular border glare.
+  * **Dynamic Password Strength Meter:** 4-tier real-time criteria evaluator (Weak, Fair, Good, Strong) with visual feedback.
+  * **Primary CTA Glow:** Shimmering gradient sweep, click ripple physics, loading spinner state, and success celebrations.
+  * **Haptic Audio Synthesis:** Subtle Web Audio API acoustic clicks (muted by default, toggleable in header).
+  * **1-Click Demo Autofill:** Instant population of sample credentials for rapid previewing.
 
 ---
 
-## 🔑 Pre-Seeded Sample Accounts for Testing
+## 🌟 Real Estate Portal Features
 
-All sample accounts use the password: `Password123!`
+EstateCraft offers an end-to-end residential and commercial property marketplace:
 
-| Role | Name | Email | Features |
+1. **Smart Search & Filtering**:
+   - Segmented search controls for **Buy a Home**, **Rent a House**, and **Commercial Properties**.
+   - Multi-criteria filtering by Location / City, Property Type, Bedroom/Bathroom counts, and Price Range.
+   - Live Leaflet / OpenStreetMap interactive GPS explorer with custom property pins.
+
+2. **Transparent Broker Representation & Fee Disclosures**:
+   - Upfront commission policies: listings clearly disclose broker fees (e.g. `2.5% upon closing` or `$500 lease fee`) before user contact.
+   - Direct owner listings are highlighted with an emerald badge: **"Direct Owner Listing &mdash; Zero Broker Fees"**.
+
+3. **Multi-Role Authentication & Safety Center**:
+   - Roles for **Buyers / Renters**, **Licensed Real Estate Brokers**, and **Administrators / Moderators**.
+   - Verified Mobile SMS workflow with 6-digit OTP verification.
+   - Built-in community **Report Listing** queue to quarantine fraudulent or inaccurate listings.
+
+4. **Mortgage Calculator & Financial Tools**:
+   - Built-in loan amortization calculator estimating monthly payments based on interest rate, term, and down payment.
+
+---
+
+## 📂 Codebase & Architecture
+
+```text
+├── .github/
+│   └── workflows/
+│       └── ci.yml               # Automated GitHub Actions syntax & asset validation
+├── api/                         # Backend AJAX endpoints (PHP)
+│   ├── get_properties.php       # Dynamic property search & JSON query API
+│   ├── report_listing.php       # Community listing report endpoint
+│   └── theme.php                # User dark/light preference storage
+├── auth/                        # PHP-based Authentication Handlers
+│   ├── login.php                # Session login & CSRF validation
+│   ├── register.php             # User & broker onboarding
+│   ├── forgot_password.php      # Password recovery handler
+│   └── google_callback.php      # OAuth 2.0 Google callback
+├── config/                      # Database & environment configurations
+│   ├── config.php               # System constants & API keys
+│   └── database.php             # PDO database connection provider
+├── database/                    # SQL Data Definitions
+│   └── schema.sql               # Complete MySQL schema (users, properties, reports)
+├── frontend/                    # Frontend UI Modules
+│   ├── AuthScreen.tsx           # Reusable React + TypeScript Obsidian Auth component
+│   └── css/                     # Core stylesheets
+├── auth.html                    # Next-Gen Obsidian Glassmorphic Auth Application
+├── index.html                   # High-performance single-page property portal
+├── index.php                    # Full dynamic PHP rendering portal
+├── setup.php                    # 1-Click Database Setup & Sample Data Seeder
+├── vercel.json                  # Production Vercel deployment configuration
+└── README.md                    # Project documentation
+```
+
+---
+
+## 💻 Local Development (WampServer & PHP)
+
+### Step 1: Start WampServer / XAMPP
+1. Launch **WampServer** (or your local Apache + MySQL stack).
+2. Ensure Apache and MySQL services are active (Green icon).
+
+### Step 2: Configure Directory
+Place this repository in your local server web directory:
+- **WampServer:** `C:\wamp64\www\Estate-Craft\`
+- **URL:** `http://localhost/Estate-Craft/`
+
+### Step 3: Run 1-Click Database Seeder
+Navigate to the web installer in your browser:
+```text
+http://localhost/Estate-Craft/setup.php
+```
+Click **"Install Database & Seed Data Now"** to execute `database/schema.sql` and populate sample properties, verified brokers, direct owners, and safety reports.
+
+### Pre-Seeded Sample Accounts
+
+All demo accounts share the password: `Password123!`
+
+| Role | Name | Email | Highlights |
 | :--- | :--- | :--- | :--- |
-| **Verified Broker** | Sarah Jenkins | `sarah.broker@realestate.local` | Apex Premier Realty, BRE# 01928374, 2.5% fee policy, verified mobile |
+| **Verified Broker** | Sarah Jenkins | `sarah.broker@realestate.local` | Apex Premier Realty, BRE# 01928374, 2.5% fee policy |
 | **Direct Owner** | Michael Chang | `michael.chang@example.com` | Zero broker fee seller, verified mobile |
-| **Commercial Broker**| Elena Vance | `elena.broker@realestate.local` | Skyline Metro Properties, BRE# 08492011, commercial lease agent |
-| **Safety Admin** | Admin Moderator | `admin@realestate.local` | Can access Safety Reports queue (`user/reports.php`) and moderate listings |
-
-*(Tip: On the `auth/login.php` page, there are 1-click **Quick Fill** buttons to automatically fill credentials for testing).*
+| **Commercial Agent** | Elena Vance | `elena.broker@realestate.local` | Skyline Metro Properties, commercial lease specialist |
+| **Safety Admin** | Admin Moderator | `admin@realestate.local` | Safety Reports review queue & listing moderation |
 
 ---
 
-## ⚙️ Configuration & Third-Party APIs
+## 🔒 Security Implementations
 
-All configuration constants are located in:
-```
-config/config.php
-```
-
-### 1. Database Connection
-```php
-define('DB_HOST', '127.0.0.1');
-define('DB_PORT', '3306'); // If your WampServer uses port 3308 for MySQL, change this here
-define('DB_NAME', 'realestate_db');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-```
-
-### 2. Phone SMS OTP Verification
-- **Development / Demo Mode (Default)**:
-  `define('SMS_MODE', 'dev');`
-  In this mode, no paid SMS gateway is needed. The 6-digit OTP code is generated, stored, and displayed in a developer banner right on `auth/verify_phone.php` so you can test phone verification instantly!
-- **Live Twilio SMS**:
-  To send real SMS messages to real phones:
-  ```php
-  define('SMS_MODE', 'twilio');
-  define('TWILIO_SID', 'your_account_sid');
-  define('TWILIO_TOKEN', 'your_auth_token');
-  define('TWILIO_FROM', '+1234567890');
-  ```
-
-### 3. Google Sign-In (OAuth 2.0)
-The Google Sign-in flow is built using OAuth 2.0:
-1. Go to [Google Cloud Console Credentials](https://console.cloud.google.com/apis/credentials).
-2. Create an **OAuth 2.0 Client ID** (Web application).
-3. Set Authorized Redirect URI to:
-   ```
-   http://localhost/buy-and-sell/auth/google_callback.php
-   ```
-4. Paste the credentials into `config/config.php`:
-   ```php
-   define('GOOGLE_CLIENT_ID', 'your_client_id.apps.googleusercontent.com');
-   define('GOOGLE_CLIENT_SECRET', 'your_client_secret');
-   ```
-*(If clicked before adding credentials, the app gracefully presents clear instructions instead of breaking).*
+- **100% Prepared Statements:** All database interactions use PDO prepared statements with named parameters to prevent SQL injection.
+- **Cryptographic Password Hashing:** Uses `password_hash()` with `PASSWORD_DEFAULT` (Bcrypt).
+- **Anti-CSRF Verification:** State-changing requests enforce nonces to prevent cross-site request forgery.
+- **MIME & File Validation:** Uploaded media is validated via magic bytes MIME inspection (`image/jpeg`, `image/png`, `image/webp`), sanitized filenames, and strict file size enforcement (max 6MB).
+- **XSS Protection:** Context-aware `htmlspecialchars()` escaping across all dynamic outputs.
 
 ---
 
-## 🔒 Security Best Practices Implemented
+## 🤝 Contributing
 
-- **Prepared SQL Statements**: 100% of database queries use PDO prepared statements with named parameters to prevent SQL injection.
-- **Password Hashing**: Passwords stored using PHP `password_hash()` with `PASSWORD_DEFAULT` (Bcrypt).
-- **CSRF Tokens**: Every state-changing form (login, register, post listing, edit, delete, report) requires and verifies a cryptographically secure CSRF token.
-- **Secure File Uploads**: Image uploads are verified using MIME inspection (`finfo_file` / `mime_content_type`), extension whitelisting (`jpg`, `jpeg`, `png`, `webp`), size limits (6MB max), and randomized unique filenames to prevent path traversal or script execution.
-- **XSS Sanitization**: User-generated content is sanitized using `htmlspecialchars()` before outputting into HTML templates.
-- **Ownership Verification**: Editing and deleting listings validates that the session user is either the original author or an administrator.
+1. Fork the Project (`gh repo fork abdihabtamu368-cpu/Estate-Craft`)
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See `LICENSE` for more information.

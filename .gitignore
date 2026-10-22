@@ -11,6 +11,19 @@ $RECYCLE.BIN/
 *.sublime-project
 *.sublime-workspace
 
+# Vercel & Cloud Build artifacts
+.vercel/
+dist/
+build/
+.output/
+
+# Dependencies & Package Managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
 # Environment / Secrets / Logs
 .env
 .env.local

@@ -1,0 +1,44 @@
+name: CI & Code Quality
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate:
+    name: Codebase & Asset Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate Vercel Configuration JSON
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('vercel.json', 'utf8')); console.log('✓ vercel.json is valid JSON');"
+
+      - name: Verify HTML Files Integrity
+        run: |
+          test -f index.html && echo "✓ index.html found"
+          test -f auth.html && echo "✓ auth.html found"
+
+      - name: Setup PHP Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_mysql
+
+      - name: Lint PHP Syntax
+        run: |
+          find . -name "*.php" -not -path "./vendor/*" -exec php -l {} +
+
+      - name: Summary Report
+        run: |
+          echo "All syntax and build verification checks passed successfully!"
