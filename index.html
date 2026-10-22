@@ -697,11 +697,13 @@
       min-width: 0;
       min-height: 0;
       height: 100%;
-      overflow-y: scroll !important;
+      overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
       padding: 24px 28px;
       background: var(--bg-card);
+      scroll-behavior: smooth;
+      position: relative;
     }
 
     /* Visible Modern Scrollbars */
@@ -724,15 +726,25 @@
     .settings-sidebar-vertical::-webkit-scrollbar-thumb:hover {
       background: #64748b;
     }
-
-    .settings-body-vertical .settings-pane {
-      display: none;
-      padding: 0;
+    .settings-body-vertical,
+    .settings-sidebar-vertical {
+      scrollbar-width: thin;
+      scrollbar-color: #94a3b8 rgba(0, 0, 0, 0.04);
     }
 
-    .settings-body-vertical .settings-pane.active {
-      display: block;
-      animation: fadeIn 0.25s ease;
+    /* Vertical Continuous Layout for All Settings Features */
+    .settings-body-vertical .settings-pane {
+      display: block !important;
+      padding: 0 0 36px 0;
+      margin-bottom: 36px;
+      border-bottom: 1px solid var(--border-color);
+      scroll-margin-top: 18px;
+    }
+
+    .settings-body-vertical .settings-pane:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 24px;
     }
 
     /* Fallback for horizontal tabs */
@@ -1724,14 +1736,14 @@
                         Settings & Features
                     </div>
                     <div class="settings-tabs-vertical">
-                        <button type="button" class="settings-vtab-btn active" onclick="switchSettingsTab('lang')">
+                        <button type="button" class="settings-vtab-btn active" data-tab="lang" onclick="scrollToSettingsSection('lang')">
                             <span class="vtab-icon">🌐</span>
                             <div class="vtab-text">
                                 <span class="vtab-title" data-i18n="tab_lang">Language & Currency</span>
                                 <span class="vtab-sub">English, Amharic, Oromo</span>
                             </div>
                         </button>
-                        <button type="button" class="settings-vtab-btn" onclick="switchSettingsTab('verification'); renderVerificationPane();">
+                        <button type="button" class="settings-vtab-btn" data-tab="verification" onclick="scrollToSettingsSection('verification')">
                             <span class="vtab-icon">🛡️</span>
                             <div class="vtab-text">
                                 <span class="vtab-title" data-i18n="tab_verification">National ID Verification</span>
@@ -1739,28 +1751,28 @@
                             </div>
                             <span id="settingsVerifyBadge" style="background:#10b981; color:#fff; font-size:10px; font-weight:800; padding:2px 7px; border-radius:9999px; margin-left:auto; display:none;">Verified</span>
                         </button>
-                        <button type="button" class="settings-vtab-btn" onclick="switchSettingsTab('security')">
+                        <button type="button" class="settings-vtab-btn" data-tab="security" onclick="scrollToSettingsSection('security')">
                             <span class="vtab-icon">🔑</span>
                             <div class="vtab-text">
                                 <span class="vtab-title" data-i18n="tab_security">Reset Password</span>
                                 <span class="vtab-sub">Security & credentials</span>
                             </div>
                         </button>
-                        <button type="button" class="settings-vtab-btn" onclick="switchSettingsTab('theme'); updateThemeCardUI();">
+                        <button type="button" class="settings-vtab-btn" data-tab="theme" onclick="scrollToSettingsSection('theme')">
                             <span class="vtab-icon">☀️</span>
                             <div class="vtab-text">
                                 <span class="vtab-title" data-i18n="tab_theme">Day / Night Mode</span>
                                 <span class="vtab-sub">Light & Dark theme</span>
                             </div>
                         </button>
-                        <button type="button" class="settings-vtab-btn" onclick="switchSettingsTab('favorites'); renderSettingsFavorites();">
+                        <button type="button" class="settings-vtab-btn" data-tab="favorites" onclick="scrollToSettingsSection('favorites')">
                             <span class="vtab-icon">❤️</span>
                             <div class="vtab-text">
                                 <span class="vtab-title" data-i18n="tab_favs">Saved Properties</span>
                                 <span class="vtab-sub">Bookmarked homes</span>
                             </div>
                         </button>
-                        <button type="button" class="settings-vtab-btn" onclick="switchSettingsTab('mortgage')">
+                        <button type="button" class="settings-vtab-btn" data-tab="mortgage" onclick="scrollToSettingsSection('mortgage')">
                             <span class="vtab-icon">🧮</span>
                             <div class="vtab-text">
                                 <span class="vtab-title" data-i18n="tab_calc">Loan Calculator</span>
@@ -1770,8 +1782,8 @@
                     </div>
                 </aside>
 
-                <!-- Settings Content Area -->
-                <main class="settings-body-vertical">
+                <!-- Settings Content Area (Smooth Continuous Vertical Scroll) -->
+                <main class="settings-body-vertical" id="settingsBodyVertical" onscroll="handleSettingsScroll()">
 
             <!-- Tab 1: Language & Regional -->
             <div class="settings-pane active" id="pane-lang">
@@ -3015,9 +3027,7 @@
     }
 
     function openFavoritesModal() {
-      openSettingsModal();
-      switchSettingsTab('favorites');
-      renderSettingsFavorites();
+      openSettingsModal('favorites');
     }
 
     function renderSettingsFavorites() {
@@ -3081,8 +3091,7 @@
     let currentResetTarget = "";
 
     function openResetPasswordModal() {
-      openSettingsModal();
-      switchSettingsTab('security');
+      openSettingsModal('security');
     }
 
     function setWizardNav(step) {
@@ -3356,32 +3365,101 @@
     }
 
     /* =========================================================================
-       6. Settings Modal, Mortgage Calculator, AI Assistant & Feedback
+       6. All-in-One Settings Hub (Unified Vercel Architecture with Smooth Vertical Scroll)
        ========================================================================= */
+    let isProgrammaticScroll = false;
+    let programmaticScrollTimer = null;
+
     function openSettingsModal(defaultTab = 'lang') {
       closeModal();
-      switchSettingsTab(defaultTab);
-      highlightLangCard(localStorage.getItem('estate_lang') || 'en');
+      // Pre-render all dynamic content so element heights and targets are accurately computed
+      renderVerificationPane();
+      renderSettingsFavorites();
       updateThemeCardUI();
+      if (typeof runMortgageCalc === 'function') runMortgageCalc();
+      highlightLangCard(localStorage.getItem('estate_lang') || 'en');
       updateVerificationBadgeUI();
-      document.getElementById('settingsModal').classList.add('active');
+
+      const modal = document.getElementById('settingsModal');
+      modal.classList.add('active');
+
+      // Allow DOM repaint, then smoothly scroll to chosen tab
+      setTimeout(() => {
+        scrollToSettingsSection(defaultTab || 'lang');
+      }, 60);
+    }
+
+    function scrollToSettingsSection(tabName) {
+      const container = document.getElementById('settingsBodyVertical') || document.querySelector('.settings-body-vertical');
+      const targetPane = document.getElementById(`pane-${tabName}`);
+
+      setActiveSidebarTab(tabName);
+
+      if (!targetPane) return;
+
+      // Ensure dynamic contents are fresh
+      if (tabName === 'verification') renderVerificationPane();
+      if (tabName === 'favorites') renderSettingsFavorites();
+      if (tabName === 'theme') updateThemeCardUI();
+
+      if (container && container.scrollHeight > container.clientHeight) {
+        isProgrammaticScroll = true;
+        clearTimeout(programmaticScrollTimer);
+
+        const contRect = container.getBoundingClientRect();
+        const targetRect = targetPane.getBoundingClientRect();
+        const targetScrollTop = (targetRect.top - contRect.top) + container.scrollTop;
+
+        container.scrollTo({
+          top: Math.max(0, targetScrollTop - 12),
+          behavior: 'smooth'
+        });
+
+        programmaticScrollTimer = setTimeout(() => {
+          isProgrammaticScroll = false;
+        }, 650);
+      } else {
+        targetPane.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     function switchSettingsTab(tabName) {
-      document.querySelectorAll('.settings-vtab-btn, .settings-tab-btn').forEach(b => {
-        b.classList.remove('active');
-        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(tabName)) {
-          b.classList.add('active');
-        }
+      scrollToSettingsSection(tabName);
+    }
+
+    function setActiveSidebarTab(tabName) {
+      document.querySelectorAll('.settings-vtab-btn').forEach(btn => {
+        const isMatch = btn.getAttribute('data-tab') === tabName ||
+                        (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${tabName}'`));
+        btn.classList.toggle('active', !!isMatch);
       });
-      document.querySelectorAll('.settings-pane').forEach(p => p.classList.remove('active'));
-      const pane = document.getElementById(`pane-${tabName}`);
-      if (pane) pane.classList.add('active');
-      if (tabName === 'verification') {
-        renderVerificationPane();
+    }
+
+    function handleSettingsScroll() {
+      if (isProgrammaticScroll) return;
+      const container = document.getElementById('settingsBodyVertical') || document.querySelector('.settings-body-vertical');
+      if (!container) return;
+
+      const tabs = ['lang', 'verification', 'security', 'theme', 'favorites', 'mortgage'];
+      const contRect = container.getBoundingClientRect();
+
+      // Check if scrolled near bottom
+      if (container.scrollHeight - container.scrollTop <= container.clientHeight + 45) {
+        setActiveSidebarTab('mortgage');
+        return;
       }
-      const body = document.querySelector('.settings-body-vertical');
-      if (body) body.scrollTop = 0;
+
+      let activeTab = 'lang';
+      for (let i = 0; i < tabs.length; i++) {
+        const pane = document.getElementById(`pane-${tabs[i]}`);
+        if (pane) {
+          const paneRect = pane.getBoundingClientRect();
+          if ((paneRect.top - contRect.top) <= 140) {
+            activeTab = tabs[i];
+          }
+        }
+      }
+      setActiveSidebarTab(activeTab);
     }
 
     /* =========================================================================
