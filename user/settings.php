@@ -209,7 +209,7 @@ require_once __DIR__ . '/../includes/header.php';
     <!-- Settings Vertical Grid Architecture -->
     <div class="settings-grid-wrapper" style="display: grid; grid-template-columns: 280px 1fr; gap: 28px; align-items: start;">
         <!-- Left Vertical Navigation Sidebar -->
-        <aside style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 14px; position: sticky; top: 90px; box-shadow: var(--shadow-sm);">
+        <aside style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 14px; position: sticky; top: 90px; max-height: calc(100vh - 120px); overflow-y: auto; box-shadow: var(--shadow-sm);">
             <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 12px; padding: 0 8px;">
                 Settings & Preferences
             </div>
