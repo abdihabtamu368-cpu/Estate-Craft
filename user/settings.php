@@ -195,36 +195,57 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
     <?php endif; ?>
 
-    <!-- Settings Layout: Horizontal Nav Tabs + Content Card -->
-    <div style="display: flex; gap: 8px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px;">
-        <a href="?tab=language" class="btn btn-sm <?= $activeTab === 'language' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px;">
-            🌐 <?= __('tab_lang', 'Language & Regional') ?>
-        </a>
-        <a href="?tab=theme" class="btn btn-sm <?= $activeTab === 'theme' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px;">
-            🎨 <?= __('theme_mode', 'Theme Mode') ?>
-        </a>
-        <a href="?tab=security" class="btn btn-sm <?= $activeTab === 'security' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px;">
-            🔒 <?= __('tab_security', 'Password & Security') ?>
-        </a>
-        <a href="?tab=feedback" class="btn btn-sm <?= $activeTab === 'feedback' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px;">
-            💬 <?= __('tab_feedback', 'User Feedback') ?>
-        </a>
-        <a href="?tab=reports" class="btn btn-sm <?= $activeTab === 'reports' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px;">
-            🛡️ <?= __('tab_reports', 'Safety & Reports') ?>
-        </a>
-        <a href="<?= BASE_URL ?>/user/verify_id.php" class="btn btn-sm btn-secondary" style="border-radius: 8px; color: #047857; border-color: #a7f3d0; background: #ecfdf5;">
-            🆔 National ID Verification
-            <?php if (($user['national_id_status'] ?? '') === 'verified'): ?>
-                <span style="color: #047857; font-weight: 800;">✓</span>
-            <?php elseif (($user['national_id_status'] ?? '') === 'pending'): ?>
-                <span style="color: #b45309; font-weight: 800;">⏳</span>
-            <?php endif; ?>
-        </a>
-        <a href="?tab=ai_assistant" class="btn btn-sm <?= $activeTab === 'ai_assistant' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px; background: <?= $activeTab === 'ai_assistant' ? 'linear-gradient(135deg, #2563eb, #7c3aed)' : '' ?>; color: <?= $activeTab === 'ai_assistant' ? '#fff' : '#6b21a8' ?>;">
-            ✨ <?= __('tab_ai_assistant', 'Antigravity AI Assistant') ?>
-            <span style="background: rgba(255,255,255,0.25); font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">BEST</span>
-        </a>
-    </div>
+    <style>
+    @media (max-width: 860px) {
+        .settings-grid-wrapper {
+            grid-template-columns: 1fr !important;
+        }
+        .settings-grid-wrapper aside {
+            position: static !important;
+        }
+    }
+    </style>
+
+    <!-- Settings Vertical Grid Architecture -->
+    <div class="settings-grid-wrapper" style="display: grid; grid-template-columns: 280px 1fr; gap: 28px; align-items: start;">
+        <!-- Left Vertical Navigation Sidebar -->
+        <aside style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 14px; position: sticky; top: 90px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 12px; padding: 0 8px;">
+                Settings & Preferences
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <a href="?tab=language" class="btn btn-sm <?= $activeTab === 'language' ? 'btn-primary' : 'btn-secondary' ?>" style="text-align: left; justify-content: flex-start; padding: 12px 14px; border-radius: 10px; font-weight: 700;">
+                    🌐 <?= __('tab_lang', 'Language & Regional') ?>
+                </a>
+                <a href="?tab=theme" class="btn btn-sm <?= $activeTab === 'theme' ? 'btn-primary' : 'btn-secondary' ?>" style="text-align: left; justify-content: flex-start; padding: 12px 14px; border-radius: 10px; font-weight: 700;">
+                    🎨 <?= __('theme_mode', 'Theme Mode') ?>
+                </a>
+                <a href="?tab=security" class="btn btn-sm <?= $activeTab === 'security' ? 'btn-primary' : 'btn-secondary' ?>" style="text-align: left; justify-content: flex-start; padding: 12px 14px; border-radius: 10px; font-weight: 700;">
+                    🔒 <?= __('tab_security', 'Password & Security') ?>
+                </a>
+                <a href="?tab=feedback" class="btn btn-sm <?= $activeTab === 'feedback' ? 'btn-primary' : 'btn-secondary' ?>" style="text-align: left; justify-content: flex-start; padding: 12px 14px; border-radius: 10px; font-weight: 700;">
+                    💬 <?= __('tab_feedback', 'User Feedback') ?>
+                </a>
+                <a href="?tab=reports" class="btn btn-sm <?= $activeTab === 'reports' ? 'btn-primary' : 'btn-secondary' ?>" style="text-align: left; justify-content: flex-start; padding: 12px 14px; border-radius: 10px; font-weight: 700;">
+                    🛡️ <?= __('tab_reports', 'Safety & Reports') ?>
+                </a>
+                <a href="<?= BASE_URL ?>/user/verify_id.php" class="btn btn-sm btn-secondary" style="text-align: left; justify-content: space-between; padding: 12px 14px; border-radius: 10px; font-weight: 700; color: #047857; border-color: #a7f3d0; background: #ecfdf5;">
+                    <span>🆔 National ID Verification</span>
+                    <?php if (($user['national_id_status'] ?? '') === 'verified'): ?>
+                        <span style="background: #10b981; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 9999px;">✓ Verified</span>
+                    <?php elseif (($user['national_id_status'] ?? '') === 'pending'): ?>
+                        <span style="background: #f59e0b; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 9999px;">⏳ Pending</span>
+                    <?php endif; ?>
+                </a>
+                <a href="?tab=ai_assistant" class="btn btn-sm <?= $activeTab === 'ai_assistant' ? 'btn-primary' : 'btn-secondary' ?>" style="text-align: left; justify-content: space-between; padding: 12px 14px; border-radius: 10px; font-weight: 700; background: <?= $activeTab === 'ai_assistant' ? 'linear-gradient(135deg, #2563eb, #7c3aed)' : '' ?>; color: <?= $activeTab === 'ai_assistant' ? '#fff' : '#6b21a8' ?>;">
+                    <span>✨ <?= __('tab_ai_assistant', 'AI Assistant') ?></span>
+                    <span style="background: rgba(255,255,255,0.25); font-size: 10px; padding: 2px 6px; border-radius: 4px;">BEST</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Right Content Main Area -->
+        <main style="min-width: 0;">
 
     <!-- ============================================================== -->
     <!-- TAB 1: LANGUAGE & REGIONAL PREFERENCES (Amharic, Oromo, English)-->
@@ -795,6 +816,8 @@ require_once __DIR__ . '/../includes/header.php';
         }
         </script>
     <?php endif; ?>
+        </main>
+    </div>
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
