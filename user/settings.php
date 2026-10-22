@@ -241,6 +241,17 @@ require_once __DIR__ . '/../includes/header.php';
                     <span>✨ <?= __('tab_ai_assistant', 'AI Assistant') ?></span>
                     <span style="background: rgba(255,255,255,0.25); font-size: 10px; padding: 2px 6px; border-radius: 4px;">BEST</span>
                 </a>
+
+                <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+                    <a href="<?= BASE_URL ?>/auth/logout.php" class="btn btn-sm" style="text-align: left; justify-content: flex-start; padding: 12px 14px; border-radius: 10px; font-weight: 700; color: #ef4444; background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.22); text-decoration: none; width: 100%; display: flex; align-items: center; gap: 8px;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span><?= __('nav_signout', 'Sign Out') ?></span>
+                    </a>
+                </div>
             </div>
         </aside>
 

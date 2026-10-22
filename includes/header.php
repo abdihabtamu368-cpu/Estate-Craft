@@ -169,10 +169,6 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
                             Admin
                         </a>
                     <?php endif; ?>
-
-                    <a href="<?= BASE_URL ?>/auth/logout.php" class="btn btn-outline btn-sm" title="Sign Out" style="padding: 6px 10px;">
-                        <?= __('nav_signout', 'Sign Out') ?>
-                    </a>
                 </div>
             <?php else: ?>
                 <a href="<?= BASE_URL ?>/auth/login.php" class="btn btn-secondary btn-sm" id="btnSignIn"><?= __('nav_signin', 'Sign In') ?></a>
