@@ -1509,6 +1509,10 @@
                 <button type="button" class="settings-tab-btn active" onclick="switchSettingsTab('lang')">
                     🌐 <span data-i18n="tab_lang">Language & Currency</span>
                 </button>
+                <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('verification'); renderVerificationPane();">
+                    🛡️ <span data-i18n="tab_verification">National ID Verification</span>
+                    <span id="settingsVerifyBadge" style="background:#10b981; color:#fff; font-size:10px; font-weight:800; padding:2px 7px; border-radius:9999px; margin-left:5px; display:none;">Verified</span>
+                </button>
                 <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('security')">
                     🔑 <span data-i18n="tab_security">Reset Password</span>
                 </button>
@@ -1559,6 +1563,13 @@
                         <button type="button" class="btn btn-primary btn-sm" id="btnCurrencyETB" onclick="setCurrency('ETB')">🇪🇹 Ethiopian Birr (ETB)</button>
                         <button type="button" class="btn btn-secondary btn-sm" id="btnCurrencyUSD" onclick="setCurrency('USD')">🇺🇸 US Dollar (USD - ~125 ETB)</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Tab: National ID Verification & Citizen Trust -->
+            <div class="settings-pane" id="pane-verification">
+                <div style="max-width: 680px; margin: 0 auto;" id="verificationPaneContent">
+                    <!-- Populated dynamically by renderVerificationPane() -->
                 </div>
             </div>
 
@@ -2099,10 +2110,10 @@
                 <div class="seller-avatar">${prop.sellerName.charAt(0).toUpperCase()}</div>
                 <div>
                   <div class="seller-name">${escapeHtml(prop.sellerName)}</div>
-                  ${prop.sellerVerified ? `
-                    <span class="badge badge-verified" style="font-size: 10px; padding: 1px 6px;">
+                  ${(prop.sellerVerified || isUserNationalIdVerified()) ? `
+                    <span class="badge badge-verified" style="font-size: 10px; padding: 2px 7px; display: inline-flex; align-items: center; gap: 4px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; border-radius: 9999px;">
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                      Verified
+                      🛡️ ID Verified Seller
                     </span>` : ''}
                 </div>
               </div>
@@ -2561,6 +2572,7 @@
         cta_btn: "Post Your Property Now",
         settings_title: "⚙️ Account & Application Settings",
         tab_lang: "Language & Regional",
+        tab_verification: "National ID Verification",
         tab_security: "Password & Security",
         tab_calc: "Mortgage Calc",
         tab_ai: "AI Assistant",
@@ -2596,6 +2608,7 @@
         cta_btn: "ቤትዎን አሁኑኑ ይለጥፉ",
         settings_title: "⚙️ የመለያ እና መተግበሪያ ቅንብሮች",
         tab_lang: "ቋንቋ እና ክልል",
+        tab_verification: "ብሔራዊ መታወቂያ ማረጋገጫ",
         tab_security: "የይለፍ ቃል እና ደህንነት",
         tab_calc: "የብድር ስሌት",
         tab_ai: "ዘመናዊ AI ረዳት",
@@ -2631,6 +2644,7 @@
         cta_btn: "Amma Mana Keessan Galmeessaa",
         settings_title: "⚙️ Qindaa’inoota Herregaa fi Appii",
         tab_lang: "Afaan fi Naannoo",
+        tab_verification: "Mirkaneessa Eenyummaa",
         tab_security: "Jechama fi Nageenya",
         tab_calc: "Liqii Herregi",
         tab_ai: "Gargaaraa AI",
@@ -2947,6 +2961,13 @@
         const userName = localStorage.getItem('estate_craft_user_name') || 'Member';
         const userInitial = (userName.charAt(0) || 'U').toUpperCase();
 
+        const idStatus = localStorage.getItem('estate_craft_id_status') || 'unverified';
+        const verifyBadgeHtml = idStatus === 'verified'
+          ? `<span style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 9999px; margin-left: 6px; display: inline-flex; align-items: center; gap: 3px;" title="ID Verified Citizen">🛡️ Verified</span>`
+          : (idStatus === 'pending'
+            ? `<span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 9999px; margin-left: 6px; display: inline-flex; align-items: center; gap: 3px;" title="Pending Review">⏳ Pending ID</span>`
+            : '');
+
         if (btnIn) {
           btnIn.className = 'btn-nav-user';
           btnIn.removeAttribute('style');
@@ -2956,8 +2977,9 @@
               <span style="position: absolute; bottom: -1px; right: -1px; width: 6.5px; height: 6.5px; border-radius: 50%; background: #10b981; border: 1.5px solid #0b0f19;"></span>
             </span>
             <span style="max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${userName}</span>
+            ${verifyBadgeHtml}
           `;
-          btnIn.onclick = (e) => { e.preventDefault(); showToast(`Signed in as ${userName}`); };
+          btnIn.onclick = (e) => { e.preventDefault(); openSettingsModal('verification'); };
         }
 
         if (btnUp) {
@@ -2980,6 +3002,8 @@
         if (homeSec) homeSec.style.display = 'none';
         if (footer) footer.style.display = 'none';
       }
+
+      updateVerificationBadgeUI();
 
       if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
         window.catalogMap.invalidateSize();
@@ -3091,6 +3115,7 @@
       switchSettingsTab(defaultTab);
       highlightLangCard(localStorage.getItem('estate_lang') || 'en');
       updateThemeCardUI();
+      updateVerificationBadgeUI();
       document.getElementById('settingsModal').classList.add('active');
     }
 
@@ -3104,6 +3129,497 @@
       document.querySelectorAll('.settings-pane').forEach(p => p.classList.remove('active'));
       const pane = document.getElementById(`pane-${tabName}`);
       if (pane) pane.classList.add('active');
+      if (tabName === 'verification') {
+        renderVerificationPane();
+      }
+    }
+
+    /* =========================================================================
+       6b. National ID Verification & Admin Moderation Engine (Vercel & Static)
+       ========================================================================= */
+    function getVerificationState() {
+      return {
+        status: localStorage.getItem('estate_craft_id_status') || 'unverified',
+        fullName: localStorage.getItem('estate_craft_id_name') || localStorage.getItem('estate_craft_user_name') || 'Abebe Kebede Tadesse',
+        idType: localStorage.getItem('estate_craft_id_type') || 'fayda',
+        idNumber: localStorage.getItem('estate_craft_id_number') || '',
+        docUrl: localStorage.getItem('estate_craft_id_doc') || '',
+        submittedAt: localStorage.getItem('estate_craft_id_submitted_at') || '',
+        verifiedAt: localStorage.getItem('estate_craft_id_verified_at') || '',
+        rejectionReason: localStorage.getItem('estate_craft_id_rejection_reason') || ''
+      };
+    }
+
+    function isUserNationalIdVerified() {
+      return localStorage.getItem('estate_craft_id_status') === 'verified';
+    }
+
+    function updateVerificationBadgeUI() {
+      const badge = document.getElementById('settingsVerifyBadge');
+      if (!badge) return;
+      const status = localStorage.getItem('estate_craft_id_status') || 'unverified';
+      if (status === 'verified') {
+        badge.style.display = 'inline-block';
+        badge.style.background = '#10b981';
+        badge.textContent = '✓ Verified';
+      } else if (status === 'pending') {
+        badge.style.display = 'inline-block';
+        badge.style.background = '#f59e0b';
+        badge.textContent = '⏳ Pending';
+      } else if (status === 'rejected') {
+        badge.style.display = 'inline-block';
+        badge.style.background = '#ef4444';
+        badge.textContent = '✕ Rejected';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    function getSampleFaydaIdSvg(name = "Abebe Kebede Tadesse", idNum = "ET-FAN-9842-1082-9901") {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 380" width="100%" height="100%">
+        <defs>
+          <linearGradient id="etGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#078930"/>
+            <stop offset="50%" stop-color="#FCDD09"/>
+            <stop offset="100%" stop-color="#DA121A"/>
+          </linearGradient>
+          <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f8fafc"/>
+            <stop offset="100%" stop-color="#e2e8f0"/>
+          </linearGradient>
+        </defs>
+        <rect width="600" height="380" rx="16" fill="url(#cardBg)" stroke="#cbd5e1" stroke-width="2"/>
+        <rect x="0" y="0" width="600" height="12" rx="4" fill="url(#etGrad)"/>
+        
+        <g transform="translate(24, 28)">
+          <circle cx="24" cy="24" r="22" fill="#0f172a"/>
+          <text x="24" y="32" font-family="sans-serif" font-size="22" fill="#fcd34d" text-anchor="middle">★</text>
+          <text x="56" y="20" font-family="sans-serif" font-size="13" font-weight="bold" fill="#0f172a">FEDERAL DEMOCRATIC REPUBLIC OF ETHIOPIA</text>
+          <text x="56" y="36" font-family="sans-serif" font-size="12" fill="#475569">የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ • FAYDA NATIONAL DIGITAL ID</text>
+        </g>
+        
+        <rect x="30" y="90" width="120" height="150" rx="8" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle cx="90" cy="140" r="32" fill="#64748b"/>
+        <path d="M50 220 C 50 185, 130 185, 130 220 Z" fill="#64748b"/>
+        <rect x="30" y="248" width="120" height="20" rx="4" fill="#0f172a"/>
+        <text x="90" y="262" font-family="monospace" font-size="9" fill="#38bdf8" text-anchor="middle">BIOMETRIC VERIFIED</text>
+        
+        <g transform="translate(170, 95)" font-family="sans-serif">
+          <text x="0" y="14" font-size="10" fill="#64748b" text-transform="uppercase">Full Name / ሙሉ ስም</text>
+          <text x="0" y="34" font-size="16" font-weight="bold" fill="#0f172a">${name}</text>
+          
+          <text x="0" y="65" font-size="10" fill="#64748b" text-transform="uppercase">Fayda FIN / ብሔራዊ መታወቂያ ቁጥር</text>
+          <text x="0" y="85" font-size="15" font-family="monospace" font-weight="bold" fill="#2563eb">${idNum}</text>
+          
+          <text x="0" y="115" font-size="10" fill="#64748b" text-transform="uppercase">Nationality / ዜግነት</text>
+          <text x="0" y="133" font-size="13" font-weight="600" fill="#0f172a">Ethiopian (ኢትዮጵያዊ)</text>
+
+          <text x="190" y="115" font-size="10" fill="#64748b" text-transform="uppercase">Region / ክልል</text>
+          <text x="190" y="133" font-size="13" font-weight="600" fill="#0f172a">Addis Ababa (አዲስ አበባ)</text>
+        </g>
+        
+        <rect x="30" y="290" width="540" height="65" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+        <rect x="42" y="300" width="45" height="45" fill="#0f172a"/>
+        <rect x="47" y="305" width="15" height="15" fill="#ffffff"/>
+        <rect x="67" y="325" width="15" height="15" fill="#ffffff"/>
+        <g transform="translate(110, 310)">
+          <line x1="0" y1="0" x2="0" y2="30" stroke="#0f172a" stroke-width="3"/>
+          <line x1="6" y1="0" x2="6" y2="30" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="12" y1="0" x2="12" y2="30" stroke="#0f172a" stroke-width="4"/>
+          <line x1="20" y1="0" x2="20" y2="30" stroke="#0f172a" stroke-width="2"/>
+          <line x1="26" y1="0" x2="26" y2="30" stroke="#0f172a" stroke-width="1"/>
+          <line x1="32" y1="0" x2="32" y2="30" stroke="#0f172a" stroke-width="3.5"/>
+          <line x1="42" y1="0" x2="42" y2="30" stroke="#0f172a" stroke-width="2"/>
+          <line x1="50" y1="0" x2="50" y2="30" stroke="#0f172a" stroke-width="4"/>
+          <line x1="60" y1="0" x2="60" y2="30" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="70" y1="0" x2="70" y2="30" stroke="#0f172a" stroke-width="3"/>
+          <line x1="80" y1="0" x2="80" y2="30" stroke="#0f172a" stroke-width="2"/>
+          <line x1="90" y1="0" x2="90" y2="30" stroke="#0f172a" stroke-width="4"/>
+          <text x="130" y="20" font-family="monospace" font-size="12" font-weight="bold" fill="#047857">NID-ETH-SECURE-HASH-${idNum.slice(-4)}</text>
+          <text x="350" y="20" font-family="sans-serif" font-size="10" fill="#64748b">OFFICIAL GOVERNMENT CERTIFIED</text>
+        </g>
+      </svg>`;
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
+    function formatDocType(t) {
+      switch(t) {
+        case 'fayda': return "Fayda National Digital ID (ፋይዳ)";
+        case 'kebele': return "Kebele Resident Card (የቀበሌ መታወቂያ)";
+        case 'passport': return "Ethiopian Passport (ፓስፖርት)";
+        case 'driver': return "Driver's License (የመንጃ ፈቃድ)";
+        default: return "National ID Document";
+      }
+    }
+
+    function maskId(id) {
+      if (!id) return '';
+      return id.length > 8 ? id.substring(0, 4) + '-••••-' + id.substring(id.length - 4) : id;
+    }
+
+    function renderVerificationPane() {
+      const container = document.getElementById('verificationPaneContent');
+      if (!container) return;
+      const state = getVerificationState();
+      updateVerificationBadgeUI();
+
+      if (state.status === 'verified') {
+        container.innerHTML = `
+          <div style="background: var(--bg-card); border-radius: 16px;">
+            <div style="background: linear-gradient(135deg, rgba(16,185,129,0.14) 0%, rgba(5,150,105,0.06) 100%); border: 2px solid #10b981; border-radius: 14px; padding: 26px 20px; text-align: center; margin-bottom: 22px;">
+              <div style="width: 64px; height: 64px; border-radius: 50%; background: #10b981; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 12px; box-shadow: 0 8px 20px rgba(16,185,129,0.35);">
+                ✓
+              </div>
+              <h2 style="font-size: 21px; font-weight: 800; color: #065f46; margin: 0 0 6px;">Officially Verified Citizen & Seller</h2>
+              <p style="font-size: 13px; color: var(--text-muted); max-width: 520px; margin: 0 auto 18px;">
+                Your Ethiopian National ID has been accepted and verified by the EstateCraft Administrator. Your account is fully certified.
+              </p>
+              <div style="display: inline-flex; align-items: center; gap: 8px; background: #10b981; color: #fff; font-size: 13.5px; font-weight: 800; padding: 7px 20px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(16,185,129,0.3);">
+                🛡️ ID Verified Seller
+              </div>
+            </div>
+
+            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 22px;">
+              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; letter-spacing: 0.04em;">Official Verification Record</div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; font-size: 13px;">
+                <div><span style="color: var(--text-muted);">Verified Citizen:</span> <strong>${escapeHtml(state.fullName)}</strong></div>
+                <div><span style="color: var(--text-muted);">Document Type:</span> <strong>${escapeHtml(formatDocType(state.idType))}</strong></div>
+                <div><span style="color: var(--text-muted);">ID Number:</span> <code style="background: var(--bg-card); padding: 2px 6px; border-radius: 4px; font-weight: 700;">${maskId(state.idNumber)}</code></div>
+                <div><span style="color: var(--text-muted);">Certified At:</span> <strong>${escapeHtml(state.verifiedAt || 'Today')}</strong></div>
+                <div><span style="color: var(--text-muted);">Reviewer:</span> <strong>EstateCraft Chief Admin</strong></div>
+                <div><span style="color: var(--text-muted);">Badge Status:</span> <span style="background: #d1fae5; color: #065f46; font-weight: 800; padding: 2px 8px; border-radius: 9999px; font-size: 11px;">✓ ACTIVE</span></div>
+              </div>
+
+              ${state.docUrl ? `
+                <div style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;">
+                  <span style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 8px;">Archived Verification Document:</span>
+                  <img src="${state.docUrl}" alt="Verified Document" style="max-height: 160px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+                </div>
+              ` : ''}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 16px; flex-wrap: wrap; gap: 10px;">
+              <span style="font-size: 12px; color: var(--text-muted);">Want to test the submission and acceptance flow again?</span>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="handleResetIdVerification()" style="font-size: 12px;">
+                🔄 Reset Verification Demo
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (state.status === 'pending') {
+        container.innerHTML = `
+          <div style="background: var(--bg-card); border-radius: 16px;">
+            <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 12px; padding: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px;">
+              <div style="font-size: 34px; flex-shrink: 0;">⏳</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 800; color: #b45309;">National ID Submitted — Under Admin Review</div>
+                <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                  Your document was submitted at <strong>${escapeHtml(state.submittedAt || 'Today')}</strong>. An EstateCraft Administrator is reviewing your credentials.
+                </div>
+              </div>
+            </div>
+
+            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 22px;">
+              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 0.03em;">Submitted Application Summary</div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 13px; margin-bottom: 14px;">
+                <div><span style="color: var(--text-muted);">Applicant Name:</span> <strong>${escapeHtml(state.fullName)}</strong></div>
+                <div><span style="color: var(--text-muted);">Document Type:</span> <strong>${escapeHtml(formatDocType(state.idType))}</strong></div>
+                <div><span style="color: var(--text-muted);">ID Number:</span> <code style="background: var(--bg-card); padding: 2px 6px; border-radius: 4px; font-weight: 700;">${escapeHtml(state.idNumber)}</code></div>
+                <div><span style="color: var(--text-muted);">Review Status:</span> <span style="background: #fef3c7; color: #92400e; font-weight: 800; padding: 2px 8px; border-radius: 9999px; font-size: 11px;">⏳ Under Review</span></div>
+              </div>
+
+              ${state.docUrl ? `
+                <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px;">
+                  <span style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 8px;">Uploaded Document Photo:</span>
+                  <img src="${state.docUrl}" alt="ID Document" style="max-height: 170px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                </div>
+              ` : ''}
+
+              <div style="margin-top: 14px; text-align: right;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="editSubmission()">✏️ Edit Details</button>
+              </div>
+            </div>
+
+            <!-- Administrator Moderation Desk (Interactive for Vercel) -->
+            <div style="background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%); border-radius: 14px; padding: 20px; color: #ffffff; box-shadow: 0 12px 24px -6px rgba(0,0,0,0.3); border: 1px solid #334155;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 20px;">👑</span>
+                  <span style="font-weight: 800; font-size: 14px; color: #f8fafc; letter-spacing: 0.02em;">ADMINISTRATOR MODERATION DESK</span>
+                </div>
+                <span style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); font-size: 11px; padding: 2px 8px; border-radius: 9999px; color: #93c5fd; font-weight: 700;">Live Action Simulation</span>
+              </div>
+              <p style="font-size: 12.5px; color: #94a3b8; margin: 0 0 16px; line-height: 1.5;">
+                As requested: Review the submitted citizen identity document below. Click <strong>Accept & Verify</strong> to grant verified seller status, or <strong>Reject</strong> if credentials do not match.
+              </p>
+
+              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary" onclick="handleAdminAcceptId()" style="background: #10b981; border-color: #10b981; font-weight: 800; padding: 9px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(16,185,129,0.35);">
+                  ✅ Accept & Verify Account
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="handleAdminRejectId()" style="background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #fca5a5; font-weight: 700; padding: 9px 18px; border-radius: 8px;">
+                  ❌ Reject Document
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (state.status === 'rejected') {
+        container.innerHTML = `
+          <div style="background: var(--bg-card); border-radius: 16px;">
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                <span style="font-size: 26px;">❌</span>
+                <div style="font-size: 16px; font-weight: 800; color: #b91c1c;">National ID Verification Not Approved</div>
+              </div>
+              <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 12px;">
+                The Administrator reviewed your submission and noted the following reason:
+              </p>
+              <div style="background: var(--bg-main); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #b91c1c; font-weight: 600;">
+                Reason: ${escapeHtml(state.rejectionReason || "Document photo was unreadable or details did not match.")}
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-lg" onclick="editSubmission()" style="width: 100%; font-weight: 800;">
+              🔁 Re-submit National ID Document
+            </button>
+          </div>
+        `;
+      } else {
+        // Unverified state - Form
+        container.innerHTML = `
+          <div style="background: var(--bg-card); border-radius: 16px;">
+            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 18px;">
+              <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 8px 16px -4px rgba(16,185,129,0.3);">
+                🛡️
+              </div>
+              <div>
+                <h3 style="font-size: 18px; font-weight: 800; margin: 0 0 4px; color: var(--text-main);">National ID & Citizen Verification</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Verify your Ethiopian identity to earn the official <strong>🛡️ ID Verified Seller</strong> badge.</p>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 22px;">
+              <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; font-size: 12px;">
+                <div style="font-weight: 700; color: #10b981; margin-bottom: 4px;">✓ Verified Badge</div>
+                <div style="color: var(--text-muted);">Trusted green badge on all your properties and profile.</div>
+              </div>
+              <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; font-size: 12px;">
+                <div style="font-weight: 700; color: #3b82f6; margin-bottom: 4px;">⚡ Buyer Trust</div>
+                <div style="color: var(--text-muted);">Verified sellers receive faster responses and genuine offers.</div>
+              </div>
+              <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; font-size: 12px;">
+                <div style="font-weight: 700; color: #8b5cf6; margin-bottom: 4px;">🔒 Admin Verification</div>
+                <div style="color: var(--text-muted);">Administrator accepts valid Fayda, Kebele or Passport scans.</div>
+              </div>
+            </div>
+
+            <form id="staticVerifyIdForm" onsubmit="handleIdVerificationSubmit(event)">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                <div class="form-group">
+                  <label class="form-label" style="font-weight: 700;">Full Legal Name (ሙሉ ስም) *</label>
+                  <input type="text" id="verifyFullName" class="form-input" placeholder="e.g. Abebe Kebede Tadesse" value="${escapeHtml(state.fullName)}" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" style="font-weight: 700;">Document Type (የመታወቂያ ዓይነት) *</label>
+                  <select id="verifyDocType" class="form-select" required>
+                    <option value="fayda" ${state.idType === 'fayda' ? 'selected' : ''}>🇪🇹 Fayda National Digital ID (ፋይዳ)</option>
+                    <option value="kebele" ${state.idType === 'kebele' ? 'selected' : ''}>🪪 Kebele Resident Card (የቀበሌ)</option>
+                    <option value="passport" ${state.idType === 'passport' ? 'selected' : ''}>🛂 Ethiopian Passport (ፓስፖርት)</option>
+                    <option value="driver" ${state.idType === 'driver' ? 'selected' : ''}>🚗 Driver's License (የመንጃ ፈቃድ)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px;">
+                <div class="form-group">
+                  <label class="form-label" style="font-weight: 700;">National ID Number (የመታወቂያ ቁጥር) *</label>
+                  <input type="text" id="verifyIdNumber" class="form-input" placeholder="e.g. ET-FAN-9842-1082" value="${escapeHtml(state.idNumber)}" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" style="font-weight: 700;">Issuing Region / Sub-city</label>
+                  <input type="text" id="verifyRegion" class="form-input" placeholder="e.g. Bole Sub-city, Addis Ababa" value="Bole Sub-city, Addis Ababa">
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                  <label class="form-label" style="font-weight: 700; margin-bottom: 0;">Upload National ID Photo / Scan *</label>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="useSampleFaydaId()" style="font-size: 12px; padding: 3px 10px; border-radius: 8px; border-color: #3b82f6; color: #2563eb; background: rgba(59,130,246,0.08); font-weight: 700;">
+                    ⚡ Click to Use Sample Fayda National ID
+                  </button>
+                </div>
+                
+                <div id="verifyDropZone" style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 22px; text-align: center; background: var(--bg-main); transition: all 0.2s; position: relative; cursor: pointer;" onclick="document.getElementById('verifyFileInput').click()">
+                  <input type="file" id="verifyFileInput" accept="image/*,.pdf" style="display: none;" onchange="handleIdDocUpload(this)">
+                  <div id="verifyUploadPrompt" style="${state.docUrl ? 'display:none;' : ''}">
+                    <div style="font-size: 34px; margin-bottom: 8px;">📄</div>
+                    <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">Click to Upload Document Photo or Use Sample Above</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Supports PNG, JPG, WebP, PDF (National ID front scan)</div>
+                  </div>
+                  <div id="verifyPreviewContainer" style="${state.docUrl ? 'display:block;' : 'display:none;'}">
+                    <img id="verifyPreviewImg" src="${state.docUrl || ''}" alt="Document Preview" style="max-height: 170px; max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <div style="margin-top: 10px;">
+                      <span style="font-size: 12px; color: #10b981; font-weight: 700;">✓ Document Loaded & Ready</span>
+                      <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); removeUploadedDoc();" style="margin-left: 10px; padding: 2px 8px; font-size: 11px;">Change Photo</button>
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" id="verifyDocDataUrl" value="${state.docUrl || ''}">
+              </div>
+
+              <div style="margin-bottom: 22px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; padding: 12px; display: flex; gap: 10px;">
+                <input type="checkbox" id="verifyConsent" required style="margin-top: 3px;" checked>
+                <label for="verifyConsent" style="font-size: 12px; color: var(--text-main); cursor: pointer; line-height: 1.4;">
+                  I solemnly declare that the National ID credentials uploaded are authentic and belong to me. I authorize EstateCraft administrators to verify my document against official records.
+                </label>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(99,102,241,0.3);">
+                🚀 Submit National ID for Verification
+              </button>
+            </form>
+          </div>
+        `;
+      }
+    }
+
+    function useSampleFaydaId() {
+      const nameInput = document.getElementById('verifyFullName');
+      const name = (nameInput && nameInput.value.trim()) || "Abebe Kebede Tadesse";
+      const sampleIdNum = "ET-FAN-9842-1082-9901";
+      const sampleSvg = getSampleFaydaIdSvg(name, sampleIdNum);
+      
+      const docTypeSelect = document.getElementById('verifyDocType');
+      if (docTypeSelect) docTypeSelect.value = 'fayda';
+
+      const idNumInput = document.getElementById('verifyIdNumber');
+      if (idNumInput) idNumInput.value = sampleIdNum;
+
+      const hiddenDoc = document.getElementById('verifyDocDataUrl');
+      if (hiddenDoc) hiddenDoc.value = sampleSvg;
+
+      const previewImg = document.getElementById('verifyPreviewImg');
+      if (previewImg) previewImg.src = sampleSvg;
+
+      const prompt = document.getElementById('verifyUploadPrompt');
+      if (prompt) prompt.style.display = 'none';
+
+      const previewCont = document.getElementById('verifyPreviewContainer');
+      if (previewCont) previewCont.style.display = 'block';
+
+      showToast("⚡ Sample Fayda National ID Loaded!");
+    }
+
+    function handleIdDocUpload(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const dataUrl = e.target.result;
+          const hiddenDoc = document.getElementById('verifyDocDataUrl');
+          if (hiddenDoc) hiddenDoc.value = dataUrl;
+
+          const previewImg = document.getElementById('verifyPreviewImg');
+          if (previewImg) previewImg.src = dataUrl;
+
+          const prompt = document.getElementById('verifyUploadPrompt');
+          if (prompt) prompt.style.display = 'none';
+
+          const previewCont = document.getElementById('verifyPreviewContainer');
+          if (previewCont) previewCont.style.display = 'block';
+
+          showToast("✓ Document image loaded!");
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function removeUploadedDoc() {
+      const hiddenDoc = document.getElementById('verifyDocDataUrl');
+      if (hiddenDoc) hiddenDoc.value = '';
+
+      const prompt = document.getElementById('verifyUploadPrompt');
+      if (prompt) prompt.style.display = 'block';
+
+      const previewCont = document.getElementById('verifyPreviewContainer');
+      if (previewCont) previewCont.style.display = 'none';
+    }
+
+    function handleIdVerificationSubmit(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('verifyFullName')?.value.trim() || 'Abebe Kebede Tadesse';
+      const docType = document.getElementById('verifyDocType')?.value || 'fayda';
+      const idNumber = document.getElementById('verifyIdNumber')?.value.trim() || '';
+      let docUrl = document.getElementById('verifyDocDataUrl')?.value || '';
+
+      if (!idNumber) {
+        alert("Please enter your National ID Number.");
+        return;
+      }
+
+      if (!docUrl) {
+        // Automatically attach sample if user hasn't selected a photo
+        docUrl = getSampleFaydaIdSvg(fullName, idNumber);
+      }
+
+      localStorage.setItem('estate_craft_id_status', 'pending');
+      localStorage.setItem('estate_craft_id_name', fullName);
+      localStorage.setItem('estate_craft_id_type', docType);
+      localStorage.setItem('estate_craft_id_number', idNumber);
+      localStorage.setItem('estate_craft_id_doc', docUrl);
+      localStorage.setItem('estate_craft_id_submitted_at', new Date().toLocaleString());
+
+      updateVerificationBadgeUI();
+      syncAuthState();
+      showToast("🚀 National ID submitted! Status: Pending Admin Review");
+      renderVerificationPane();
+    }
+
+    function handleAdminAcceptId() {
+      localStorage.setItem('estate_craft_id_status', 'verified');
+      localStorage.setItem('estate_craft_id_verified_at', new Date().toLocaleString());
+
+      updateVerificationBadgeUI();
+      syncAuthState();
+      renderProperties();
+      showToast("🎉 National ID Accepted! Account is now Verified 🛡️");
+      renderVerificationPane();
+    }
+
+    function handleAdminRejectId() {
+      const reason = prompt("Enter rejection reason for applicant:", "ID photo is unreadable or blurry");
+      if (reason !== null) {
+        localStorage.setItem('estate_craft_id_status', 'rejected');
+        localStorage.setItem('estate_craft_id_rejection_reason', reason || 'Document photo was unreadable or details did not match.');
+
+        updateVerificationBadgeUI();
+        syncAuthState();
+        showToast("❌ National ID submission was rejected.");
+        renderVerificationPane();
+      }
+    }
+
+    function handleResetIdVerification() {
+      localStorage.removeItem('estate_craft_id_status');
+      localStorage.removeItem('estate_craft_id_name');
+      localStorage.removeItem('estate_craft_id_type');
+      localStorage.removeItem('estate_craft_id_number');
+      localStorage.removeItem('estate_craft_id_doc');
+      localStorage.removeItem('estate_craft_id_submitted_at');
+      localStorage.removeItem('estate_craft_id_verified_at');
+      localStorage.removeItem('estate_craft_id_rejection_reason');
+
+      updateVerificationBadgeUI();
+      syncAuthState();
+      renderProperties();
+      showToast("🔄 Verification reset. You can submit again.");
+      renderVerificationPane();
+    }
+
+    function editSubmission() {
+      localStorage.setItem('estate_craft_id_status', 'unverified');
+      renderVerificationPane();
     }
 
     function openMortgageModal() {
