@@ -10,7 +10,7 @@ $message = '';
 $status = 'idle'; // 'idle', 'success', 'error'
 $errorDetails = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['auto'])) {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' || isset($_GET['auto']) || php_sapi_name() === 'cli') {
     try {
         $dsn = sprintf('mysql:host=%s;port=%s;charset=utf8mb4', DB_HOST, DB_PORT);
         $pdo = new PDO($dsn, DB_USER, DB_PASS, [
