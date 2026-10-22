@@ -33,3 +33,6 @@ pnpm-debug.log*
 # Uploads directory (ignore uploaded user images, but keep folder via .gitkeep)
 uploads/properties/*
 !uploads/properties/.gitkeep
+uploads/verifications/*
+!uploads/verifications/.gitkeep
+

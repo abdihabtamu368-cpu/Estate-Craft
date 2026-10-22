@@ -27,6 +27,7 @@ $stmt = $pdo->prepare("
         u.email as owner_email,
         u.phone as owner_phone,
         u.phone_verified as owner_phone_verified,
+        u.national_id_status as owner_national_id_status,
         u.role as owner_role,
         u.avatar as owner_avatar,
         u.broker_agency,
@@ -93,6 +94,11 @@ require_once __DIR__ . '/../includes/header.php';
                     <span class="badge badge-broker">Broker Represented</span>
                 <?php else: ?>
                     <span class="badge badge-verified">Direct from Owner</span>
+                <?php endif; ?>
+                <?php if (($property['owner_national_id_status'] ?? '') === 'verified'): ?>
+                    <span class="badge" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:700;">
+                        🛡️ ID Verified Seller
+                    </span>
                 <?php endif; ?>
             </div>
 
@@ -237,6 +243,11 @@ require_once __DIR__ . '/../includes/header.php';
                                 <span class="badge badge-verified" style="margin-top: 4px;">
                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     Verified Phone
+                                </span>
+                            <?php endif; ?>
+                            <?php if (($property['owner_national_id_status'] ?? '') === 'verified'): ?>
+                                <span class="badge" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:700; margin-top: 4px; display:inline-flex; align-items:center; gap:4px;">
+                                    🛡️ National ID Verified
                                 </span>
                             <?php endif; ?>
                         </div>

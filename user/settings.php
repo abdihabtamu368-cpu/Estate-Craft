@@ -212,6 +212,14 @@ require_once __DIR__ . '/../includes/header.php';
         <a href="?tab=reports" class="btn btn-sm <?= $activeTab === 'reports' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px;">
             🛡️ <?= __('tab_reports', 'Safety & Reports') ?>
         </a>
+        <a href="<?= BASE_URL ?>/user/verify_id.php" class="btn btn-sm btn-secondary" style="border-radius: 8px; color: #047857; border-color: #a7f3d0; background: #ecfdf5;">
+            🆔 National ID Verification
+            <?php if (($user['national_id_status'] ?? '') === 'verified'): ?>
+                <span style="color: #047857; font-weight: 800;">✓</span>
+            <?php elseif (($user['national_id_status'] ?? '') === 'pending'): ?>
+                <span style="color: #b45309; font-weight: 800;">⏳</span>
+            <?php endif; ?>
+        </a>
         <a href="?tab=ai_assistant" class="btn btn-sm <?= $activeTab === 'ai_assistant' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px; background: <?= $activeTab === 'ai_assistant' ? 'linear-gradient(135deg, #2563eb, #7c3aed)' : '' ?>; color: <?= $activeTab === 'ai_assistant' ? '#fff' : '#6b21a8' ?>;">
             ✨ <?= __('tab_ai_assistant', 'Antigravity AI Assistant') ?>
             <span style="background: rgba(255,255,255,0.25); font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">BEST</span>
@@ -473,6 +481,40 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php else: ?>
                         <span class="badge badge-verified">Active</span>
                     <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- National ID Verification Status -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 24px; margin-top: 20px;">
+                <h4 style="font-size: 16px; font-weight: 700; color: var(--secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    🛡️ Official National ID Verification
+                </h4>
+                <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; flex-wrap: wrap; gap: 14px;">
+                    <div>
+                        <div style="font-weight: 700; color: var(--secondary); font-size: 14px;">
+                            <?php if (!empty($user['national_id_number'])): ?>
+                                <?= htmlspecialchars($user['national_id_number']) ?>
+                            <?php else: ?>
+                                Fayda / Kebele / Ethiopian Passport
+                            <?php endif; ?>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                            Status: 
+                            <?php if (($user['national_id_status'] ?? '') === 'verified'): ?>
+                                <span style="color:#10b981; font-weight:700;">Verified 🛡️</span>
+                            <?php elseif (($user['national_id_status'] ?? '') === 'pending'): ?>
+                                <span style="color:#f59e0b; font-weight:700;">Pending Moderator Review ⏳</span>
+                            <?php elseif (($user['national_id_status'] ?? '') === 'rejected'): ?>
+                                <span style="color:#ef4444; font-weight:700;">Rejected ❌</span>
+                            <?php else: ?>
+                                <span style="color:var(--text-muted);">Not Submitted</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <a href="<?= BASE_URL ?>/user/verify_id.php" class="btn btn-secondary btn-sm" style="color: #047857; border-color: #a7f3d0; background: #ecfdf5;">
+                        <?= ($user['national_id_status'] ?? '') === 'verified' ? 'View Certificate' : 'Verify National ID' ?>
+                    </a>
                 </div>
             </div>
         </div>

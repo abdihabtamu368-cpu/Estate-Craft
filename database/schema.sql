@@ -39,6 +39,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   `theme_mode` VARCHAR(30) DEFAULT 'default' COMMENT 'light, dark, or default (system)',
   `ai_smart_alerts` TINYINT(1) DEFAULT 1,
   `ai_search_query` VARCHAR(255) NULL,
+  -- National ID Verification fields
+  `national_id_number` VARCHAR(100) NULL,
+  `national_id_type` VARCHAR(50) DEFAULT 'fayda_national_id',
+  `national_id_document` VARCHAR(255) NULL,
+  `national_id_status` ENUM('unverified', 'pending', 'verified', 'rejected') NOT NULL DEFAULT 'unverified',
+  `national_id_submitted_at` DATETIME NULL,
+  `national_id_verified_at` DATETIME NULL,
+  `national_id_rejection_reason` VARCHAR(255) NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

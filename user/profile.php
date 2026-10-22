@@ -156,9 +156,33 @@ require_once __DIR__ . '/../includes/header.php';
             <small style="color: var(--text-muted); font-size: 12px;">Changing your phone number will require re-verifying with a 6-digit SMS OTP code.</small>
         </div>
 
-        <div class="form-group" style="margin-bottom: 24px;">
+        <div class="form-group" style="margin-bottom: 20px;">
             <label class="form-label" for="profBio">Professional Bio</label>
             <textarea id="profBio" name="bio" rows="3" class="form-textarea" placeholder="Tell potential clients about your experience, neighborhood specializations, and background..."><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
+        </div>
+
+        <!-- National ID Verification Badge / Link in Profile -->
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div>
+                <div style="font-weight: 700; color: var(--secondary); font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                    🛡️ National ID Verification:
+                    <?php if (($user['national_id_status'] ?? '') === 'verified'): ?>
+                        <span style="color: #047857; font-weight: 700;">Verified (Level 2)</span>
+                    <?php elseif (($user['national_id_status'] ?? '') === 'pending'): ?>
+                        <span style="color: #b45309; font-weight: 700;">Under Review ⏳</span>
+                    <?php elseif (($user['national_id_status'] ?? '') === 'rejected'): ?>
+                        <span style="color: #b91c1c; font-weight: 700;">Rejected ⚠️</span>
+                    <?php else: ?>
+                        <span style="color: var(--text-muted);">Unverified</span>
+                    <?php endif; ?>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                    Official government ID (Fayda, Kebele, or Passport) required for verified seller trust badges.
+                </div>
+            </div>
+            <a href="<?= BASE_URL ?>/user/verify_id.php" class="btn btn-secondary btn-sm" style="color: #047857; border-color: #a7f3d0; background: #ecfdf5;">
+                <?= ($user['national_id_status'] ?? '') === 'verified' ? 'View Certificate' : 'Verify ID Now &rarr;' ?>
+            </a>
         </div>
 
         <!-- Broker Specific Section -->

@@ -224,6 +224,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // 13. National ID Verification: Accept & Verify
+    elseif ($action === 'accept_national_id') {
+        $userId = (int)($_POST['user_id'] ?? 0);
+        if ($userId > 0) {
+            $stmt = $pdo->prepare("
+                UPDATE users 
+                SET national_id_status = 'verified', 
+                    national_id_verified_at = NOW(), 
+                    national_id_rejection_reason = NULL,
+                    phone_verified = 1
+                WHERE id = :id
+            ");
+            $stmt->execute(['id' => $userId]);
+            $_SESSION['flash_success'] = "National ID for Member #{$userId} accepted! Account is now officially Verified 🛡️";
+        }
+    }
+
+    // 14. National ID Verification: Reject
+    elseif ($action === 'reject_national_id') {
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $reason = trim($_POST['rejection_reason'] ?? 'Submitted document is blurry, expired, or does not match account name.');
+        if ($userId > 0) {
+            $stmt = $pdo->prepare("
+                UPDATE users 
+                SET national_id_status = 'rejected', 
+                    national_id_rejection_reason = :reason 
+                WHERE id = :id
+            ");
+            $stmt->execute(['reason' => $reason, 'id' => $userId]);
+            $_SESSION['flash_warning'] = "National ID for Member #{$userId} was rejected. Reason recorded: " . htmlspecialchars($reason);
+        }
+    }
+
+    // 15. National ID Verification: Reset to Unverified
+    elseif ($action === 'reset_national_id') {
+        $userId = (int)($_POST['user_id'] ?? 0);
+        if ($userId > 0) {
+            $stmt = $pdo->prepare("
+                UPDATE users 
+                SET national_id_status = 'unverified', 
+                    national_id_verified_at = NULL, 
+                    national_id_rejection_reason = NULL 
+                WHERE id = :id
+            ");
+            $stmt->execute(['id' => $userId]);
+            $_SESSION['flash_info'] = "National ID status for Member #{$userId} reset to Unverified.";
+        }
+    }
+
     header("Location: " . BASE_URL . "/admin/index.php?tab=" . urlencode($activeTab));
     exit;
 }
@@ -234,6 +283,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $countUsers = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $countBrokers = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'broker'")->fetchColumn();
 $countUnverified = $pdo->query("SELECT COUNT(*) FROM users WHERE phone_verified = 0")->fetchColumn();
+$countPendingId = $pdo->query("SELECT COUNT(*) FROM users WHERE national_id_status = 'pending'")->fetchColumn();
+$countVerifiedId = $pdo->query("SELECT COUNT(*) FROM users WHERE national_id_status = 'verified'")->fetchColumn();
 $countProperties = $pdo->query("SELECT COUNT(*) FROM properties")->fetchColumn();
 $countPendingProps = $pdo->query("SELECT COUNT(*) FROM properties WHERE status = 'pending_review' OR status = 'flagged'")->fetchColumn();
 $countResets = $pdo->query("SELECT COUNT(*) FROM password_resets WHERE expires_at > NOW()")->fetchColumn();
@@ -244,10 +295,36 @@ $countFeedback = $pdo->query("SELECT COUNT(*) FROM user_feedback WHERE status = 
 // FETCH DATA FOR ACTIVE TAB
 // =========================================================================
 
+// Tab: National ID Approvals
+$idFilterStatus = $_GET['id_status'] ?? 'all';
+$nationalIdRequests = [];
+if ($activeTab === 'national_id') {
+    $sql = "
+        SELECT id, full_name, email, phone, phone_verified, role, broker_agency,
+               national_id_number, national_id_type, national_id_document,
+               national_id_status, national_id_submitted_at, national_id_verified_at, national_id_rejection_reason
+        FROM users 
+        WHERE (national_id_status != 'unverified' OR national_id_number IS NOT NULL)
+    ";
+    $params = [];
+    if ($idFilterStatus !== 'all') {
+        $sql .= " AND national_id_status = :st";
+        $params['st'] = $idFilterStatus;
+    }
+    if (!empty($searchQuery)) {
+        $sql .= " AND (full_name LIKE :q OR email LIKE :q OR national_id_number LIKE :q)";
+        $params['q'] = "%{$searchQuery}%";
+    }
+    $sql .= " ORDER BY CASE national_id_status WHEN 'pending' THEN 1 WHEN 'rejected' THEN 2 WHEN 'verified' THEN 3 ELSE 4 END, national_id_submitted_at DESC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $nationalIdRequests = $stmt->fetchAll();
+}
+
 // Tab: Members
 $members = [];
 if ($activeTab === 'members') {
-    $sql = "SELECT id, full_name, email, phone, phone_verified, role, broker_agency, created_at FROM users WHERE 1=1";
+    $sql = "SELECT id, full_name, email, phone, phone_verified, role, broker_agency, national_id_status, national_id_type, national_id_number, created_at FROM users WHERE 1=1";
     $params = [];
     if (!empty($searchQuery)) {
         $sql .= " AND (full_name LIKE :q OR email LIKE :q OR phone LIKE :q OR broker_agency LIKE :q)";
@@ -372,6 +449,12 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
 
         <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">ID Verifications</div>
+            <div style="font-size: 28px; font-weight: 800; color: <?= $countPendingId > 0 ? '#ef4444' : '#10b981' ?>; margin-top: 4px;"><?= number_format($countPendingId) ?></div>
+            <div style="font-size: 12px; color: #10b981; margin-top: 4px;">🛡️ <?= number_format($countVerifiedId) ?> Verified Citizens</div>
+        </div>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; box-shadow: var(--shadow-sm);">
             <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Unverified Users</div>
             <div style="font-size: 28px; font-weight: 800; color: <?= $countUnverified > 0 ? '#f59e0b' : '#10b981' ?>; margin-top: 4px;"><?= number_format($countUnverified) ?></div>
             <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Pending phone approval</div>
@@ -404,11 +487,17 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- Admin Portal Navigation Tabs -->
     <div style="display: flex; gap: 8px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; overflow-x: auto; padding-bottom: 2px;">
+        <a href="?tab=national_id" class="btn btn-sm <?= $activeTab === 'national_id' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px 8px 0 0; padding: 10px 18px; font-weight: 700; position: relative;">
+            🆔 National ID Approvals
+            <?php if ($countPendingId > 0): ?>
+                <span style="background: #ef4444; color: #fff; font-size: 10px; padding: 1px 7px; border-radius: 9999px; margin-left: 6px; font-weight: 800;"><?= $countPendingId ?> PENDING</span>
+            <?php endif; ?>
+        </a>
         <a href="?tab=members" class="btn btn-sm <?= $activeTab === 'members' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px 8px 0 0; padding: 10px 18px; font-weight: 700;">
             👥 Members (<?= $countUsers ?>)
         </a>
         <a href="?tab=verifications" class="btn btn-sm <?= $activeTab === 'verifications' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px 8px 0 0; padding: 10px 18px; font-weight: 700;">
-            🛡️ Verifications & Brokers (<?= $countUnverified ?>)
+            🛡️ Brokers & Phone (<?= $countUnverified ?>)
         </a>
         <a href="?tab=resets" class="btn btn-sm <?= $activeTab === 'resets' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px 8px 0 0; padding: 10px 18px; font-weight: 700; position: relative;">
             🔑 Password Resets
@@ -426,6 +515,201 @@ require_once __DIR__ . '/../includes/header.php';
             💬 Customer Feedback (<?= $countFeedback ?>)
         </a>
     </div>
+
+    <!-- ===================================================================
+         TAB: NATIONAL ID IDENTITY VERIFICATION APPROVALS
+         =================================================================== -->
+    <?php if ($activeTab === 'national_id'): ?>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px; box-shadow: var(--shadow-sm);">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 800; color: var(--secondary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                        🛡️ National ID Account Verifications (Fayda / Kebele / Passport)
+                        <?php if ($countPendingId > 0): ?>
+                            <span style="background: #ef4444; color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 9999px;"><?= $countPendingId ?> Awaiting Action</span>
+                        <?php endif; ?>
+                    </h2>
+                    <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+                        Review submitted Ethiopian National IDs and document scans. Click <strong>Accept &amp; Verify</strong> to grant verified badges across their listings, or <strong>Reject</strong> with reason.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <form method="GET" action="" style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                <input type="hidden" name="tab" value="national_id">
+                <input type="text" name="q" value="<?= htmlspecialchars($searchQuery) ?>" placeholder="Search citizen name, email, or ID number..." class="form-input" style="max-width: 340px;">
+                <select name="id_status" class="form-select" style="max-width: 190px;" onchange="this.form.submit()">
+                    <option value="all" <?= $idFilterStatus === 'all' ? 'selected' : '' ?>>All Applications</option>
+                    <option value="pending" <?= $idFilterStatus === 'pending' ? 'selected' : '' ?>>⏳ Pending Review (<?= $countPendingId ?>)</option>
+                    <option value="verified" <?= $idFilterStatus === 'verified' ? 'selected' : '' ?>>🛡️ Verified (<?= $countVerifiedId ?>)</option>
+                    <option value="rejected" <?= $idFilterStatus === 'rejected' ? 'selected' : '' ?>>❌ Rejected</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                <?php if (!empty($searchQuery) || $idFilterStatus !== 'all'): ?>
+                    <a href="?tab=national_id" class="btn btn-secondary btn-sm">Reset</a>
+                <?php endif; ?>
+            </form>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 12px; text-transform: uppercase;">
+                            <th style="padding: 12px 10px;">Citizen / Member</th>
+                            <th style="padding: 12px 10px;">ID Type</th>
+                            <th style="padding: 12px 10px;">ID Number</th>
+                            <th style="padding: 12px 10px;">Document Scan</th>
+                            <th style="padding: 12px 10px;">Submitted</th>
+                            <th style="padding: 12px 10px;">Current Status</th>
+                            <th style="padding: 12px 10px; text-align: right;">Moderator Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($nationalIdRequests)): ?>
+                            <tr>
+                                <td colspan="7" style="padding: 40px 20px; text-align: center; color: var(--text-muted);">
+                                    <div style="font-size: 32px; margin-bottom: 8px;">🎉</div>
+                                    <div style="font-weight: 700; font-size: 16px; color: var(--secondary);">No verification submissions found</div>
+                                    <div style="font-size: 13px; margin-top: 4px;">Users who insert their National ID on the verification page will appear here for review.</div>
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($nationalIdRequests as $req): ?>
+                                <?php
+                                    $typeMap = [
+                                        'fayda_national_id' => '🇪🇹 Fayda National ID',
+                                        'kebele_id'         => '🪪 Kebele Resident ID',
+                                        'passport'          => '🛂 Ethiopian Passport',
+                                        'driver_license'    => "🚗 Driver's License"
+                                    ];
+                                    $typeName = $typeMap[$req['national_id_type']] ?? 'Official ID';
+                                    $docUrl = !empty($req['national_id_document']) ? (str_starts_with($req['national_id_document'], 'http') ? $req['national_id_document'] : BASE_URL . '/' . ltrim($req['national_id_document'], '/')) : '';
+                                    $isPdf = $docUrl && str_ends_with(strtolower($docUrl), '.pdf');
+                                ?>
+                                <tr style="border-bottom: 1px solid var(--border-color); <?= $req['national_id_status'] === 'pending' ? 'background: rgba(245, 158, 11, 0.04);' : '' ?>">
+                                    <td style="padding: 14px 10px;">
+                                        <div style="font-weight: 700; color: var(--secondary); font-size: 15px;"><?= htmlspecialchars($req['full_name']) ?></div>
+                                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                                            <a href="mailto:<?= htmlspecialchars($req['email']) ?>" style="color: var(--primary);"><?= htmlspecialchars($req['email']) ?></a>
+                                            <?php if (!empty($req['phone'])): ?>
+                                                &bull; <?= htmlspecialchars($req['phone']) ?>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div style="margin-top: 4px;">
+                                            <span class="badge badge-<?= $req['role'] === 'broker' ? 'broker' : 'sale' ?>" style="font-size: 11px;">
+                                                <?= ucfirst($req['role']) ?>
+                                            </span>
+                                            <?php if (!empty($req['broker_agency'])): ?>
+                                                <span style="font-size: 11px; color: var(--text-muted);">🏢 <?= htmlspecialchars($req['broker_agency']) ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 14px 10px;">
+                                        <div style="font-weight: 600; color: var(--secondary); font-size: 13px;"><?= $typeName ?></div>
+                                        <div style="font-size: 11px; color: var(--text-muted);"><?= htmlspecialchars($req['national_id_type'] ?: 'fayda_national_id') ?></div>
+                                    </td>
+                                    <td style="padding: 14px 10px;">
+                                        <code style="background: var(--bg-main); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 700; font-size: 13px; color: var(--secondary); letter-spacing: 0.04em;">
+                                            <?= htmlspecialchars($req['national_id_number'] ?: 'Not Entered') ?>
+                                        </code>
+                                    </td>
+                                    <td style="padding: 14px 10px;">
+                                        <?php if ($docUrl): ?>
+                                            <?php if ($isPdf): ?>
+                                                <a href="<?= htmlspecialchars($docUrl) ?>" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 5px 10px;">
+                                                    📄 View PDF Scan
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                                </a>
+                                            <?php else: ?>
+                                                <div style="display: flex; align-items: center; gap: 8px;">
+                                                    <a href="<?= htmlspecialchars($docUrl) ?>" target="_blank" title="Click to view full size image">
+                                                        <img src="<?= htmlspecialchars($docUrl) ?>" alt="ID Document Scan" style="width: 54px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+                                                    </a>
+                                                    <a href="<?= htmlspecialchars($docUrl) ?>" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 8px; font-size: 11px;">
+                                                        🔎 Enlarge
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <span style="font-size: 12px; color: var(--text-muted); font-style: italic;">No file attached</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td style="padding: 14px 10px; font-size: 12px; color: var(--text-muted);">
+                                        <?= !empty($req['national_id_submitted_at']) ? date('M j, Y H:i', strtotime($req['national_id_submitted_at'])) : '—' ?>
+                                    </td>
+                                    <td style="padding: 14px 10px;">
+                                        <?php if ($req['national_id_status'] === 'verified'): ?>
+                                            <span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                                Verified
+                                            </span>
+                                            <?php if (!empty($req['national_id_verified_at'])): ?>
+                                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                                                    <?= date('M j, Y', strtotime($req['national_id_verified_at'])) ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php elseif ($req['national_id_status'] === 'pending'): ?>
+                                            <span class="badge" style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-weight: 700;">
+                                                ⏳ Pending Review
+                                            </span>
+                                        <?php elseif ($req['national_id_status'] === 'rejected'): ?>
+                                            <span class="badge" style="background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700;">
+                                                ❌ Rejected
+                                            </span>
+                                            <?php if (!empty($req['national_id_rejection_reason'])): ?>
+                                                <div style="font-size: 11px; color: #b91c1c; margin-top: 3px; max-width: 220px; word-break: break-word;">
+                                                    "<?= htmlspecialchars($req['national_id_rejection_reason']) ?>"
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <span style="font-size: 12px; color: var(--text-muted);">Unverified</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td style="padding: 14px 10px; text-align: right;">
+                                        <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center; flex-wrap: wrap;">
+                                            
+                                            <!-- Accept & Verify Form -->
+                                            <?php if ($req['national_id_status'] !== 'verified'): ?>
+                                                <form method="POST" action="" style="display: inline;">
+                                                    <?= getCsrfInput() ?>
+                                                    <input type="hidden" name="action" value="accept_national_id">
+                                                    <input type="hidden" name="user_id" value="<?= $req['id'] ?>">
+                                                    <button type="submit" class="btn btn-primary btn-sm" style="background: #059669; border-color: #059669; font-weight: 700;" title="Accept National ID and mark account Verified">
+                                                        ✅ Accept &amp; Verify
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+
+                                            <!-- Reject Button (Modal Trigger) -->
+                                            <?php if ($req['national_id_status'] !== 'rejected'): ?>
+                                                <button type="button" class="btn btn-outline btn-sm" style="color: #ef4444; border-color: #fca5a5; font-weight: 600;" onclick="openRejectIdModal(<?= $req['id'] ?>, '<?= htmlspecialchars(addslashes($req['full_name'])) ?>', '<?= htmlspecialchars(addslashes($req['national_id_number'] ?? '')) ?>')" title="Reject document and specify reason">
+                                                    ❌ Reject
+                                                </button>
+                                            <?php endif; ?>
+
+                                            <!-- Revoke / Reset to Unverified -->
+                                            <?php if ($req['national_id_status'] === 'verified'): ?>
+                                                <form method="POST" action="" style="display: inline;" onsubmit="return confirm('Revoke verification for this user?');">
+                                                    <?= getCsrfInput() ?>
+                                                    <input type="hidden" name="action" value="reset_national_id">
+                                                    <input type="hidden" name="user_id" value="<?= $req['id'] ?>">
+                                                    <button type="submit" class="btn btn-secondary btn-sm" style="color: #64748b; font-size: 11px;">
+                                                        Reset
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <!-- ===================================================================
          TAB 1: MEMBERS / USERS MANAGEMENT
@@ -489,14 +773,24 @@ require_once __DIR__ . '/../includes/header.php';
                                         </span>
                                     </td>
                                     <td style="padding: 14px 10px;">
-                                        <?php if ($m['phone_verified']): ?>
-                                            <span style="color: #10b981; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                                Verified
+                                        <?php if (($m['national_id_status'] ?? '') === 'verified'): ?>
+                                            <span style="color: #047857; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;">
+                                                🛡️ ID Verified
+                                            </span>
+                                        <?php elseif (($m['national_id_status'] ?? '') === 'pending'): ?>
+                                            <a href="?tab=national_id" style="color: #b45309; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none;" title="National ID awaiting admin review">
+                                                ⏳ ID Pending
+                                            </a>
+                                        <?php elseif (($m['national_id_status'] ?? '') === 'rejected'): ?>
+                                            <span style="color: #b91c1c; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;" title="ID rejected">
+                                                ❌ ID Rejected
                                             </span>
                                         <?php else: ?>
-                                            <span style="color: #f59e0b; font-weight: 700; font-size: 12px;">⚠️ Pending</span>
+                                            <span style="color: var(--text-muted); font-size: 11px;">No National ID</span>
                                         <?php endif; ?>
+                                        <div style="font-size: 11px; margin-top: 4px; color: <?= $m['phone_verified'] ? '#10b981' : '#94a3b8' ?>;">
+                                            📱 <?= $m['phone_verified'] ? 'Phone Verified' : 'Phone Unverified' ?>
+                                        </div>
                                     </td>
                                     <td style="padding: 14px 10px; font-size: 12px; color: var(--text-muted);">
                                         <?= date('M j, Y', strtotime($m['created_at'])) ?>
@@ -1164,6 +1458,53 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
+<!-- ===================================================================
+     MODAL 4: REJECT NATIONAL ID VERIFICATION
+     =================================================================== -->
+<div class="modal-overlay" id="rejectIdModal">
+    <div class="modal-card" style="max-width: 500px;">
+        <div class="modal-header">
+            <div class="modal-title" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
+                ❌ Reject National ID Verification
+            </div>
+            <button type="button" class="modal-close" onclick="closeAdminModal('rejectIdModal')">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 24px;">
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                You are rejecting the ID verification for <strong id="rejectIdTargetName" style="color: var(--secondary);"></strong> (<code id="rejectIdTargetNumber"></code>).
+            </p>
+            <form method="POST" action="">
+                <?= getCsrfInput() ?>
+                <input type="hidden" name="action" value="reject_national_id">
+                <input type="hidden" name="user_id" id="rejectIdUserIdField" value="0">
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="form-label">Predefined Reason</label>
+                    <select class="form-select" onchange="document.getElementById('rejectReasonInput').value = this.value">
+                        <option value="Uploaded ID document scan is blurry, dark, or illegible.">Document is blurry / illegible</option>
+                        <option value="The registered account name does not match the legal name on the National ID.">Name mismatch with ID</option>
+                        <option value="The National ID document has expired. Please submit a valid unexpired ID.">Expired National ID</option>
+                        <option value="Invalid Fayda FAN/FIN or Kebele registration number entered.">Invalid ID number</option>
+                        <option value="Document corners are cropped or incomplete. Please upload full front/back scan.">Cropped / Incomplete photo</option>
+                        <option value="">-- Custom Reason Below --</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">Reason Explanation (Visible to Member)</label>
+                    <textarea name="rejection_reason" id="rejectReasonInput" class="form-textarea" rows="3" required style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; font-family: inherit; font-size: 13px;">Uploaded ID document scan is blurry, dark, or illegible.</textarea>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">This message will be shown to the user on their dashboard so they can rectify and resubmit.</div>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeAdminModal('rejectIdModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="background: #ef4444; border-color: #ef4444;">Confirm Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function openModal(modalId) {
     const m = document.getElementById(modalId);
@@ -1186,6 +1527,13 @@ function openAcceptResetModal(resetId, email) {
     document.getElementById('acceptEmailField').value = email;
     document.getElementById('acceptTargetEmail').textContent = email;
     openModal('acceptResetModal');
+}
+
+function openRejectIdModal(userId, fullName, idNumber) {
+    document.getElementById('rejectIdUserIdField').value = userId;
+    document.getElementById('rejectIdTargetName').textContent = fullName;
+    document.getElementById('rejectIdTargetNumber').textContent = idNumber || 'No ID Number';
+    openModal('rejectIdModal');
 }
 
 function toggleBrokerAgencyField(role) {

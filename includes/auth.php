@@ -29,7 +29,15 @@ function refreshCurrentUser(): ?array {
     }
 
     $pdo = getDB();
-    $stmt = $pdo->prepare("SELECT id, full_name, email, phone, phone_verified, role, avatar, bio, broker_agency, broker_license_no, broker_fee_percentage, broker_fixed_fee, broker_fee_notes, preferred_language, theme_mode, ai_smart_alerts, ai_search_query, created_at FROM users WHERE id = :id LIMIT 1");
+    $stmt = $pdo->prepare("
+        SELECT id, full_name, email, phone, phone_verified, role, avatar, bio, 
+               broker_agency, broker_license_no, broker_fee_percentage, broker_fixed_fee, broker_fee_notes, 
+               preferred_language, theme_mode, ai_smart_alerts, ai_search_query, created_at,
+               national_id_number, national_id_type, national_id_document, national_id_status,
+               national_id_submitted_at, national_id_verified_at, national_id_rejection_reason
+        FROM users 
+        WHERE id = :id LIMIT 1
+    ");
     $stmt->execute(['id' => $_SESSION['user_id']]);
     $user = $stmt->fetch();
 

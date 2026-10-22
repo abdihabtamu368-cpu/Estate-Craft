@@ -50,6 +50,26 @@ require_once __DIR__ . '/../includes/header.php';
                 <span class="badge badge-<?= $user['role'] === 'broker' ? 'broker' : 'sale' ?>">
                     <?= ucfirst($user['role']) ?>
                 </span>
+                
+                <!-- National ID Status Badge -->
+                <?php if (($user['national_id_status'] ?? '') === 'verified'): ?>
+                    <span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                        🛡️ National ID Verified
+                    </span>
+                <?php elseif (($user['national_id_status'] ?? '') === 'pending'): ?>
+                    <a href="<?= BASE_URL ?>/user/verify_id.php" class="badge" style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Click to view review progress">
+                        ⏳ ID Under Review
+                    </a>
+                <?php elseif (($user['national_id_status'] ?? '') === 'rejected'): ?>
+                    <a href="<?= BASE_URL ?>/user/verify_id.php" class="badge" style="background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Click to view rejection reason & resubmit">
+                        ❌ ID Rejected &mdash; Resubmit
+                    </a>
+                <?php else: ?>
+                    <a href="<?= BASE_URL ?>/user/verify_id.php" class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                        🆔 Verify National ID
+                    </a>
+                <?php endif; ?>
+
                 <?php if ($user['phone_verified']): ?>
                     <span class="badge badge-verified">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -61,15 +81,67 @@ require_once __DIR__ . '/../includes/header.php';
                     </a>
                 <?php endif; ?>
             </div>
-            <p style="color: var(--text-muted); font-size: 14px;">Manage your properties, monitor views, and adjust fee disclosures.</p>
+            <p style="color: var(--text-muted); font-size: 14px;">Manage your properties, monitor views, and manage account verification status.</p>
         </div>
 
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="<?= BASE_URL ?>/user/verify_id.php" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                🛡️ Verify National ID
+                <?php if (($user['national_id_status'] ?? '') === 'verified'): ?>
+                    <span style="color: #10b981; font-weight: 800;">✓</span>
+                <?php elseif (($user['national_id_status'] ?? '') === 'pending'): ?>
+                    <span style="color: #f59e0b; font-weight: 800;">⏳</span>
+                <?php endif; ?>
+            </a>
             <a href="<?= BASE_URL ?>/user/settings.php" class="btn btn-secondary btn-sm">⚙️ Settings</a>
             <a href="<?= BASE_URL ?>/user/profile.php" class="btn btn-secondary btn-sm">Edit Profile & Fees</a>
             <a href="<?= BASE_URL ?>/properties/create.php" class="btn btn-primary btn-sm">+ Post New Listing</a>
         </div>
     </div>
+
+    <!-- National ID Status Alerts -->
+    <?php if (($user['national_id_status'] ?? '') === 'pending'): ?>
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: #f59e0b; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
+                    ⏳
+                </div>
+                <div>
+                    <div style="font-weight: 800; color: #92400e; font-size: 15px;">National ID Verification In Progress</div>
+                    <div style="color: #b45309; font-size: 13px;">Your National ID (<code><?= htmlspecialchars($user['national_id_number'] ?? '') ?></code>) has been submitted and is currently being reviewed by our administration team.</div>
+                </div>
+            </div>
+            <a href="<?= BASE_URL ?>/user/verify_id.php" class="btn btn-secondary btn-sm" style="border-color: #f59e0b; color: #92400e;">View Submission Details</a>
+        </div>
+    <?php elseif (($user['national_id_status'] ?? '') === 'rejected'): ?>
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
+                    ⚠️
+                </div>
+                <div>
+                    <div style="font-weight: 800; color: #991b1b; font-size: 15px;">National ID Submission Rejected</div>
+                    <div style="color: #b91c1c; font-size: 13px;">
+                        Moderator note: <em>"<?= htmlspecialchars($user['national_id_rejection_reason'] ?: 'Document was illegible or incomplete.') ?>"</em>
+                    </div>
+                </div>
+            </div>
+            <a href="<?= BASE_URL ?>/user/verify_id.php" class="btn btn-primary btn-sm" style="background: #ef4444; border-color: #ef4444;">Resubmit Verification</a>
+        </div>
+    <?php elseif (($user['national_id_status'] ?? '') === 'unverified' || empty($user['national_id_status'])): ?>
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 44px; height: 44px; border-radius: 10px; background: #059669; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(5,150,105,0.25);">
+                    🛡️
+                </div>
+                <div>
+                    <div style="font-weight: 800; color: #065f46; font-size: 15px;">Verify Your Account With National ID (Fayda / Kebele / Passport)</div>
+                    <div style="color: #047857; font-size: 13px;">Upload your official ID document to get the Verified Seller Badge on all your property listings.</div>
+                </div>
+            </div>
+            <a href="<?= BASE_URL ?>/user/verify_id.php" class="btn btn-primary btn-sm" style="background: #059669; border-color: #059669;">Insert National ID &rarr;</a>
+        </div>
+    <?php endif; ?>
 
     <!-- Stats Row -->
     <div class="dashboard-stats">

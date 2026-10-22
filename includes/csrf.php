@@ -17,6 +17,10 @@ function getCsrfInput(): string {
     return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
 }
 
+function csrfField(): string {
+    return getCsrfInput();
+}
+
 function verifyCsrfToken(?string $token): bool {
     if (empty($token) || empty($_SESSION['csrf_token'])) {
         return false;
