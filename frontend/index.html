@@ -592,12 +592,28 @@
           };
         }
       } else {
-        // Guest Visitor: Show header, home catalog and footer
-        if (authSec) authSec.style.display = 'none';
-        if (header) header.style.display = 'block';
-        if (homeSec) homeSec.style.display = 'block';
-        if (footer) footer.style.display = 'block';
+        // First Page: Show Login with Create Account
+        if (authSec) authSec.style.display = 'flex';
+        if (header) header.style.display = 'none';
+        if (homeSec) homeSec.style.display = 'none';
+        if (footer) footer.style.display = 'none';
       }
+
+      if (window.homeMap && typeof window.homeMap.invalidateSize === 'function') {
+        window.homeMap.invalidateSize();
+      }
+    }
+
+    function enterFrontendAsGuest() {
+      const authSec = document.getElementById('welcomeAuthSection');
+      const header = document.getElementById('frontSiteHeader');
+      const homeSec = document.getElementById('homePageSections');
+      const footer = document.getElementById('frontSiteFooter');
+
+      if (authSec) authSec.style.display = 'none';
+      if (header) header.style.display = 'block';
+      if (homeSec) homeSec.style.display = 'block';
+      if (footer) footer.style.display = 'block';
 
       if (window.homeMap && typeof window.homeMap.invalidateSize === 'function') {
         window.homeMap.invalidateSize();

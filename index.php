@@ -34,8 +34,8 @@ $featuredProperties = $stmtFeatured->fetchAll();
 $stmtCities = $pdo->query("SELECT city, COUNT(*) as count FROM properties WHERE status = 'active' GROUP BY city ORDER BY count DESC LIMIT 4");
 $topCities = $stmtCities->fetchAll();
 
-// Optional Split Auth View (Triggered if explicitly accessing index.php?auth=1 while unauthenticated)
-if (isset($_GET['auth']) && !$currentUser) {
+// First Page Landing View: Dedicated Login & Create Account (Shown on initial visit before authentication)
+if (!$currentUser && !isset($_GET['explore'])) {
     $hideHeaderNavbar = true;
     $pageTitle = "Log in or Sign up - EstateCraft";
 
@@ -196,6 +196,18 @@ if (isset($_GET['auth']) && !$currentUser) {
                             </button>
                         </form>
                     </div>
+
+                    <!-- Guest Explore & Quick Fill Options -->
+                    <div class="fb-guest-link-wrap" style="text-align: center; margin-top: 22px;">
+                        <a href="<?= BASE_URL ?>/index.php?explore=1" class="fb-guest-link" style="font-size: 14.5px; font-weight: 700; color: #0866ff; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                            <span>Browse properties as guest &rarr;</span>
+                        </a>
+                    </div>
+                    <div style="margin-top: 14px; text-align: center;">
+                        <button type="button" onclick="fillPhpDemo()" style="background: rgba(8, 102, 255, 0.08); border: 1px dashed rgba(8, 102, 255, 0.4); color: #0866ff; font-size: 12.5px; font-weight: 600; padding: 6px 14px; border-radius: 9999px; cursor: pointer;">
+                            ⚡ 1-Click Demo Fill (Abdi / Abdi@123)
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -233,6 +245,15 @@ if (isset($_GET['auth']) && !$currentUser) {
         } else {
             pw.type = 'password';
             btn.textContent = '👁️';
+        }
+    }
+
+    function fillPhpDemo() {
+        const emailInput = document.querySelector('input[name="email"]');
+        const pwInput = document.getElementById('firstPageLoginPassword');
+        if (emailInput && pwInput) {
+            emailInput.value = 'abdihabtamu368@gmail.com';
+            pwInput.value = 'Abdi@123';
         }
     }
     </script>

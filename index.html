@@ -1804,7 +1804,7 @@
 <body>
 
     <!-- Header Navigation -->
-    <header class="site-header" id="mainSiteHeader">
+    <header class="site-header" id="mainSiteHeader" style="display: none;">
         <div class="nav-container">
             <a href="index.html" class="brand-logo" id="headerBrandLogo">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1856,7 +1856,7 @@
 
     <main>
         <!-- Facebook-Style Split First Page Landing (Visible on initial visit before sign-in/sign-up) -->
-        <section class="fb-landing-section" id="welcomeAuthSection" style="display: none; min-height: 100vh;">
+        <section class="fb-landing-section" id="welcomeAuthSection" style="min-height: 100vh;">
             <div class="fb-landing-container">
                 <!-- Left Column: Branding, Tagline & Photo Cards Collage -->
                 <div class="fb-left-col">
@@ -1992,6 +1992,18 @@
                                 </button>
                             </form>
                         </div>
+
+                        <!-- Guest Explore & Quick Fill Options -->
+                        <div class="fb-guest-link-wrap" style="text-align: center; margin-top: 22px;">
+                            <a href="javascript:void(0)" onclick="enterAsGuest()" class="fb-guest-link" style="font-size: 14.5px; font-weight: 700; color: #0866ff; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                                <span>Browse properties as guest &rarr;</span>
+                            </a>
+                        </div>
+                        <div style="margin-top: 14px; text-align: center;">
+                            <button type="button" onclick="fillDemoCredentials()" style="background: rgba(8, 102, 255, 0.08); border: 1px dashed rgba(8, 102, 255, 0.4); color: #0866ff; font-size: 12.5px; font-weight: 600; padding: 6px 14px; border-radius: 9999px; cursor: pointer;">
+                                ⚡ 1-Click Demo Fill (Abdi / Abdi@123)
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2008,7 +2020,7 @@
         </section>
 
         <!-- Home Page Catalog & Sections -->
-        <div id="homePageSections">
+        <div id="homePageSections" style="display: none;">
             <!-- Modern Premium Hero Section -->
             <section class="hero-section" id="catalogSearchSection">
                 <div class="hero-ambient-orb orb-1"></div>
@@ -2786,7 +2798,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Footer -->
-    <footer class="site-footer" id="mainSiteFooter">
+    <footer class="site-footer" id="mainSiteFooter" style="display: none;">
         <div class="footer-container">
             <div class="footer-brand">
                 <h3>
@@ -4083,11 +4095,11 @@
           btnUp.style.display = 'none';
         }
       } else {
-        // Guest Visitor: Reveal header, modern homepage hero, catalog, and footer
-        if (authSec) authSec.style.display = 'none';
-        if (header) header.style.display = 'block';
-        if (homeSec) homeSec.style.display = 'block';
-        if (footer) footer.style.display = 'block';
+        // Initial First Page: Show Login with Create Account landing page
+        if (authSec) authSec.style.display = 'flex';
+        if (header) header.style.display = 'none';
+        if (homeSec) homeSec.style.display = 'none';
+        if (footer) footer.style.display = 'none';
 
         const btnIn = document.getElementById('btnNavSignIn');
         const btnUp = document.getElementById('btnNavSignUp');
@@ -4116,6 +4128,33 @@
 
       if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
         window.catalogMap.invalidateSize();
+      }
+    }
+
+    function enterAsGuest() {
+      const authSec = document.getElementById('welcomeAuthSection');
+      const header = document.getElementById('mainSiteHeader');
+      const homeSec = document.getElementById('homePageSections');
+      const footer = document.getElementById('mainSiteFooter');
+
+      if (authSec) authSec.style.display = 'none';
+      if (header) header.style.display = 'block';
+      if (homeSec) homeSec.style.display = 'block';
+      if (footer) footer.style.display = 'block';
+
+      if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
+        window.catalogMap.invalidateSize();
+      }
+      showToast("👀 Browsing as guest. Sign in anytime to post properties or access settings.");
+    }
+
+    function fillDemoCredentials() {
+      const email = document.getElementById('fpLoginEmail');
+      const pw = document.getElementById('fpLoginPassword');
+      if (email && pw) {
+        email.value = 'abdihabtamu368@gmail.com';
+        pw.value = 'Abdi@123';
+        showToast("⚡ Sample credentials filled. Click 'Log in' to enter.");
       }
     }
 
