@@ -11,6 +11,7 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/upload.php';
 
+$currentUser = getCurrentUser();
 $pdo = getDB();
 
 // Fetch Featured Properties

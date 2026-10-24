@@ -4200,7 +4200,7 @@
       }
     }
 
-    function handleStaticFirstPageLogin(e) {
+    async function handleStaticFirstPageLogin(e) {
       e.preventDefault();
       const email = document.getElementById('fpLoginEmail').value.trim();
       const pw = document.getElementById('fpLoginPassword').value;
@@ -4208,6 +4208,29 @@
         alert("Please enter your email/phone and password.");
         return;
       }
+
+      // Attempt backend login if available
+      try {
+        const resp = await fetch('api/login.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: pw })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.success && data.user) {
+            localStorage.setItem('estate_craft_logged_in', 'true');
+            localStorage.setItem('estate_craft_user_name', data.user.full_name || email.split('@')[0]);
+            localStorage.setItem('estate_craft_user_role', data.user.role || 'user');
+            showToast(`👋 Welcome back, ${data.user.full_name}! You are now on the Home page.`);
+            syncAuthState();
+            return;
+          }
+        }
+      } catch (err) {
+        console.log("Local static fallback mode:", err);
+      }
+
       const displayName = email.split('@')[0] || 'Member';
       localStorage.setItem('estate_craft_logged_in', 'true');
       localStorage.setItem('estate_craft_user_name', displayName);
@@ -4215,10 +4238,12 @@
       syncAuthState();
     }
 
-    function handleStaticFirstPageRegister(e) {
+    async function handleStaticFirstPageRegister(e) {
       e.preventDefault();
       const name = document.getElementById('fpRegName').value.trim();
       const email = document.getElementById('fpRegEmail').value.trim();
+      const phoneEl = document.getElementById('fpRegPhone');
+      const phone = phoneEl ? phoneEl.value.trim() : '+251 91 123 4567';
       const pw = document.getElementById('fpRegPassword').value;
       const conf = document.getElementById('fpRegConfirm').value;
       if (!name || !email || !pw) {
@@ -4229,10 +4254,77 @@
         alert("Passwords do not match.");
         return;
       }
+
+      // Persist to MySQL database whenever backend is reachable
+      try {
+        const resp = await fetch('api/register.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name: name, email: email, phone: phone, password: pw, role: 'user' })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.success) {
+            const displayName = (data.user && data.user.full_name) || name;
+            localStorage.setItem('estate_craft_logged_in', 'true');
+            localStorage.setItem('estate_craft_user_name', displayName);
+            localStorage.setItem('estate_craft_user_role', (data.user && data.user.role) || 'user');
+            showToast(`🎉 Account created in database! Welcome to EstateCraft, ${displayName}!`);
+            syncAuthState();
+            return;
+          }
+        }
+      } catch (err) {
+        console.log("Backend offline, saving to local static session:", err);
+      }
+
       const displayName = name || email.split('@')[0] || 'Member';
       localStorage.setItem('estate_craft_logged_in', 'true');
       localStorage.setItem('estate_craft_user_name', displayName);
       showToast(`🎉 Account created! Welcome to EstateCraft, ${displayName}!`);
+      syncAuthState();
+    }
+
+    async function handleStaticRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regStaticName') ? document.getElementById('regStaticName').value.trim() : '';
+      const email = document.getElementById('regStaticEmail') ? document.getElementById('regStaticEmail').value.trim() : '';
+      const phone = document.getElementById('regStaticPhone') ? document.getElementById('regStaticPhone').value.trim() : '';
+      const pw = document.getElementById('regStaticPassword') ? document.getElementById('regStaticPassword').value : '';
+      const role = document.getElementById('regStaticRole') ? document.getElementById('regStaticRole').value : 'user';
+
+      if (!name || !email || !pw) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      try {
+        const resp = await fetch('api/register.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name: name, email: email, phone: phone, password: pw, role: role })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.success) {
+            closeModal();
+            localStorage.setItem('estate_craft_logged_in', 'true');
+            localStorage.setItem('estate_craft_user_name', name);
+            localStorage.setItem('estate_craft_user_role', role);
+            showToast(`🎉 Account created! Welcome to EstateCraft, ${name}!`);
+            syncAuthState();
+            return;
+          }
+        }
+      } catch (err) {
+        console.log("Static registration fallback:", err);
+      }
+
+      closeModal();
+      localStorage.setItem('estate_craft_logged_in', 'true');
+      localStorage.setItem('estate_craft_user_name', name);
+      localStorage.setItem('estate_craft_user_role', role);
+      showToast(`🎉 Account created! Welcome to EstateCraft, ${name}!`);
       syncAuthState();
     }
 
