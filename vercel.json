@@ -10,7 +10,11 @@
     { "source": "/signin", "destination": "/auth.html" },
     { "source": "/signup", "destination": "/auth.html" },
     { "source": "/obsidian", "destination": "/auth.html" },
-    { "source": "/preview", "destination": "/auth.html" }
+    { "source": "/preview", "destination": "/auth.html" },
+    { "source": "/properties", "destination": "/index.html" },
+    { "source": "/map", "destination": "/index.html" },
+    { "source": "/settings", "destination": "/index.html" },
+    { "source": "/post", "destination": "/index.html" }
   ],
   "headers": [
     {

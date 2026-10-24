@@ -47,7 +47,11 @@ $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 $cleanDir = preg_replace('#/(auth|properties|user|api|config|includes|admin)$#i', '', $scriptDir);
 $cleanDir = rtrim($cleanDir, '/');
 
-define('BASE_URL', $protocol . $host . $cleanDir);
+// Properly encode path segments (e.g. "buy and sell" -> "buy%20and%20sell") for valid RFC URLs
+$encodedSegments = array_map('rawurlencode', explode('/', $cleanDir));
+$cleanDirEncoded = implode('/', $encodedSegments);
+
+define('BASE_URL', $protocol . $host . $cleanDirEncoded);
 define('ROOT_PATH', realpath(__DIR__ . '/..'));
 define('UPLOAD_DIR', ROOT_PATH . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'properties' . DIRECTORY_SEPARATOR);
 define('UPLOAD_URL', BASE_URL . '/uploads/properties/');

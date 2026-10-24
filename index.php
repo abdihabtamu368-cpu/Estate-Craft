@@ -34,8 +34,8 @@ $featuredProperties = $stmtFeatured->fetchAll();
 $stmtCities = $pdo->query("SELECT city, COUNT(*) as count FROM properties WHERE status = 'active' GROUP BY city ORDER BY count DESC LIMIT 4");
 $topCities = $stmtCities->fetchAll();
 
-// Mandatory Auth Check: Users MUST log in or create an account before viewing the homepage or properties
-if (!$currentUser) {
+// Optional Split Auth View (Triggered if explicitly accessing index.php?auth=1 while unauthenticated)
+if (isset($_GET['auth']) && !$currentUser) {
     $hideHeaderNavbar = true;
     $pageTitle = "Log in or Sign up - EstateCraft";
 
@@ -247,23 +247,53 @@ require_once __DIR__ . '/includes/header.php';
 
 <!-- Hero Section -->
 <section class="hero-section" id="propertiesCatalogSection">
+    <div class="hero-ambient-orb orb-1"></div>
+    <div class="hero-ambient-orb orb-2"></div>
     <div class="hero-pattern"></div>
+    
     <div class="hero-content">
         <div class="hero-tag">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            Transparent Real Estate &bull; Verified Brokers &bull; Direct Owners
+            <span class="pulse-dot"></span>
+            <span><?= __('hero_tag', 'Verified Real Estate Marketplace Ethiopia') ?></span>
+            <span style="opacity: 0.5;">&bull;</span>
+            <span class="hero-tag-gold">🛡️ <?= __('hero_tag_fayda', '100% Fayda ID Verified') ?></span>
         </div>
 
         <h1 class="hero-title">
-            <?= __('hero_title', 'The Smarter Way to Buy, Rent & Sell Exceptional Homes Across Ethiopia') ?>
+            <?= __('hero_title_1', 'Find, Buy, Sell & Rent') ?><br>
+            <span class="hero-title-accent"><?= __('hero_title_accent', 'Exceptional Homes') ?></span><br>
+            <?= __('hero_title_2', 'Across Ethiopia') ?>
         </h1>
         <p class="hero-subtitle">
             <?= __('hero_subtitle', 'Browse verified listings, view upfront broker fees before contacting agents, and explore neighborhoods with satellite map search.') ?>
         </p>
 
+        <!-- Trust Stats Row -->
+        <div class="hero-stats-row">
+            <div class="hero-stat-item">
+                <span class="stat-number">2,400+</span>
+                <span class="stat-label">Verified Listings</span>
+            </div>
+            <div class="hero-stat-sep"></div>
+            <div class="hero-stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">National ID Verified</span>
+            </div>
+            <div class="hero-stat-sep"></div>
+            <div class="hero-stat-item">
+                <span class="stat-number">0% Fee</span>
+                <span class="stat-label">Direct Owner Deals</span>
+            </div>
+            <div class="hero-stat-sep"></div>
+            <div class="hero-stat-item">
+                <span class="stat-number">4.9 ★</span>
+                <span class="stat-label">Client Trust</span>
+            </div>
+        </div>
+
         <?php if (!$currentUser): ?>
         <!-- First View Call to Action: Sign In, Sign Up & Create Account -->
-        <div style="display: flex; gap: 14px; justify-content: center; align-items: center; margin: 22px 0 32px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 14px; justify-content: center; align-items: center; margin: 0 0 36px; flex-wrap: wrap;">
             <a href="<?= BASE_URL ?>/auth/register.php" class="btn btn-primary btn-lg" id="heroBtnCreateAccount" style="font-weight: 800; padding: 13px 28px; border-radius: var(--radius-full); box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; font-size: 15px;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                 <span><?= __('hero_btn_register', 'Create Free Account / Sign Up') ?></span>
@@ -278,9 +308,9 @@ require_once __DIR__ . '/includes/header.php';
         <!-- Search Bar Card -->
         <div class="search-box-card">
             <div class="search-tabs">
-                <button type="button" class="tab-btn active" data-purpose=""><?= __('tab_all', 'All Properties') ?></button>
-                <button type="button" class="tab-btn" data-purpose="sale"><?= __('tab_buy', 'Buy a Home') ?></button>
-                <button type="button" class="tab-btn" data-purpose="rent"><?= __('tab_rent', 'Rent a House') ?></button>
+                <button type="button" class="tab-btn active" data-purpose="">✨ <?= __('tab_all', 'All Properties') ?></button>
+                <button type="button" class="tab-btn" data-purpose="sale">🏡 <?= __('tab_buy', 'Buy a Home') ?></button>
+                <button type="button" class="tab-btn" data-purpose="rent">🔑 <?= __('tab_rent', 'Rent a House') ?></button>
             </div>
 
             <form method="GET" action="<?= BASE_URL ?>/properties/index.php">
@@ -288,15 +318,21 @@ require_once __DIR__ . '/includes/header.php';
 
                 <div class="search-grid">
                     <div class="form-group">
-                        <label class="form-label" for="searchLocation">Location / City in Ethiopia</label>
+                        <label class="form-label" for="searchLocation">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>Location / City in Ethiopia</span>
+                        </label>
                         <input type="text" id="searchLocation" name="location" class="form-input" placeholder="e.g. Bole, Kazanchis, CMC, Hawassa">
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="searchType">Property Type</label>
+                        <label class="form-label" for="searchType">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                            <span>Property Type</span>
+                        </label>
                         <select id="searchType" name="type" class="form-select">
                             <option value="">All Types</option>
-                            <option value="house">Houses</option>
+                            <option value="house">Houses &amp; Compounds</option>
                             <option value="apartment">Apartments / Condos</option>
                             <option value="villa">Luxury Villas</option>
                             <option value="townhouse">Townhouses</option>
@@ -305,23 +341,37 @@ require_once __DIR__ . '/includes/header.php';
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="searchPrice">Max Price (ETB)</label>
+                        <label class="form-label" for="searchPrice">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>
+                            <span>Max Budget (ETB)</span>
+                        </label>
                         <select id="searchPrice" name="max_price" class="form-select">
-                            <option value="">Any Price</option>
-                            <option value="50000">ETB 50,000 / mo</option>
-                            <option value="100000">ETB 100,000 / mo</option>
-                            <option value="20000000">ETB 20,000,000</option>
-                            <option value="40000000">ETB 40,000,000</option>
+                            <option value="">Any Budget</option>
+                            <option value="50000">Up to ETB 50,000 / mo</option>
+                            <option value="100000">Up to ETB 100,000 / mo</option>
+                            <option value="20000000">Up to ETB 20,000,000</option>
+                            <option value="40000000">Up to ETB 40,000,000</option>
                             <option value="60000000">ETB 60,000,000+</option>
                         </select>
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-lg" id="btnMainSearch">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <?= __('search_btn', 'Search Homes') ?>
+                        <span><?= __('search_btn', 'Search Homes') ?></span>
                     </button>
                 </div>
             </form>
+
+            <!-- Quick Popular Searches -->
+            <div class="search-quick-tags">
+                <span class="quick-tags-label">Popular Searches:</span>
+                <a href="<?= BASE_URL ?>/properties/index.php?location=Bole" class="quick-tag-chip" style="text-decoration: none;">📍 Bole Atlas</a>
+                <a href="<?= BASE_URL ?>/properties/index.php?location=Kazanchis" class="quick-tag-chip" style="text-decoration: none;">📍 Kazanchis</a>
+                <a href="<?= BASE_URL ?>/properties/index.php?location=Old+Airport" class="quick-tag-chip" style="text-decoration: none;">📍 Old Airport</a>
+                <a href="<?= BASE_URL ?>/properties/index.php?location=CMC" class="quick-tag-chip" style="text-decoration: none;">📍 CMC Condos</a>
+                <a href="<?= BASE_URL ?>/properties/index.php?location=Hawassa" class="quick-tag-chip" style="text-decoration: none;">📍 Hawassa Lake</a>
+                <a href="<?= BASE_URL ?>/properties/index.php?location=Bishoftu" class="quick-tag-chip" style="text-decoration: none;">📍 Bishoftu Resort</a>
+            </div>
         </div>
     </div>
 </section>

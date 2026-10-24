@@ -18,7 +18,7 @@
 <body>
 
     <!-- Header Navigation -->
-    <header class="site-header" id="frontSiteHeader" style="display: none;">
+    <header class="site-header" id="frontSiteHeader">
         <div class="nav-container">
             <a href="index.html" class="brand-logo" id="headerBrandLogo">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -216,7 +216,7 @@
         </section>
 
         <!-- Home Page Wrapper -->
-        <div id="homePageSections" style="display: none;">
+        <div id="homePageSections">
             <!-- Hero Section -->
             <section class="hero-section" id="catalogSearchSection">
 
@@ -491,7 +491,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="site-footer" id="frontSiteFooter" style="display: none;">
+    <footer class="site-footer" id="frontSiteFooter">
         <div class="footer-container">
             <div class="footer-brand">
                 <h3>
@@ -592,11 +592,11 @@
           };
         }
       } else {
-        // Enforce account creation or login before viewing the portal
-        if (authSec) authSec.style.display = 'flex';
-        if (header) header.style.display = 'none';
-        if (homeSec) homeSec.style.display = 'none';
-        if (footer) footer.style.display = 'none';
+        // Guest Visitor: Show header, home catalog and footer
+        if (authSec) authSec.style.display = 'none';
+        if (header) header.style.display = 'block';
+        if (homeSec) homeSec.style.display = 'block';
+        if (footer) footer.style.display = 'block';
       }
 
       if (window.homeMap && typeof window.homeMap.invalidateSize === 'function') {

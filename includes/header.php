@@ -184,21 +184,58 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
 <?php endif; ?>
 
 <script>
-// Language selector dropdown toggle
+// Resilient Header Controls (Theme switcher, Language menu, Mobile drawer)
 document.addEventListener('DOMContentLoaded', function() {
     const langBtn = document.getElementById('langToggleBtn');
     const langMenu = document.getElementById('langMenu');
+    const themeBtn = document.getElementById('themeToggleBtn');
+    const themeMenu = document.getElementById('themeMenu');
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
 
+    // Language Dropdown
     if (langBtn && langMenu) {
         langBtn.addEventListener('click', function(e) {
             e.stopPropagation();
+            if (themeMenu) themeMenu.style.display = 'none';
             langMenu.style.display = langMenu.style.display === 'block' ? 'none' : 'block';
         });
+    }
 
-        document.addEventListener('click', function() {
-            langMenu.style.display = 'none';
+    // Theme Mode Dropdown
+    if (themeBtn && themeMenu) {
+        themeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (langMenu) langMenu.style.display = 'none';
+            themeMenu.style.display = themeMenu.style.display === 'block' ? 'none' : 'block';
         });
     }
+
+    // Mobile Hamburger Toggle
+    if (mobileBtn && navLinks) {
+        mobileBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            navLinks.classList.toggle('mobile-open');
+        });
+    }
+
+    // Dismiss all dropdowns on outside click or Escape
+    document.addEventListener('click', function(e) {
+        if (langMenu && !langMenu.contains(e.target) && e.target !== langBtn) {
+            langMenu.style.display = 'none';
+        }
+        if (themeMenu && !themeMenu.contains(e.target) && e.target !== themeBtn) {
+            themeMenu.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (langMenu) langMenu.style.display = 'none';
+            if (themeMenu) themeMenu.style.display = 'none';
+            if (navLinks) navLinks.classList.remove('mobile-open');
+        }
+    });
 });
 </script>
 

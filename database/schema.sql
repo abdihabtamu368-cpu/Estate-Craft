@@ -158,11 +158,11 @@ CREATE TABLE IF NOT EXISTS `user_feedback` (
 -- =======================================================
 
 INSERT INTO `users` (`id`, `full_name`, `email`, `password_hash`, `phone`, `phone_verified`, `role`, `broker_agency`, `broker_license_no`, `broker_fee_percentage`, `broker_fixed_fee`, `broker_fee_notes`) VALUES
-(1, 'Admin Moderator', 'admin@realestate.local', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 91 100 0001', 1, 'admin', NULL, NULL, NULL, NULL, NULL),
+(1, 'Admin Moderator', 'admin@realestate.local', '$2y$10$kwdqNgBBIKZC5bRdyFM9ruuKqq.elHRnI7d82wU0DfC3S2DJYNnAS', '+251 91 100 0001', 1, 'admin', NULL, NULL, NULL, NULL, NULL),
 (2, 'Sara Tefera (Verified Broker)', 'sara.broker@realestate.local', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 91 123 4567', 1, 'broker', 'Addis Premier Realty', 'BRE# ET-019283', 2.00, 5000.00, '2% sales commission upon contract closing; 1-month rental tenant placement fee.'),
 (3, 'Dawit Bekele (Direct Owner)', 'dawit.owner@example.com', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 92 234 5678', 1, 'user', NULL, NULL, NULL, NULL, NULL),
 (4, 'Bethlehem Tadesse (Commercial Broker)', 'bethlehem.broker@realestate.local', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 93 345 6789', 1, 'broker', 'Skyline Addis Commercial Properties', 'BRE# ET-084920', 1.80, 0.00, '1.8% negotiable commercial broker commission payable upon lease agreement.'),
-(5, 'Abdi Habtamu', 'abdihabtamu368@gmail.com', '$2y$10$VH4peRbN3Y3MmVwZSdj0aeJVzFPVh4mDnfqVC14kRTeSFSSLTruQe', '+251 90 909 0909', 1, 'user', NULL, NULL, NULL, NULL, NULL);
+(5, 'Abdi Habtamu', 'abdihabtamu368@gmail.com', '$2y$10$kwdqNgBBIKZC5bRdyFM9ruuKqq.elHRnI7d82wU0DfC3S2DJYNnAS', '+251 90 909 0909', 1, 'admin', NULL, NULL, NULL, NULL, NULL);
 
 -- Sample Ethiopian Properties (Centered in Addis Ababa, Bishoftu, Hawassa, Bahir Dar)
 INSERT INTO `properties` (`id`, `user_id`, `title`, `slug`, `description`, `purpose`, `property_type`, `price`, `price_frequency`, `bedrooms`, `bathrooms`, `area_sqft`, `address`, `city`, `state`, `postal_code`, `country`, `latitude`, `longitude`, `status`, `featured`, `contact_name`, `contact_phone`, `contact_email`, `has_broker`, `broker_fee_display`, `views_count`) VALUES
