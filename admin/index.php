@@ -434,6 +434,9 @@ require_once __DIR__ . '/../includes/header.php';
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Add New Member
             </button>
+            <a href="<?= BASE_URL ?>/auth/register.php" class="btn btn-secondary btn-sm" style="background: rgba(8, 102, 255, 0.15); border-color: rgba(8, 102, 255, 0.4); color: #93c5fd; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                🚀 Open Create Account Page
+            </a>
             <a href="<?= BASE_URL ?>/index.php" class="btn btn-secondary btn-sm" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #ffffff;">
                 🌐 View Main Site
             </a>
@@ -718,20 +721,31 @@ require_once __DIR__ . '/../includes/header.php';
         <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px; box-shadow: var(--shadow-sm);">
             
             <!-- Filter Bar -->
-            <form method="GET" action="" style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
-                <input type="hidden" name="tab" value="members">
-                <input type="text" name="q" value="<?= htmlspecialchars($searchQuery) ?>" placeholder="Search by name, email, or phone..." class="form-input" style="max-width: 340px;">
-                <select name="role" class="form-select" style="max-width: 160px;" onchange="this.form.submit()">
-                    <option value="all" <?= $filterRole === 'all' ? 'selected' : '' ?>>All Roles</option>
-                    <option value="user" <?= $filterRole === 'user' ? 'selected' : '' ?>>Users / Buyers</option>
-                    <option value="broker" <?= $filterRole === 'broker' ? 'selected' : '' ?>>Brokers</option>
-                    <option value="admin" <?= $filterRole === 'admin' ? 'selected' : '' ?>>Admins</option>
-                </select>
-                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-                <?php if (!empty($searchQuery) || $filterRole !== 'all'): ?>
-                    <a href="?tab=members" class="btn btn-secondary btn-sm">Reset</a>
-                <?php endif; ?>
-            </form>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+                <form method="GET" action="" style="display: flex; gap: 12px; flex-wrap: wrap; flex: 1;">
+                    <input type="hidden" name="tab" value="members">
+                    <input type="text" name="q" value="<?= htmlspecialchars($searchQuery) ?>" placeholder="Search by name, email, or phone..." class="form-input" style="max-width: 320px;">
+                    <select name="role" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
+                        <option value="all" <?= $filterRole === 'all' ? 'selected' : '' ?>>All Roles</option>
+                        <option value="user" <?= $filterRole === 'user' ? 'selected' : '' ?>>Users / Buyers</option>
+                        <option value="broker" <?= $filterRole === 'broker' ? 'selected' : '' ?>>Brokers</option>
+                        <option value="admin" <?= $filterRole === 'admin' ? 'selected' : '' ?>>Admins</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                    <?php if (!empty($searchQuery) || $filterRole !== 'all'): ?>
+                        <a href="?tab=members" class="btn btn-secondary btn-sm">Reset</a>
+                    <?php endif; ?>
+                </form>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="openModal('addMemberModal')" style="font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                        ➕ Add / Create Account
+                    </button>
+                    <a href="<?= BASE_URL ?>/auth/register.php" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                        📝 Open Sign-Up Form
+                    </a>
+                </div>
+            </div>
 
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">

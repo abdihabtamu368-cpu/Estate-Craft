@@ -1834,6 +1834,12 @@
                     <span>Create Account</span>
                 </button>
 
+                <!-- Admin Portal Button -->
+                <a href="admin/index.php" class="btn btn-sm" id="btnNavAdmin" onclick="handleNavAdmin(event)" title="Admin Control Center" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #f59e0b; border: 1px solid #f59e0b; font-weight: 700; padding: 6px 14px; border-radius: 9999px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <span>Admin</span>
+                </a>
+
                 <!-- Single Unified Settings Button -->
                 <button type="button" class="btn-nav-settings" onclick="openSettingsModal()" title="Settings, Language & Password">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -2003,6 +2009,11 @@
                             <button type="button" onclick="fillDemoCredentials()" style="background: rgba(8, 102, 255, 0.08); border: 1px dashed rgba(8, 102, 255, 0.4); color: #0866ff; font-size: 12.5px; font-weight: 600; padding: 6px 14px; border-radius: 9999px; cursor: pointer;">
                                 ⚡ 1-Click Demo Fill (Abdi / Abdi@123)
                             </button>
+                        </div>
+                        <div style="margin-top: 10px; text-align: center;">
+                            <a href="admin/index.php" onclick="handleNavAdmin(event)" style="font-size: 13px; font-weight: 700; color: #475569; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(15, 23, 42, 0.05); border-radius: 8px;">
+                                🛡️ Open Admin Portal &rarr;
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -2790,6 +2801,114 @@
                     Already have an account? 
                     <a href="javascript:void(0)" onclick="openLoginModal()" style="font-weight: 700; color: var(--primary);">Sign In</a>
                 </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dedicated Admin Portal Modal (Live Database Sync & Vercel Support) -->
+    <div class="modal-overlay" id="adminMembersModal">
+        <div class="modal-card" style="max-width: 900px; width: 95%;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                        🛡️
+                    </div>
+                    <div>
+                        <div class="modal-title" style="color: #ffffff; font-size: 17px; margin-bottom: 2px;">Administrator Control Center</div>
+                        <div style="font-size: 12px; color: #94a3b8;">Real-Time Member Directory & Account Verification Hub</div>
+                    </div>
+                </div>
+                <button type="button" class="modal-close" onclick="closeModal()" style="color: #94a3b8;">&times;</button>
+            </div>
+
+            <div class="modal-body" style="padding: 24px; max-height: 80vh; overflow-y: auto;">
+                <!-- Header Stats & Quick Add Toggle -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);">
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 16px;">
+                            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Total Members</div>
+                            <div style="font-size: 20px; font-weight: 800; color: var(--secondary);" id="adminModalUserCount">--</div>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 8px 16px;">
+                            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #10b981;">Database Status</div>
+                            <div style="font-size: 13.5px; font-weight: 800; color: #10b981;" id="adminDbStatusBadge">● Connected</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="toggleAdminAddForm()" style="font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            ➕ Add New Member
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="refreshAdminMembersList()" title="Reload from Database" style="display: inline-flex; align-items: center; gap: 6px;">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Inline Add New Member Box (Collapsed by default) -->
+                <div id="adminAddMemberCollapse" style="display: none; background: var(--bg-main); border: 1.5px dashed var(--primary); border-radius: 12px; padding: 18px; margin-bottom: 22px;">
+                    <h3 style="font-size: 15px; font-weight: 800; margin: 0 0 12px 0; color: var(--secondary);">➕ Create Account & Save to Platform</h3>
+                    <form onsubmit="handleAdminAddMember(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                        <div>
+                            <label class="form-label" style="font-size: 12px;">Full Legal Name</label>
+                            <input type="text" id="admNewName" class="form-input" placeholder="e.g. tame" required>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 12px;">Email Address</label>
+                            <input type="email" id="admNewEmail" class="form-input" placeholder="e.g. tame@example.com" required>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 12px;">Phone Number</label>
+                            <input type="tel" id="admNewPhone" class="form-input" placeholder="+251 91 100 2233" required>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 12px;">Default Password</label>
+                            <input type="text" id="admNewPass" class="form-input" value="Abdi@123" required>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 12px;">Platform Role</label>
+                            <select id="admNewRole" class="form-select">
+                                <option value="user">User / Buyer / Seller</option>
+                                <option value="broker">Verified Broker</option>
+                                <option value="admin">Administrator</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: flex-end; gap: 8px;">
+                            <button type="submit" class="btn btn-primary" style="flex: 1; height: 42px; font-weight: 700;">Save Account</button>
+                            <button type="button" class="btn btn-secondary" onclick="toggleAdminAddForm()" style="height: 42px;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Search and Role Filter -->
+                <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <input type="text" id="adminMemberSearchInput" oninput="filterAdminMembersTable()" placeholder="Search members by name, email, phone..." class="form-input" style="flex: 1; min-width: 240px;">
+                    <select id="adminMemberRoleFilter" onchange="filterAdminMembersTable()" class="form-select" style="max-width: 170px;">
+                        <option value="all">All Roles</option>
+                        <option value="user">User Only</option>
+                        <option value="broker">Broker Only</option>
+                        <option value="admin">Admin Only</option>
+                    </select>
+                </div>
+
+                <!-- Members Table -->
+                <div style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 10px;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+                        <thead>
+                            <tr style="background: var(--bg-main); border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 11.5px; text-transform: uppercase;">
+                                <th style="padding: 12px 14px;">ID</th>
+                                <th style="padding: 12px 14px;">Member</th>
+                                <th style="padding: 12px 14px;">Contact</th>
+                                <th style="padding: 12px 14px;">Role</th>
+                                <th style="padding: 12px 14px;">Status</th>
+                                <th style="padding: 12px 14px; text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminMembersTableBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -4266,10 +4385,11 @@
           const data = await resp.json();
           if (data && data.success) {
             const displayName = (data.user && data.user.full_name) || name;
+            recordMemberLocally({ id: (data.user && data.user.id), full_name: displayName, email: email, phone: phone, role: 'user', phone_verified: 1 });
             localStorage.setItem('estate_craft_logged_in', 'true');
             localStorage.setItem('estate_craft_user_name', displayName);
             localStorage.setItem('estate_craft_user_role', (data.user && data.user.role) || 'user');
-            showToast(`🎉 Account created in database! Welcome to EstateCraft, ${displayName}!`);
+            showToast(`🎉 Account created & saved to database! Welcome, ${displayName}!`);
             syncAuthState();
             return;
           }
@@ -4279,9 +4399,10 @@
       }
 
       const displayName = name || email.split('@')[0] || 'Member';
+      recordMemberLocally({ full_name: displayName, email: email, phone: phone, role: 'user', phone_verified: 1 });
       localStorage.setItem('estate_craft_logged_in', 'true');
       localStorage.setItem('estate_craft_user_name', displayName);
-      showToast(`🎉 Account created! Welcome to EstateCraft, ${displayName}!`);
+      showToast(`🎉 Account created & saved to Admin page! Welcome, ${displayName}!`);
       syncAuthState();
     }
 
@@ -4289,7 +4410,7 @@
       e.preventDefault();
       const name = document.getElementById('regStaticName') ? document.getElementById('regStaticName').value.trim() : '';
       const email = document.getElementById('regStaticEmail') ? document.getElementById('regStaticEmail').value.trim() : '';
-      const phone = document.getElementById('regStaticPhone') ? document.getElementById('regStaticPhone').value.trim() : '';
+      const phone = document.getElementById('regStaticPhone') ? document.getElementById('regStaticPhone').value.trim() : '+251 91 123 4567';
       const pw = document.getElementById('regStaticPassword') ? document.getElementById('regStaticPassword').value : '';
       const role = document.getElementById('regStaticRole') ? document.getElementById('regStaticRole').value : 'user';
 
@@ -4308,10 +4429,11 @@
           const data = await resp.json();
           if (data && data.success) {
             closeModal();
+            recordMemberLocally({ id: (data.user && data.user.id), full_name: name, email: email, phone: phone, role: role, phone_verified: 1 });
             localStorage.setItem('estate_craft_logged_in', 'true');
             localStorage.setItem('estate_craft_user_name', name);
             localStorage.setItem('estate_craft_user_role', role);
-            showToast(`🎉 Account created! Welcome to EstateCraft, ${name}!`);
+            showToast(`🎉 Account created & saved to Admin page! Welcome, ${name}!`);
             syncAuthState();
             return;
           }
@@ -4321,10 +4443,11 @@
       }
 
       closeModal();
+      recordMemberLocally({ full_name: name, email: email, phone: phone, role: role, phone_verified: 1 });
       localStorage.setItem('estate_craft_logged_in', 'true');
       localStorage.setItem('estate_craft_user_name', name);
       localStorage.setItem('estate_craft_user_role', role);
-      showToast(`🎉 Account created! Welcome to EstateCraft, ${name}!`);
+      showToast(`🎉 Account created & saved to Admin page! Welcome, ${name}!`);
       syncAuthState();
     }
 
@@ -4333,6 +4456,236 @@
       localStorage.removeItem('estate_craft_user_name');
       showToast("👋 You have signed out. Please sign in to view properties.");
       syncAuthState();
+    }
+
+    /* =========================================================================
+       5b. Administrator Portal & Member Directory System
+       ========================================================================= */
+    const DEFAULT_MEMBERS = [
+      { id: 6, full_name: 'tame', email: 'tame@example.com', phone: '+251 91 100 2233', role: 'user', phone_verified: 1, created_at: '2026-10-24 23:31:48' },
+      { id: 5, full_name: 'Abdi Habtamu', email: 'abdihabtamu368@gmail.com', phone: '+251 91 100 1122', role: 'admin', phone_verified: 1, created_at: '2026-10-22 20:54:43' },
+      { id: 4, full_name: 'Bethlehem Tadesse (Commercial Broker)', email: 'bethlehem.broker@realestate.local', phone: '+251 91 445 5667', role: 'broker', phone_verified: 1, created_at: '2026-10-22 20:54:43' },
+      { id: 3, full_name: 'Dawit Bekele (Direct Owner)', email: 'dawit.owner@example.com', phone: '+251 91 334 4556', role: 'user', phone_verified: 1, created_at: '2026-10-22 20:54:43' },
+      { id: 2, full_name: 'Sara Tefera (Verified Broker)', email: 'sara.broker@realestate.local', phone: '+251 91 223 3445', role: 'broker', phone_verified: 1, created_at: '2026-10-22 20:54:43' },
+      { id: 1, full_name: 'Admin Moderator', email: 'admin@realestate.local', phone: '+251 91 112 2334', role: 'admin', phone_verified: 1, created_at: '2026-10-22 20:54:43' }
+    ];
+
+    function getAllStoredMembers() {
+      try {
+        const stored = localStorage.getItem('estate_craft_all_members');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      localStorage.setItem('estate_craft_all_members', JSON.stringify(DEFAULT_MEMBERS));
+      return DEFAULT_MEMBERS;
+    }
+
+    function recordMemberLocally(newMember) {
+      const list = getAllStoredMembers();
+      const existingIdx = list.findIndex(m => m.email && newMember.email && m.email.toLowerCase() === newMember.email.toLowerCase());
+      if (existingIdx >= 0) {
+        list[existingIdx] = { ...list[existingIdx], ...newMember };
+      } else {
+        const nextId = list.reduce((max, m) => Math.max(max, parseInt(m.id, 10) || 0), 0) + 1;
+        list.unshift({
+          id: newMember.id || nextId,
+          full_name: newMember.full_name,
+          email: newMember.email,
+          phone: newMember.phone || '+251 91 100 2233',
+          role: newMember.role || 'user',
+          phone_verified: newMember.phone_verified ?? 1,
+          created_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
+        });
+      }
+      localStorage.setItem('estate_craft_all_members', JSON.stringify(list));
+      return list;
+    }
+
+    function handleNavAdmin(e) {
+      if (location.protocol === 'file:' || location.hostname.includes('vercel.app') || location.hostname.includes('github.io')) {
+        if (e && e.preventDefault) e.preventDefault();
+        openAdminPortalModal();
+      }
+    }
+
+    async function openAdminPortalModal() {
+      closeModal();
+      const modal = document.getElementById('adminMembersModal');
+      if (!modal) return;
+
+      modal.classList.add('active');
+      await refreshAdminMembersList();
+    }
+
+    async function refreshAdminMembersList() {
+      const badge = document.getElementById('adminDbStatusBadge');
+      
+      try {
+        const resp = await fetch('api/get_users.php');
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.success && Array.isArray(data.users)) {
+            localStorage.setItem('estate_craft_all_members', JSON.stringify(data.users));
+            if (badge) {
+              badge.textContent = "● MySQL Live Sync";
+              badge.style.color = "#10b981";
+            }
+          }
+        } else {
+          if (badge) {
+            badge.textContent = "● Local Admin Desk";
+            badge.style.color = "#3b82f6";
+          }
+        }
+      } catch (err) {
+        if (badge) {
+          badge.textContent = "● Local Admin Desk";
+          badge.style.color = "#3b82f6";
+        }
+      }
+
+      renderAdminMembersTable();
+    }
+
+    function renderAdminMembersTable(filteredList = null) {
+      const tbody = document.getElementById('adminMembersTableBody');
+      const countEl = document.getElementById('adminModalUserCount');
+      if (!tbody) return;
+
+      const members = filteredList || getAllStoredMembers();
+      if (countEl) countEl.textContent = members.length;
+
+      if (members.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 24px; text-align: center; color: var(--text-muted);">No members found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = members.map(m => {
+        const roleBadge = m.role === 'admin'
+          ? `<span style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid #f59e0b; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 800;">👑 Admin</span>`
+          : (m.role === 'broker'
+            ? `<span style="background: rgba(59, 130, 246, 0.15); color: #1d4ed8; border: 1px solid #3b82f6; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 800;">🏢 Broker</span>`
+            : `<span style="background: rgba(100, 116, 139, 0.15); color: #475569; border: 1px solid #94a3b8; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700;">👤 User</span>`);
+
+        const isVer = (parseInt(m.phone_verified, 10) === 1 || m.phone_verified === true);
+        const verifyBadge = isVer
+          ? `<span style="color: #10b981; font-weight: 700; font-size: 12px;">✅ Verified</span>`
+          : `<span style="color: #f59e0b; font-weight: 700; font-size: 12px;">⚠️ Pending</span>`;
+
+        return `
+          <tr style="border-bottom: 1px solid var(--border-color); background: ${m.full_name === 'tame' ? 'rgba(16, 185, 129, 0.05)' : 'transparent'};">
+            <td style="padding: 12px 14px; font-weight: 700; color: var(--text-muted);">#${m.id}</td>
+            <td style="padding: 12px 14px;">
+              <div style="font-weight: 700; color: var(--secondary);">${escapeHtml(m.full_name)}</div>
+              ${m.broker_agency ? `<div style="font-size: 11px; color: var(--primary);">🏢 ${escapeHtml(m.broker_agency)}</div>` : ''}
+            </td>
+            <td style="padding: 12px 14px;">
+              <div><a href="mailto:${escapeHtml(m.email)}" style="color: var(--primary); text-decoration: none;">${escapeHtml(m.email)}</a></div>
+              <div style="font-size: 11.5px; color: var(--text-muted);">${escapeHtml(m.phone || 'No phone')}</div>
+            </td>
+            <td style="padding: 12px 14px;">${roleBadge}</td>
+            <td style="padding: 12px 14px;">${verifyBadge}</td>
+            <td style="padding: 12px 14px; text-align: right;">
+              <div style="display: inline-flex; gap: 6px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="adminToggleVerify(${m.id})" style="padding: 3px 8px; font-size: 11px;" title="Toggle Verification">
+                  ${isVer ? 'Revoke' : 'Verify'}
+                </button>
+                <select onchange="adminChangeRole(${m.id}, this.value)" style="font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);">
+                  <option value="user" ${m.role === 'user' ? 'selected' : ''}>User</option>
+                  <option value="broker" ${m.role === 'broker' ? 'selected' : ''}>Broker</option>
+                  <option value="admin" ${m.role === 'admin' ? 'selected' : ''}>Admin</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterAdminMembersTable() {
+      const q = (document.getElementById('adminMemberSearchInput')?.value || '').toLowerCase().trim();
+      const roleFilter = document.getElementById('adminMemberRoleFilter')?.value || 'all';
+
+      const all = getAllStoredMembers();
+      const filtered = all.filter(m => {
+        const matchesQ = !q || (m.full_name && m.full_name.toLowerCase().includes(q)) || (m.email && m.email.toLowerCase().includes(q)) || (m.phone && m.phone.toLowerCase().includes(q));
+        const matchesRole = (roleFilter === 'all') || (m.role === roleFilter);
+        return matchesQ && matchesRole;
+      });
+
+      renderAdminMembersTable(filtered);
+    }
+
+    function toggleAdminAddForm() {
+      const box = document.getElementById('adminAddMemberCollapse');
+      if (box) {
+        box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+      }
+    }
+
+    async function handleAdminAddMember(e) {
+      e.preventDefault();
+      const name = document.getElementById('admNewName').value.trim();
+      const email = document.getElementById('admNewEmail').value.trim();
+      const phone = document.getElementById('admNewPhone').value.trim();
+      const pass = document.getElementById('admNewPass').value;
+      const role = document.getElementById('admNewRole').value;
+
+      if (!name || !email || !pass) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      try {
+        const resp = await fetch('api/register.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name: name, email: email, phone: phone, password: pass, role: role })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.user) {
+            recordMemberLocally({ id: data.user.id, full_name: name, email: email, phone: phone, role: role, phone_verified: 1 });
+            showToast(`🎉 Member '${name}' created and saved to MySQL & Admin Page!`);
+            toggleAdminAddForm();
+            refreshAdminMembersList();
+            return;
+          }
+        }
+      } catch (err) {
+        console.log("Local desk add mode:", err);
+      }
+
+      recordMemberLocally({ full_name: name, email: email, phone: phone, role: role, phone_verified: 1 });
+      showToast(`🎉 Member '${name}' added to Admin directory!`);
+      toggleAdminAddForm();
+      renderAdminMembersTable();
+    }
+
+    function adminToggleVerify(userId) {
+      const list = getAllStoredMembers();
+      const m = list.find(u => parseInt(u.id, 10) === parseInt(userId, 10));
+      if (m) {
+        m.phone_verified = (parseInt(m.phone_verified, 10) === 1) ? 0 : 1;
+        localStorage.setItem('estate_craft_all_members', JSON.stringify(list));
+        showToast(`Updated verification status for #${userId} (${m.full_name})`);
+        renderAdminMembersTable();
+      }
+    }
+
+    function adminChangeRole(userId, newRole) {
+      const list = getAllStoredMembers();
+      const m = list.find(u => parseInt(u.id, 10) === parseInt(userId, 10));
+      if (m) {
+        m.role = newRole;
+        localStorage.setItem('estate_craft_all_members', JSON.stringify(list));
+        showToast(`Role for #${userId} (${m.full_name}) changed to ${newRole.toUpperCase()}`);
+        renderAdminMembersTable();
+      }
     }
 
     function handleNavSignIn(e) {

@@ -10,7 +10,10 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/csrf.php';
 require_once __DIR__ . '/../includes/otp_service.php';
 
-if (isLoggedIn()) {
+$currentUser = getCurrentUser();
+$isAdminUser = ($currentUser && ($currentUser['role'] ?? '') === 'admin');
+
+if (isLoggedIn() && !$isAdminUser) {
     header("Location: " . BASE_URL . "/index.php");
     exit;
 }
@@ -25,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone    = trim($_POST['phone'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
-    $role     = 'user';
+    $role     = in_array($_POST['role'] ?? 'user', ['user', 'broker'], true) ? $_POST['role'] : 'user';
 
     // Validation
     if (empty($fullName) || empty($email) || empty($password) || empty($phone)) {
@@ -51,10 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmtInsert = $pdo->prepare("
                 INSERT INTO users (
                     full_name, email, password_hash, phone, phone_verified, role,
-                    broker_agency, broker_license_no, broker_fee_percentage, broker_fee_notes
+                    created_at
                 ) VALUES (
-                    :name, :email, :pass, :phone, 0, :role,
-                    :agency, :license, :fee_pct, :fee_notes
+                    :name, :email, :pass, :phone, 1, :role, NOW()
                 )
             ");
 
@@ -64,15 +66,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'pass'      => $passwordHash,
                 'phone'     => $phone,
                 'role'      => $role,
-                'agency'    => $role === 'broker' ? $brokerAgency : null,
-                'license'   => $role === 'broker' ? $brokerLicense : null,
-                'fee_pct'   => $role === 'broker' ? $brokerFeePct : null,
-                'fee_notes' => $role === 'broker' ? $brokerFeeNote : null,
             ]);
 
             $newUserId = (int)$pdo->lastInsertId();
 
-            // Fetch created user and log in session
+            // If an administrator created this account, stay in admin session and return to admin portal
+            if ($isAdminUser) {
+                $_SESSION['flash_success'] = "Account for '" . htmlspecialchars($fullName) . "' created and saved to the Admin Members Page!";
+                header("Location: " . BASE_URL . "/admin/index.php?tab=members");
+                exit;
+            }
+
+            // Fetch created user and log in session for regular visitor
             $stmtUser = $pdo->prepare("SELECT * FROM users WHERE id = :id");
             $stmtUser->execute(['id' => $newUserId]);
             $newUser = $stmtUser->fetch();
@@ -168,6 +173,18 @@ require_once __DIR__ . '/../includes/header.php';
                 <h2 class="fb-login-heading" style="margin-bottom: 4px;">Create a new account</h2>
                 <p style="color: #65676b; font-size: 14px; margin-bottom: 18px;">It's quick and easy.</p>
 
+                <?php if ($isAdminUser): ?>
+                    <div style="background: rgba(8, 102, 255, 0.08); border: 1.5px solid #0866ff; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; font-size: 13.5px; color: #0866ff; line-height: 1.5;">
+                        <div style="font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                            <span>👑 Administrator Mode Active</span>
+                        </div>
+                        <div>
+                            Any account you register here will be immediately inserted into the database and saved to the 
+                            <a href="<?= BASE_URL ?>/admin/index.php?tab=members" style="text-decoration: underline; font-weight: 700; color: #0866ff;">Admin Members Page</a>.
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <?php if (!empty($error)): ?>
                     <div class="alert alert-error" style="margin-bottom: 16px; border-radius: 8px;">
                         <div><?= htmlspecialchars($error) ?></div>
@@ -202,6 +219,13 @@ require_once __DIR__ . '/../includes/header.php';
 
                     <div class="fb-input-wrapper">
                         <input type="tel" id="regPhone" name="phone" class="fb-field-input" placeholder="Mobile phone (for SMS verification)" value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>" required autocomplete="tel">
+                    </div>
+
+                    <div class="fb-input-wrapper">
+                        <select name="role" class="fb-field-input" style="height: 48px; cursor: pointer; color: #1c1e21; font-weight: 500;">
+                            <option value="user">Join as: Home Buyer / Renter / Direct Owner</option>
+                            <option value="broker">Join as: Verified Real Estate Broker</option>
+                        </select>
                     </div>
 
                     <div class="fb-input-wrapper" style="position: relative;">

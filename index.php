@@ -209,6 +209,11 @@ if (!$currentUser && !isset($_GET['explore'])) {
                             ⚡ 1-Click Demo Fill (Abdi / Abdi@123)
                         </button>
                     </div>
+                    <div style="margin-top: 10px; text-align: center;">
+                        <a href="<?= BASE_URL ?>/admin/index.php" style="font-size: 13px; font-weight: 700; color: #475569; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(15, 23, 42, 0.05); border-radius: 8px;">
+                            🛡️ Open Admin Portal &rarr;
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
