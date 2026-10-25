@@ -1999,12 +1999,6 @@
                             </form>
                         </div>
 
-                        <!-- Guest Explore Option -->
-                        <div class="fb-guest-link-wrap" style="text-align: center; margin-top: 22px;">
-                            <a href="javascript:void(0)" onclick="enterAsGuest()" class="fb-guest-link" style="font-size: 14.5px; font-weight: 700; color: #0866ff; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
-                                <span>Browse properties as guest &rarr;</span>
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -4238,23 +4232,6 @@
       if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
         window.catalogMap.invalidateSize();
       }
-    }
-
-    function enterAsGuest() {
-      const authSec = document.getElementById('welcomeAuthSection');
-      const header = document.getElementById('mainSiteHeader');
-      const homeSec = document.getElementById('homePageSections');
-      const footer = document.getElementById('mainSiteFooter');
-
-      if (authSec) authSec.style.display = 'none';
-      if (header) header.style.display = 'block';
-      if (homeSec) homeSec.style.display = 'block';
-      if (footer) footer.style.display = 'block';
-
-      if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
-        window.catalogMap.invalidateSize();
-      }
-      showToast("👀 Browsing as guest. Sign in anytime to post properties or access settings.");
     }
 
     // Dismiss mobile navigation on outside click or escape

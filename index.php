@@ -198,12 +198,6 @@ if (!$currentUser && !isset($_GET['explore'])) {
                         </form>
                     </div>
 
-                    <!-- Guest Explore Option -->
-                    <div class="fb-guest-link-wrap" style="text-align: center; margin-top: 22px;">
-                        <a href="<?= BASE_URL ?>/index.php?explore=1" class="fb-guest-link" style="font-size: 14.5px; font-weight: 700; color: #0866ff; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
-                            <span>Browse properties as guest &rarr;</span>
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
