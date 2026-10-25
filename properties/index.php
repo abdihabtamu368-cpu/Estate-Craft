@@ -205,13 +205,17 @@ require_once __DIR__ . '/../includes/header.php';
                         Search on Map
                     </button>
                 </div>
-                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Explore:</span>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('catMapSearchInput').value='Bole'; searchMapLocation('Bole', 'catalog');">📍 Bole</button>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('catMapSearchInput').value='Kazanchis'; searchMapLocation('Kazanchis', 'catalog');">📍 Kazanchis</button>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('catMapSearchInput').value='Old Airport'; searchMapLocation('Old Airport', 'catalog');">📍 Old Airport</button>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('catMapSearchInput').value='CMC'; searchMapLocation('CMC', 'catalog');">📍 CMC</button>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('catMapSearchInput').value='Hawassa'; searchMapLocation('Hawassa', 'catalog');">📍 Hawassa</button>
+                <!-- All Areas Horizontal Scroller with Scroll Sync -->
+                <div style="margin-top: 10px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">📍 All Areas & Subcities (Auto-syncs on map scroll):</span>
+                        <span style="font-size: 11px; color: var(--text-muted);">Scroll map or click area</span>
+                    </div>
+                    <div class="map-scroller-wrap">
+                        <button type="button" class="map-scroller-btn" onclick="scrollAreaTrack('catAreaTrack', -200)" aria-label="Scroll left">&lsaquo;</button>
+                        <div class="map-area-scroller-track" id="catAreaTrack"></div>
+                        <button type="button" class="map-scroller-btn" onclick="scrollAreaTrack('catAreaTrack', 200)" aria-label="Scroll right">&rsaquo;</button>
+                    </div>
                 </div>
                 <div id="catMapSearchStatus" style="font-size: 13px; color: var(--primary); margin-top: 8px; font-weight: 600;"></div>
             </div>

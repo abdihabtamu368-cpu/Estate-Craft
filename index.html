@@ -1799,6 +1799,91 @@
         height: 120px;
       }
     }
+
+    /* Interactive Map Area Scroller & Live Sync Styles */
+    .map-scroller-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      width: 100%;
+    }
+
+    .map-scroller-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color, #e2e8f0);
+      background: var(--bg-card, #ffffff);
+      color: var(--text-main, #0f172a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 800;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+      user-select: none;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .map-scroller-btn:hover {
+      background: var(--primary, #0866ff);
+      color: #ffffff;
+      border-color: var(--primary, #0866ff);
+      transform: scale(1.08);
+    }
+
+    .map-area-scroller-track {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      white-space: nowrap;
+      padding: 6px 2px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .map-area-scroller-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .map-area-chip {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 9999px;
+      border: 1px solid var(--border-color, #cbd5e1);
+      background: var(--bg-card, #ffffff);
+      color: var(--text-main, #1e293b);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .map-area-chip:hover {
+      border-color: var(--primary, #0866ff);
+      color: var(--primary, #0866ff);
+      background: rgba(8, 102, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .map-area-chip.active-area-chip {
+      background: #0866ff !important;
+      color: #ffffff !important;
+      border-color: #0866ff !important;
+      font-weight: 800 !important;
+      box-shadow: 0 3px 10px rgba(8, 102, 255, 0.35);
+      transform: scale(1.05);
+    }
     </style>
 </head>
 <body>
@@ -2254,15 +2339,17 @@
                         </button>
                     </div>
 
-                    <!-- Quick Jump Chips -->
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center;">
-                        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Explore:</span>
-                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Bole'; searchMapLocation('Bole');">📍 Bole</button>
-                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Kazanchis'; searchMapLocation('Kazanchis');">📍 Kazanchis</button>
-                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Old Airport'; searchMapLocation('Old Airport');">📍 Old Airport</button>
-                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='CMC'; searchMapLocation('CMC');">📍 CMC</button>
-                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Sarbet'; searchMapLocation('Sarbet');">📍 Sarbet</button>
-                        <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('rootMapSearchInput').value='Hawassa'; searchMapLocation('Hawassa');">📍 Hawassa</button>
+                    <!-- All Areas Horizontal Scroller with Scroll Sync -->
+                    <div style="margin-top: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">📍 All Areas & Subcities (Auto-syncs on map scroll):</span>
+                            <span style="font-size: 11px; color: var(--text-muted);">Scroll map or click area</span>
+                        </div>
+                        <div class="map-scroller-wrap">
+                            <button type="button" class="map-scroller-btn" onclick="scrollAreaTrack('rootAreaTrack', -200)" aria-label="Scroll left">&lsaquo;</button>
+                            <div class="map-area-scroller-track" id="rootAreaTrack"></div>
+                            <button type="button" class="map-scroller-btn" onclick="scrollAreaTrack('rootAreaTrack', 200)" aria-label="Scroll right">&rsaquo;</button>
+                        </div>
                     </div>
                     <div id="rootMapSearchStatus" style="font-size: 13px; color: var(--primary); margin-top: 8px; font-weight: 600;"></div>
                 </div>
@@ -3826,6 +3913,10 @@
       window.staticMapLocations = locations;
       window.staticMarkersLayer = staticMarkersLayer;
 
+      // Auto-initialize root area scroller & live map scroll sync
+      renderAreaScroller('rootAreaTrack', 'rootMapSearchInput');
+      attachMapScrollLocationSync(map, 'rootMapSearchInput', 'rootAreaTrack', 'rootMapSearchStatus');
+
       setTimeout(function() {
         if (window.homeMap) window.homeMap.invalidateSize();
       }, 300);
@@ -3862,14 +3953,149 @@
     const ETHIOPIAN_MAP_LOCATIONS = {
       'bole': { lat: 8.9954, lng: 38.7884, zoom: 15, name: 'Bole Subcity, Addis Ababa' },
       'bole atlas': { lat: 9.0020, lng: 38.7840, zoom: 16, name: 'Bole Atlas, Addis Ababa' },
+      'bole medhanialem': { lat: 8.9972, lng: 38.7865, zoom: 16, name: 'Bole Medhanialem, Addis Ababa' },
       'kazanchis': { lat: 9.0190, lng: 38.7690, zoom: 16, name: 'Kazanchis, Kirkos, Addis Ababa' },
       'old airport': { lat: 8.9880, lng: 38.7300, zoom: 15, name: 'Old Airport, Nefas Silk, Addis Ababa' },
       'cmc': { lat: 9.0260, lng: 38.8250, zoom: 15, name: 'CMC Michael, Yeka, Addis Ababa' },
+      'summit': { lat: 9.0150, lng: 38.8550, zoom: 15, name: 'Summit, Addis Ababa' },
       'sarbet': { lat: 8.9950, lng: 38.7450, zoom: 15, name: 'Sarbet (African Union), Addis Ababa' },
       'piazza': { lat: 9.0345, lng: 38.7523, zoom: 16, name: 'Piazza / Arada, Addis Ababa' },
       'megenagna': { lat: 9.0188, lng: 38.8023, zoom: 16, name: 'Megenagna, Yeka, Addis Ababa' },
-      'hawassa': { lat: 7.0504, lng: 38.4764, zoom: 14, name: 'Hawassa, Sidama' }
+      'gerji': { lat: 8.9980, lng: 38.8150, zoom: 15, name: 'Gerji, Bole, Addis Ababa' },
+      'mexico': { lat: 9.0110, lng: 38.7460, zoom: 16, name: 'Mexico Square, Addis Ababa' },
+      '22': { lat: 9.0180, lng: 38.7850, zoom: 16, name: '22 Mazoria, Yeka, Addis Ababa' },
+      'ayat': { lat: 9.0300, lng: 38.8700, zoom: 15, name: 'Ayat, Addis Ababa' },
+      'lebu': { lat: 8.9600, lng: 38.7100, zoom: 15, name: 'Lebu, Addis Ababa' },
+      'jemo': { lat: 8.9500, lng: 38.6900, zoom: 15, name: 'Jemo, Addis Ababa' },
+      'gotera': { lat: 8.9880, lng: 38.7550, zoom: 15, name: 'Gotera, Kirkos, Addis Ababa' },
+      'sengatera': { lat: 9.0135, lng: 38.7490, zoom: 16, name: 'Sengatera, Financial District, Addis Ababa' },
+      'arat kilo': { lat: 9.0320, lng: 38.7620, zoom: 16, name: 'Arat Kilo, Arada, Addis Ababa' },
+      'sidist kilo': { lat: 9.0450, lng: 38.7610, zoom: 16, name: 'Sidist Kilo, Addis Ababa' },
+      'torhailoch': { lat: 9.0080, lng: 38.7250, zoom: 15, name: 'Torhailoch, Addis Ababa' },
+      'kality': { lat: 8.9300, lng: 38.7600, zoom: 14, name: 'Akaki Kality, Addis Ababa' },
+      'hawassa': { lat: 7.0504, lng: 38.4764, zoom: 14, name: 'Hawassa, Sidama' },
+      'bahir dar': { lat: 11.5936, lng: 37.3908, zoom: 14, name: 'Bahir Dar, Amhara' },
+      'adama': { lat: 8.5400, lng: 39.2700, zoom: 14, name: 'Adama (Nazret), Oromia' },
+      'bishoftu': { lat: 8.7500, lng: 38.9800, zoom: 14, name: 'Bishoftu (Debre Zeyit), Oromia' },
+      'dire dawa': { lat: 9.6009, lng: 41.8501, zoom: 14, name: 'Dire Dawa' },
+      'gondar': { lat: 12.6000, lng: 37.4667, zoom: 14, name: 'Gondar, Amhara' },
+      'mekelle': { lat: 13.4967, lng: 39.4767, zoom: 14, name: 'Mekelle, Tigray' },
+      'jimma': { lat: 7.6734, lng: 36.8344, zoom: 14, name: 'Jimma, Oromia' }
     };
+
+    const ALL_ETHIOPIAN_AREAS = [
+      { key: 'bole', name: 'Bole', label: '📍 Bole', lat: 8.9954, lng: 38.7884, zoom: 15 },
+      { key: 'bole atlas', name: 'Bole Atlas', label: '📍 Bole Atlas', lat: 9.0020, lng: 38.7840, zoom: 16 },
+      { key: 'bole medhanialem', name: 'Bole Medhanialem', label: '📍 Medhanialem', lat: 8.9972, lng: 38.7865, zoom: 16 },
+      { key: 'kazanchis', name: 'Kazanchis', label: '📍 Kazanchis', lat: 9.0190, lng: 38.7690, zoom: 16 },
+      { key: 'old airport', name: 'Old Airport', label: '📍 Old Airport', lat: 8.9880, lng: 38.7300, zoom: 15 },
+      { key: 'cmc', name: 'CMC Michael', label: '📍 CMC', lat: 9.0260, lng: 38.8250, zoom: 15 },
+      { key: 'summit', name: 'Summit', label: '📍 Summit', lat: 9.0150, lng: 38.8550, zoom: 15 },
+      { key: 'sarbet', name: 'Sarbet', label: '📍 Sarbet', lat: 8.9950, lng: 38.7450, zoom: 15 },
+      { key: 'piazza', name: 'Piazza / Arada', label: '📍 Piazza', lat: 9.0345, lng: 38.7523, zoom: 16 },
+      { key: 'megenagna', name: 'Megenagna', label: '📍 Megenagna', lat: 9.0188, lng: 38.8023, zoom: 16 },
+      { key: 'gerji', name: 'Gerji', label: '📍 Gerji', lat: 8.9980, lng: 38.8150, zoom: 15 },
+      { key: 'mexico', name: 'Mexico Square', label: '📍 Mexico', lat: 9.0110, lng: 38.7460, zoom: 16 },
+      { key: '22', name: '22 Mazoria', label: '📍 22 Mazoria', lat: 9.0180, lng: 38.7850, zoom: 16 },
+      { key: 'ayat', name: 'Ayat', label: '📍 Ayat', lat: 9.0300, lng: 38.8700, zoom: 15 },
+      { key: 'lebu', name: 'Lebu', label: '📍 Lebu', lat: 8.9600, lng: 38.7100, zoom: 15 },
+      { key: 'jemo', name: 'Jemo', label: '📍 Jemo', lat: 8.9500, lng: 38.6900, zoom: 15 },
+      { key: 'gotera', name: 'Gotera', label: '📍 Gotera', lat: 8.9880, lng: 38.7550, zoom: 15 },
+      { key: 'sengatera', name: 'Sengatera', label: '📍 Sengatera', lat: 9.0135, lng: 38.7490, zoom: 16 },
+      { key: 'arat kilo', name: 'Arat Kilo', label: '📍 Arat Kilo', lat: 9.0320, lng: 38.7620, zoom: 16 },
+      { key: 'sidist kilo', name: 'Sidist Kilo', label: '📍 Sidist Kilo', lat: 9.0450, lng: 38.7610, zoom: 16 },
+      { key: 'torhailoch', name: 'Torhailoch', label: '📍 Torhailoch', lat: 9.0080, lng: 38.7250, zoom: 15 },
+      { key: 'kality', name: 'Akaki Kality', label: '📍 Kality', lat: 8.9300, lng: 38.7600, zoom: 14 },
+      { key: 'hawassa', name: 'Hawassa', label: '📍 Hawassa', lat: 7.0504, lng: 38.4764, zoom: 14 },
+      { key: 'bahir dar', name: 'Bahir Dar', label: '📍 Bahir Dar', lat: 11.5936, lng: 37.3908, zoom: 14 },
+      { key: 'adama', name: 'Adama', label: '📍 Adama', lat: 8.5400, lng: 39.2700, zoom: 14 },
+      { key: 'bishoftu', name: 'Bishoftu', label: '📍 Bishoftu', lat: 8.7500, lng: 38.9800, zoom: 14 },
+      { key: 'dire dawa', name: 'Dire Dawa', label: '📍 Dire Dawa', lat: 9.6009, lng: 41.8501, zoom: 14 },
+      { key: 'gondar', name: 'Gondar', label: '📍 Gondar', lat: 12.6000, lng: 37.4667, zoom: 14 },
+      { key: 'mekelle', name: 'Mekelle', label: '📍 Mekelle', lat: 13.4967, lng: 39.4767, zoom: 14 },
+      { key: 'jimma', name: 'Jimma', label: '📍 Jimma', lat: 7.6734, lng: 36.8344, zoom: 14 }
+    ];
+
+    function scrollAreaTrack(trackId, offset) {
+      const track = document.getElementById(trackId);
+      if (track) {
+        track.scrollBy({ left: offset, behavior: 'smooth' });
+      }
+    }
+
+    function renderAreaScroller(trackId, searchInputId) {
+      const track = document.getElementById(trackId);
+      if (!track) return;
+      track.innerHTML = '';
+
+      ALL_ETHIOPIAN_AREAS.forEach(area => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'map-area-chip';
+        btn.setAttribute('data-key', area.key);
+        btn.innerHTML = area.label;
+        btn.onclick = function() {
+          const input = document.getElementById(searchInputId);
+          if (input) input.value = area.name;
+          searchMapLocation(area.key);
+          setActiveAreaChip(trackId, area.key);
+        };
+        track.appendChild(btn);
+      });
+    }
+
+    function setActiveAreaChip(trackId, key) {
+      const track = document.getElementById(trackId);
+      if (!track) return;
+      const chips = track.querySelectorAll('.map-area-chip');
+      chips.forEach(chip => {
+        if (chip.getAttribute('data-key') === key) {
+          chip.classList.add('active-area-chip');
+          chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        } else {
+          chip.classList.remove('active-area-chip');
+        }
+      });
+    }
+
+    function attachMapScrollLocationSync(mapInstance, inputId, trackId, statusId) {
+      if (!mapInstance) return;
+
+      let syncTimer = null;
+      mapInstance.on('move', function() {
+        clearTimeout(syncTimer);
+        syncTimer = setTimeout(function() {
+          if (!mapInstance) return;
+          const center = mapInstance.getCenter();
+          let closest = null;
+          let minDist = Infinity;
+
+          for (const area of ALL_ETHIOPIAN_AREAS) {
+            const dLat = area.lat - center.lat;
+            const dLng = area.lng - center.lng;
+            const dist = dLat * dLat + dLng * dLng;
+            if (dist < minDist) {
+              minDist = dist;
+              closest = area;
+            }
+          }
+
+          if (closest) {
+            const input = document.getElementById(inputId);
+            if (input && document.activeElement !== input) {
+              input.value = closest.name;
+            }
+            const statusEl = document.getElementById(statusId);
+            if (statusEl) {
+              statusEl.innerHTML = `📍 Map focused on: <strong>${closest.name}</strong> (${center.lat.toFixed(4)}, ${center.lng.toFixed(4)})`;
+            }
+            if (trackId) {
+              setActiveAreaChip(trackId, closest.key);
+            }
+          }
+        }, 120);
+      });
+    }
 
     let rootSearchMarker = null;
 

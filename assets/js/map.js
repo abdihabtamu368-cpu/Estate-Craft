@@ -5,6 +5,7 @@
 
 // Ethiopia Coordinates Constants
 const ETHIOPIA_CENTER = [9.010793, 38.761252]; // Addis Ababa
+const ETHIOPIA_BOUNDS = [[3.2, 32.8], [15.1, 48.2]];
 
 function getEthiopiaBounds() {
     if (typeof L !== 'undefined' && L.latLngBounds) {
@@ -108,6 +109,16 @@ function initCatalogMap(containerId, apiUrl, queryParams = {}) {
                 catalogMapInstance.invalidateSize();
             }
         }, 300);
+
+        // Auto-initialize area scroller & live map scroll sync
+        const catalogTrackId = document.getElementById('homeAreaTrack') ? 'homeAreaTrack' : (document.getElementById('catAreaTrack') ? 'catAreaTrack' : null);
+        const catalogSearchInputId = document.getElementById('homeMapSearchInput') ? 'homeMapSearchInput' : (document.getElementById('catMapSearchInput') ? 'catMapSearchInput' : null);
+        const catalogStatusId = document.getElementById('homeMapSearchStatus') ? 'homeMapSearchStatus' : (document.getElementById('catMapSearchStatus') ? 'catMapSearchStatus' : null);
+
+        if (catalogTrackId && catalogSearchInputId) {
+            renderAreaScroller(catalogTrackId, catalogSearchInputId, 'catalog');
+            attachMapScrollLocationSync(catalogMapInstance, catalogSearchInputId, catalogTrackId, catalogStatusId);
+        }
     }
 
     loadPropertiesOnMap(apiUrl, queryParams);
@@ -225,6 +236,7 @@ function initPropertyDetailMap(containerId, lat, lng, title, priceText, addressT
 
 // Ethiopian Locations Dictionary for Fast Instant Search & Autocomplete
 // Comprehensive Ethiopian Locations & Subcity Dictionary
+// Comprehensive Ethiopian Locations & Subcity Dictionary
 const ETHIOPIAN_LOCATIONS = {
     'bole': { lat: 8.9954, lng: 38.7884, zoom: 15, name: 'Bole Subcity, Addis Ababa' },
     'bole atlas': { lat: 9.0020, lng: 38.7840, zoom: 16, name: 'Bole Atlas, Addis Ababa' },
@@ -267,6 +279,121 @@ const ETHIOPIAN_LOCATIONS = {
     'mekelle': { lat: 13.4967, lng: 39.4767, zoom: 14, name: 'Mekelle, Tigray' },
     'jimma': { lat: 7.6734, lng: 36.8344, zoom: 14, name: 'Jimma, Oromia' }
 };
+
+// All Ethiopian Areas for Horizontal Scroller & Map Movement Detection
+const ALL_ETHIOPIAN_AREAS = [
+    { key: 'bole', name: 'Bole', label: '📍 Bole', lat: 8.9954, lng: 38.7884, zoom: 15 },
+    { key: 'bole atlas', name: 'Bole Atlas', label: '📍 Bole Atlas', lat: 9.0020, lng: 38.7840, zoom: 16 },
+    { key: 'bole medhanialem', name: 'Bole Medhanialem', label: '📍 Medhanialem', lat: 8.9972, lng: 38.7865, zoom: 16 },
+    { key: 'kazanchis', name: 'Kazanchis', label: '📍 Kazanchis', lat: 9.0190, lng: 38.7690, zoom: 16 },
+    { key: 'old airport', name: 'Old Airport', label: '📍 Old Airport', lat: 8.9880, lng: 38.7300, zoom: 15 },
+    { key: 'cmc', name: 'CMC Michael', label: '📍 CMC', lat: 9.0260, lng: 38.8250, zoom: 15 },
+    { key: 'summit', name: 'Summit', label: '📍 Summit', lat: 9.0150, lng: 38.8550, zoom: 15 },
+    { key: 'sarbet', name: 'Sarbet', label: '📍 Sarbet', lat: 8.9950, lng: 38.7450, zoom: 15 },
+    { key: 'piazza', name: 'Piazza / Arada', label: '📍 Piazza', lat: 9.0345, lng: 38.7523, zoom: 16 },
+    { key: 'megenagna', name: 'Megenagna', label: '📍 Megenagna', lat: 9.0188, lng: 38.8023, zoom: 16 },
+    { key: 'gerji', name: 'Gerji', label: '📍 Gerji', lat: 8.9980, lng: 38.8150, zoom: 15 },
+    { key: 'mexico', name: 'Mexico Square', label: '📍 Mexico', lat: 9.0110, lng: 38.7460, zoom: 16 },
+    { key: '22', name: '22 Mazoria', label: '📍 22 Mazoria', lat: 9.0180, lng: 38.7850, zoom: 16 },
+    { key: 'ayat', name: 'Ayat', label: '📍 Ayat', lat: 9.0300, lng: 38.8700, zoom: 15 },
+    { key: 'lebu', name: 'Lebu', label: '📍 Lebu', lat: 8.9600, lng: 38.7100, zoom: 15 },
+    { key: 'jemo', name: 'Jemo', label: '📍 Jemo', lat: 8.9500, lng: 38.6900, zoom: 15 },
+    { key: 'gotera', name: 'Gotera', label: '📍 Gotera', lat: 8.9880, lng: 38.7550, zoom: 15 },
+    { key: 'sengatera', name: 'Sengatera', label: '📍 Sengatera', lat: 9.0135, lng: 38.7490, zoom: 16 },
+    { key: 'arat kilo', name: 'Arat Kilo', label: '📍 Arat Kilo', lat: 9.0320, lng: 38.7620, zoom: 16 },
+    { key: 'sidist kilo', name: 'Sidist Kilo', label: '📍 Sidist Kilo', lat: 9.0450, lng: 38.7610, zoom: 16 },
+    { key: 'torhailoch', name: 'Torhailoch', label: '📍 Torhailoch', lat: 9.0080, lng: 38.7250, zoom: 15 },
+    { key: 'kality', name: 'Akaki Kality', label: '📍 Kality', lat: 8.9300, lng: 38.7600, zoom: 14 },
+    { key: 'hawassa', name: 'Hawassa', label: '📍 Hawassa', lat: 7.0504, lng: 38.4764, zoom: 14 },
+    { key: 'bahir dar', name: 'Bahir Dar', label: '📍 Bahir Dar', lat: 11.5936, lng: 37.3908, zoom: 14 },
+    { key: 'adama', name: 'Adama', label: '📍 Adama', lat: 8.5400, lng: 39.2700, zoom: 14 },
+    { key: 'bishoftu', name: 'Bishoftu', label: '📍 Bishoftu', lat: 8.7500, lng: 38.9800, zoom: 14 },
+    { key: 'dire dawa', name: 'Dire Dawa', label: '📍 Dire Dawa', lat: 9.6009, lng: 41.8501, zoom: 14 },
+    { key: 'gondar', name: 'Gondar', label: '📍 Gondar', lat: 12.6000, lng: 37.4667, zoom: 14 },
+    { key: 'mekelle', name: 'Mekelle', label: '📍 Mekelle', lat: 13.4967, lng: 39.4767, zoom: 14 },
+    { key: 'jimma', name: 'Jimma', label: '📍 Jimma', lat: 7.6734, lng: 36.8344, zoom: 14 }
+];
+
+function scrollAreaTrack(trackId, offset) {
+    const track = document.getElementById(trackId);
+    if (track) {
+        track.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+}
+
+function renderAreaScroller(trackId, searchInputId, mapType = 'catalog') {
+    const track = document.getElementById(trackId);
+    if (!track) return;
+    track.innerHTML = '';
+
+    ALL_ETHIOPIAN_AREAS.forEach(area => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'map-area-chip';
+        btn.setAttribute('data-key', area.key);
+        btn.innerHTML = area.label;
+        btn.onclick = function() {
+            const input = document.getElementById(searchInputId);
+            if (input) input.value = area.name;
+            searchMapLocation(area.key, mapType);
+            setActiveAreaChip(trackId, area.key);
+        };
+        track.appendChild(btn);
+    });
+}
+
+function setActiveAreaChip(trackId, key) {
+    const track = document.getElementById(trackId);
+    if (!track) return;
+    const chips = track.querySelectorAll('.map-area-chip');
+    chips.forEach(chip => {
+        if (chip.getAttribute('data-key') === key) {
+            chip.classList.add('active-area-chip');
+            chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        } else {
+            chip.classList.remove('active-area-chip');
+        }
+    });
+}
+
+function attachMapScrollLocationSync(mapInstance, inputId, trackId, statusId) {
+    if (!mapInstance) return;
+
+    let syncTimer = null;
+    mapInstance.on('move', function() {
+        clearTimeout(syncTimer);
+        syncTimer = setTimeout(function() {
+            if (!mapInstance) return;
+            const center = mapInstance.getCenter();
+            let closest = null;
+            let minDist = Infinity;
+
+            for (const area of ALL_ETHIOPIAN_AREAS) {
+                const dLat = area.lat - center.lat;
+                const dLng = area.lng - center.lng;
+                const dist = dLat * dLat + dLng * dLng;
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = area;
+                }
+            }
+
+            if (closest) {
+                const input = document.getElementById(inputId);
+                if (input && document.activeElement !== input) {
+                    input.value = closest.name;
+                }
+                const statusEl = document.getElementById(statusId);
+                if (statusEl) {
+                    statusEl.innerHTML = `📍 Map focused on: <strong>${closest.name}</strong> (${center.lat.toFixed(4)}, ${center.lng.toFixed(4)})`;
+                }
+                if (trackId) {
+                    setActiveAreaChip(trackId, closest.key);
+                }
+            }
+        }, 120);
+    });
+}
 
 window.pickerMapInstance = null;
 window.pickerMarkerInstance = null;
@@ -349,6 +476,16 @@ function initPropertyPickerMap(containerId, latInputId, lngInputId, defaultLat =
 
     // Initial label sync
     updateInputs(initialLat, initialLng, false);
+
+    // Auto-initialize picker area scroller & live map scroll sync
+    const pickerTrack = document.getElementById('pickerAreaTrack');
+    const pickerSearchInput = document.getElementById('mapSearchInput');
+    const pickerStatus = document.getElementById('mapSearchStatus');
+
+    if (pickerTrack && pickerSearchInput) {
+        renderAreaScroller('pickerAreaTrack', 'mapSearchInput', 'picker');
+        attachMapScrollLocationSync(map, 'mapSearchInput', 'pickerAreaTrack', 'mapSearchStatus');
+    }
 }
 
 /**

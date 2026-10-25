@@ -2365,3 +2365,90 @@ html[data-theme="dark"] .ai-feature-box h4 {
   }
 }
 
+/* =========================================================================
+   Interactive Map Area Scroller & Live Sync Styles
+   ========================================================================= */
+.map-scroller-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  width: 100%;
+}
+
+.map-scroller-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-main, #0f172a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 800;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  user-select: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.map-scroller-btn:hover {
+  background: var(--primary, #0866ff);
+  color: #ffffff;
+  border-color: var(--primary, #0866ff);
+  transform: scale(1.08);
+}
+
+.map-area-scroller-track {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  white-space: nowrap;
+  padding: 6px 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex: 1;
+}
+
+.map-area-scroller-track::-webkit-scrollbar {
+  display: none;
+}
+
+.map-area-chip {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-main, #1e293b);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.map-area-chip:hover {
+  border-color: var(--primary, #0866ff);
+  color: var(--primary, #0866ff);
+  background: rgba(8, 102, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.map-area-chip.active-area-chip {
+  background: #0866ff !important;
+  color: #ffffff !important;
+  border-color: #0866ff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 3px 10px rgba(8, 102, 255, 0.35);
+  transform: scale(1.05);
+}
+

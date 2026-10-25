@@ -303,14 +303,17 @@ require_once __DIR__ . '/../includes/header.php';
                     </button>
                 </div>
                 
-                <!-- Quick Location Shortcut Badges -->
-                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; align-items: center;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Jump:</span>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 7px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('mapSearchInput').value='Bole'; searchMapLocation('Bole', 'picker');">📍 Bole</button>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 7px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('mapSearchInput').value='Kazanchis'; searchMapLocation('Kazanchis', 'picker');">📍 Kazanchis</button>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 7px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('mapSearchInput').value='Old Airport'; searchMapLocation('Old Airport', 'picker');">📍 Old Airport</button>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 7px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('mapSearchInput').value='CMC'; searchMapLocation('CMC', 'picker');">📍 CMC</button>
-                    <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 7px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('mapSearchInput').value='Hawassa'; searchMapLocation('Hawassa', 'picker');">📍 Hawassa</button>
+                <!-- All Areas Horizontal Scroller with Scroll Sync -->
+                <div style="margin-top: 10px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">📍 All Areas & Subcities (Auto-syncs on map scroll):</span>
+                        <span style="font-size: 11px; color: var(--text-muted);">Scroll map or click area</span>
+                    </div>
+                    <div class="map-scroller-wrap">
+                        <button type="button" class="map-scroller-btn" onclick="scrollAreaTrack('pickerAreaTrack', -200)" aria-label="Scroll left">&lsaquo;</button>
+                        <div class="map-area-scroller-track" id="pickerAreaTrack"></div>
+                        <button type="button" class="map-scroller-btn" onclick="scrollAreaTrack('pickerAreaTrack', 200)" aria-label="Scroll right">&rsaquo;</button>
+                    </div>
                 </div>
                 <div id="mapSearchStatus" style="font-size: 12px; color: var(--primary); margin-top: 4px; font-weight: 600;"></div>
             </div>
