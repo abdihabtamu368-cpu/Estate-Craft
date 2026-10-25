@@ -312,6 +312,9 @@ require_once __DIR__ . '/../includes/header.php';
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         Search Map
                     </button>
+                    <button type="button" class="btn btn-secondary" onclick="useDeviceGpsLocation('picker')" title="Use My Current GPS Position" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+                        🎯 My Location
+                    </button>
                 </div>
                 
                 <!-- Quick Location Shortcut Badges -->
@@ -325,14 +328,29 @@ require_once __DIR__ . '/../includes/header.php';
                     <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('mapSearchInput').value='Piazza'; searchMapLocation('Piazza', 'picker');">📍 Piazza</button>
                     <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 16px;" onclick="document.getElementById('mapSearchInput').value='Hawassa'; searchMapLocation('Hawassa', 'picker');">📍 Hawassa</button>
                 </div>
-                <div id="mapSearchStatus" style="font-size: 12px; color: var(--primary); margin-top: 4px; font-weight: 600;"></div>
+                <div id="mapSearchStatus" style="font-size: 12px; color: var(--primary); margin-top: 6px; font-weight: 600;"></div>
             </div>
 
             <div id="pickerMap" style="height: 320px; border-radius: 8px; border: 1px solid var(--border-color);"></div>
 
+            <!-- Accepted Map Location Confirmation Card -->
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">📍</span>
+                    <div>
+                        <strong style="color: #065f46; font-size: 13px;">Location Accepted From Map:</strong>
+                        <span id="acceptedCoordsLabel" style="font-size: 12px; font-weight: 700; color: #047857;">9.010793, 38.761252</span>
+                        <div style="font-size: 11.5px; color: #047857;">Clicking on the map or dragging the pin automatically accepts coordinates and updates the address.</div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="useDeviceGpsLocation('picker')" style="font-size: 11.5px; padding: 4px 10px;">
+                    🎯 GPS Pin
+                </button>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
-                <input type="text" id="propLat" name="latitude" class="form-input" value="9.010793" readonly title="Latitude">
-                <input type="text" id="propLng" name="longitude" class="form-input" value="38.761252" readonly title="Longitude">
+                <input type="text" id="propLat" name="latitude" class="form-input" value="9.010793" readonly title="Latitude (Accepted from Map)">
+                <input type="text" id="propLng" name="longitude" class="form-input" value="38.761252" readonly title="Longitude (Accepted from Map)">
             </div>
         </div>
 

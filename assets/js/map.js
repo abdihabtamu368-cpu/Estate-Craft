@@ -323,20 +323,125 @@ function initPropertyPickerMap(containerId, latInputId, lngInputId, defaultLat =
 
     window.pickerMarkerInstance = marker;
 
-    function updateInputs(lat, lng) {
+    function updateInputs(lat, lng, shouldReverse = true) {
         latInput.value = lat.toFixed(6);
         lngInput.value = lng.toFixed(6);
+
+        const badge = document.getElementById('acceptedCoordsLabel');
+        if (badge) {
+            badge.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        }
+
+        if (shouldReverse) {
+            reverseGeocodeCoordinates(lat, lng);
+        }
     }
 
     marker.on('dragend', function (e) {
         const position = marker.getLatLng();
-        updateInputs(position.lat, position.lng);
+        updateInputs(position.lat, position.lng, true);
     });
 
     map.on('click', function (e) {
         marker.setLatLng(e.latlng);
-        updateInputs(e.latlng.lat, e.latlng.lng);
+        updateInputs(e.latlng.lat, e.latlng.lng, true);
     });
+
+    // Initial label sync
+    updateInputs(initialLat, initialLng, false);
+}
+
+/**
+ * Reverse geocodes coordinates to automatically accept & autofill address / city
+ */
+function reverseGeocodeCoordinates(lat, lng) {
+    const statusEls = ['mapSearchStatus', 'catMapSearchStatus', 'homeMapSearchStatus'];
+    statusEls.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = `⏳ Accepting location from map: <strong>${lat.toFixed(6)}, ${lng.toFixed(6)}</strong>...`;
+    });
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16&addressdetails=1`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.address) {
+                const addr = data.address;
+                const suburb = addr.suburb || addr.neighbourhood || addr.residential || addr.road || '';
+                const city = addr.city || addr.town || addr.county || 'Addis Ababa';
+                const state = addr.state || addr.region || '';
+
+                const addressInput = document.getElementById('propAddress');
+                const cityInput = document.getElementById('propCity');
+                const stateInput = document.getElementById('propState');
+
+                if (addressInput && (!addressInput.value || addressInput.value.trim() === '')) {
+                    addressInput.value = suburb ? `${suburb}, ${city}` : city;
+                }
+                if (cityInput && (!cityInput.value || cityInput.value.trim() === '')) {
+                    cityInput.value = city;
+                }
+                if (stateInput && (!stateInput.value || stateInput.value.trim() === '')) {
+                    stateInput.value = state || suburb;
+                }
+
+                const resolvedName = [suburb, city].filter(Boolean).join(', ') || city;
+                statusEls.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = `✅ Location accepted from map: <strong>${escapeHtml(resolvedName)}</strong> (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+                });
+
+                if (window.pickerMarkerInstance) {
+                    window.pickerMarkerInstance.bindPopup(`
+                        <div style="font-family: inherit; font-size: 13px; line-height: 1.4;">
+                            <strong style="color: #10b981; font-size: 14px;">✅ Location Accepted from Map</strong><br>
+                            <span style="font-size: 12px; color: #1e293b; font-weight: 700;">${escapeHtml(resolvedName)}</span><br>
+                            <span style="font-size: 11px; color: #64748b;">Coordinates: ${lat.toFixed(6)}, ${lng.toFixed(6)}</span><br>
+                            <span style="font-size: 11px; color: #2563eb; font-weight: 600;">✓ Address fields updated</span>
+                        </div>
+                    `).openPopup();
+                }
+            }
+        })
+        .catch(() => {
+            statusEls.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = `✅ Location accepted from map: <strong>${lat.toFixed(6)}, ${lng.toFixed(6)}</strong>`;
+            });
+        });
+}
+
+/**
+ * Uses device GPS / Geolocation to detect current position and accept location on map
+ */
+function useDeviceGpsLocation(mapType = 'picker') {
+    if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser.");
+        return;
+    }
+    const statusEls = ['mapSearchStatus', 'catMapSearchStatus', 'homeMapSearchStatus'];
+    statusEls.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = `⏳ Detecting your GPS location...`;
+    });
+
+    navigator.geolocation.getCurrentPosition(
+        function (pos) {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            applyMapSearchResult(lat, lng, "Current GPS Location", 16, mapType);
+            reverseGeocodeCoordinates(lat, lng);
+        },
+        function (err) {
+            statusEls.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = `⚠️ Could not detect GPS position (${err.message}). You can click anywhere on the map to pin location.`;
+                    setTimeout(() => { el.innerHTML = ''; }, 4500);
+                }
+            });
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+    );
 }
 
 /**

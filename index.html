@@ -2787,6 +2787,112 @@
                 </p>
             </div>
         </div>
+    <!-- Post Property Modal with Interactive Map Location Picker -->
+    <div class="modal-overlay" id="postPropertyModal">
+        <div class="modal-card" style="max-width: 640px; width: 95%;">
+            <div class="modal-header">
+                <div class="modal-title">🏡 Post a Property Listing</div>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px; max-height: 85vh; overflow-y: auto;">
+                <form id="postPropForm" onsubmit="handlePostProperty(event)">
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="newTitle">Property Title *</label>
+                        <input type="text" id="newTitle" class="form-input" placeholder="e.g. Modern 3-Bedroom Furnished Penthouse in Bole" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newPurpose">Listing Purpose *</label>
+                            <select id="newPurpose" class="form-select">
+                                <option value="sale">For Sale</option>
+                                <option value="rent">For Rent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newType">Property Type *</label>
+                            <select id="newType" class="form-select">
+                                <option value="apartment">Apartment</option>
+                                <option value="villa">Villa / House</option>
+                                <option value="condo">Condominium</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="land">Land Plot</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newPrice">Price (ETB) *</label>
+                            <input type="number" id="newPrice" class="form-input" placeholder="e.g. 15000000" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newCity">City / Neighborhood *</label>
+                            <input type="text" id="newCity" class="form-input" placeholder="e.g. Bole Atlas, Addis Ababa" required>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newBeds">Bedrooms</label>
+                            <input type="number" id="newBeds" class="form-input" value="3">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newBaths">Bathrooms</label>
+                            <input type="number" id="newBaths" class="form-input" value="2">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newSqft">Area (sqft)</label>
+                            <input type="number" id="newSqft" class="form-input" value="1800">
+                        </div>
+                    </div>
+
+                    <!-- Interactive Map Location Picker -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                            <label class="form-label" style="margin-bottom: 0;">📍 Pin Location on Map (Click Map or Drag Pin)</label>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="useDeviceGpsForPostModal()" style="font-size: 11.5px; padding: 3px 10px;">
+                                🎯 Detect My GPS
+                            </button>
+                        </div>
+
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Jump:</span>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(9.0016, 38.7845, 'Bole')">📍 Bole</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(9.0203, 38.7675, 'Kazanchis')">📍 Kazanchis</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(8.9880, 38.7420, 'Old Airport')">📍 Old Airport</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(9.0250, 38.8350, 'CMC')">📍 CMC</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(7.0504, 38.4764, 'Hawassa')">📍 Hawassa</button>
+                        </div>
+
+                        <div id="modalPostPickerMap" style="height: 220px; border-radius: 8px; border: 1px solid var(--border-color); background: #e2e8f0;"></div>
+
+                        <!-- Accepted Coordinates Badge -->
+                        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 8px 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span>📍</span>
+                                <div>
+                                    <strong style="color: #065f46;">Location Accepted:</strong>
+                                    <span id="postModalAcceptedCoords" style="color: #047857; font-weight: 700;">9.010800, 38.761300</span>
+                                </div>
+                            </div>
+                            <span style="font-size: 11px; color: #047857;">✓ Coordinates saved</span>
+                        </div>
+                        <input type="hidden" id="newLat" value="9.0108">
+                        <input type="hidden" id="newLng" value="38.7613">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" for="newDesc">Description</label>
+                        <textarea id="newDesc" rows="3" class="form-input" style="height: auto;" placeholder="Highlight main features, parking, neighborhood amenities..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="width: 100%;">
+                        Submit & Publish Listing &rarr;
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Dedicated Admin Portal Modal (Live Database Sync & Vercel Support) -->
@@ -3490,9 +3596,105 @@
       document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
     }
 
+    let postPickerMapInstance = null;
+    let postPickerMarkerInstance = null;
+
     function openPostModal() {
       const postModal = document.getElementById('postPropertyModal');
-      if (postModal) postModal.classList.add('active');
+      if (postModal) {
+        postModal.classList.add('active');
+        setTimeout(initPostModalMap, 250);
+      }
+    }
+
+    function initPostModalMap() {
+      const mapEl = document.getElementById('modalPostPickerMap');
+      if (!mapEl || typeof L === 'undefined') return;
+
+      const defaultLat = 9.0108;
+      const defaultLng = 38.7613;
+
+      if (!postPickerMapInstance) {
+        postPickerMapInstance = L.map('modalPostPickerMap', {
+          center: [defaultLat, defaultLng],
+          zoom: 13
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(postPickerMapInstance);
+
+        postPickerMarkerInstance = L.marker([defaultLat, defaultLng], {
+          draggable: true
+        }).addTo(postPickerMapInstance);
+
+        function onPostCoordsUpdate(lat, lng) {
+          const latInput = document.getElementById('newLat');
+          const lngInput = document.getElementById('newLng');
+          const badge = document.getElementById('postModalAcceptedCoords');
+          if (latInput) latInput.value = lat.toFixed(6);
+          if (lngInput) lngInput.value = lng.toFixed(6);
+          if (badge) badge.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+          // Reverse geocode to auto-fill neighborhood / city
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16&addressdetails=1`)
+            .then(r => r.json())
+            .then(d => {
+              if (d && d.address) {
+                const area = d.address.suburb || d.address.neighbourhood || d.address.road || '';
+                const city = d.address.city || d.address.town || 'Addis Ababa';
+                const fullLoc = area ? `${area}, ${city}` : city;
+                const cityInput = document.getElementById('newCity');
+                if (cityInput && (!cityInput.value || cityInput.value.trim() === '')) {
+                  cityInput.value = fullLoc;
+                }
+              }
+            })
+            .catch(() => {});
+        }
+
+        postPickerMarkerInstance.on('dragend', function() {
+          const pos = postPickerMarkerInstance.getLatLng();
+          onPostCoordsUpdate(pos.lat, pos.lng);
+        });
+
+        postPickerMapInstance.on('click', function(e) {
+          postPickerMarkerInstance.setLatLng(e.latlng);
+          onPostCoordsUpdate(e.latlng.lat, e.latlng.lng);
+        });
+      }
+
+      postPickerMapInstance.invalidateSize();
+    }
+
+    function jumpPostModalMap(lat, lng, name) {
+      if (postPickerMapInstance && postPickerMarkerInstance) {
+        postPickerMapInstance.flyTo([lat, lng], 14);
+        postPickerMarkerInstance.setLatLng([lat, lng]);
+        const latInput = document.getElementById('newLat');
+        const lngInput = document.getElementById('newLng');
+        const badge = document.getElementById('postModalAcceptedCoords');
+        if (latInput) latInput.value = lat.toFixed(6);
+        if (lngInput) lngInput.value = lng.toFixed(6);
+        if (badge) badge.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)} (${name})`;
+        const cityInput = document.getElementById('newCity');
+        if (cityInput && (!cityInput.value || cityInput.value.trim() === '')) {
+          cityInput.value = `${name}, Ethiopia`;
+        }
+      }
+    }
+
+    function useDeviceGpsForPostModal() {
+      if (!navigator.geolocation) {
+        alert("GPS geolocation not supported by browser.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        jumpPostModalMap(pos.coords.latitude, pos.coords.longitude, "My Location");
+      }, function() {
+        alert("Unable to detect GPS position. Please pin on map manually.");
+      });
     }
 
     function handlePostProperty(event) {
@@ -3506,6 +3708,8 @@
       const baths = parseInt(document.getElementById('newBaths').value) || 1;
       const sqft = parseInt(document.getElementById('newSqft').value) || 1000;
       const desc = document.getElementById('newDesc').value.trim();
+      const lat = parseFloat(document.getElementById('newLat') ? document.getElementById('newLat').value : 9.0108) || 9.0108;
+      const lng = parseFloat(document.getElementById('newLng') ? document.getElementById('newLng').value : 38.7613) || 38.7613;
 
       const newProp = {
         id: Date.now(),
@@ -3518,8 +3722,10 @@
         bedrooms: beds,
         bathrooms: baths,
         areaSqft: sqft,
+        latitude: lat,
+        longitude: lng,
         image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80",
-        sellerName: "Direct Property Owner",
+        sellerName: localStorage.getItem('estate_craft_user_name') || "Direct Property Owner",
         sellerRole: "user",
         sellerPhone: "+251 91 000 0000",
         sellerVerified: true,
@@ -3530,8 +3736,11 @@
 
       properties.unshift(newProp);
       renderProperties(properties);
+      if (typeof updateMapMarkers === 'function') {
+        updateMapMarkers(properties);
+      }
       closeModal();
-      alert("Success! Your property has been added to the catalog.");
+      showToast("🎉 Property published with exact map location accepted!");
     }
 
     let staticMarkersLayer = null;

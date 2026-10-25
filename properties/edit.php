@@ -298,6 +298,9 @@ require_once __DIR__ . '/../includes/header.php';
                     <button type="button" class="btn btn-primary btn-sm" onclick="searchMapLocation(document.getElementById('mapSearchInput').value, 'picker')">
                         Search Map
                     </button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="useDeviceGpsLocation('picker')" title="Use My Current GPS Position" style="display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                        🎯 My Location
+                    </button>
                 </div>
                 
                 <!-- Quick Location Shortcut Badges -->
@@ -313,9 +316,24 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
 
             <div id="pickerMap" style="height: 280px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 8px;"></div>
+            
+            <!-- Accepted Map Location Confirmation Card -->
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 16px;">📍</span>
+                    <div>
+                        <strong style="color: #065f46; font-size: 12.5px;">Location Accepted From Map:</strong>
+                        <span id="acceptedCoordsLabel" style="font-size: 12px; font-weight: 700; color: #047857;"><?= htmlspecialchars((string)$property['latitude']) ?>, <?= htmlspecialchars((string)$property['longitude']) ?></span>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="useDeviceGpsLocation('picker')" style="font-size: 11px; padding: 2px 8px;">
+                    🎯 GPS Pin
+                </button>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="propLat" name="latitude" class="form-input" value="<?= htmlspecialchars((string)$property['latitude']) ?>" readonly>
-                <input type="text" id="propLng" name="longitude" class="form-input" value="<?= htmlspecialchars((string)$property['longitude']) ?>" readonly>
+                <input type="text" id="propLat" name="latitude" class="form-input" value="<?= htmlspecialchars((string)$property['latitude']) ?>" readonly title="Latitude (Accepted from Map)">
+                <input type="text" id="propLng" name="longitude" class="form-input" value="<?= htmlspecialchars((string)$property['longitude']) ?>" readonly title="Longitude (Accepted from Map)">
             </div>
         </div>
 
