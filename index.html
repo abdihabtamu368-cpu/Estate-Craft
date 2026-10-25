@@ -1999,20 +1999,10 @@
                             </form>
                         </div>
 
-                        <!-- Guest Explore & Quick Fill Options -->
+                        <!-- Guest Explore Option -->
                         <div class="fb-guest-link-wrap" style="text-align: center; margin-top: 22px;">
                             <a href="javascript:void(0)" onclick="enterAsGuest()" class="fb-guest-link" style="font-size: 14.5px; font-weight: 700; color: #0866ff; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
                                 <span>Browse properties as guest &rarr;</span>
-                            </a>
-                        </div>
-                        <div style="margin-top: 14px; text-align: center;">
-                            <button type="button" onclick="fillDemoCredentials()" style="background: rgba(8, 102, 255, 0.08); border: 1px dashed rgba(8, 102, 255, 0.4); color: #0866ff; font-size: 12.5px; font-weight: 600; padding: 6px 14px; border-radius: 9999px; cursor: pointer;">
-                                ⚡ 1-Click Demo Fill (Abdi / Abdi@123)
-                            </button>
-                        </div>
-                        <div style="margin-top: 10px; text-align: center;">
-                            <a href="admin/index.php" onclick="handleNavAdmin(event)" style="font-size: 13px; font-weight: 700; color: #475569; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(15, 23, 42, 0.05); border-radius: 8px;">
-                                🛡️ Open Admin Portal &rarr;
                             </a>
                         </div>
                     </div>
@@ -4265,16 +4255,6 @@
         window.catalogMap.invalidateSize();
       }
       showToast("👀 Browsing as guest. Sign in anytime to post properties or access settings.");
-    }
-
-    function fillDemoCredentials() {
-      const email = document.getElementById('fpLoginEmail');
-      const pw = document.getElementById('fpLoginPassword');
-      if (email && pw) {
-        email.value = 'abdihabtamu368@gmail.com';
-        pw.value = 'Abdi@123';
-        showToast("⚡ Sample credentials filled. Click 'Log in' to enter.");
-      }
     }
 
     // Dismiss mobile navigation on outside click or escape

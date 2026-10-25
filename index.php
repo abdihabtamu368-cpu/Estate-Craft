@@ -198,20 +198,10 @@ if (!$currentUser && !isset($_GET['explore'])) {
                         </form>
                     </div>
 
-                    <!-- Guest Explore & Quick Fill Options -->
+                    <!-- Guest Explore Option -->
                     <div class="fb-guest-link-wrap" style="text-align: center; margin-top: 22px;">
                         <a href="<?= BASE_URL ?>/index.php?explore=1" class="fb-guest-link" style="font-size: 14.5px; font-weight: 700; color: #0866ff; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
                             <span>Browse properties as guest &rarr;</span>
-                        </a>
-                    </div>
-                    <div style="margin-top: 14px; text-align: center;">
-                        <button type="button" onclick="fillPhpDemo()" style="background: rgba(8, 102, 255, 0.08); border: 1px dashed rgba(8, 102, 255, 0.4); color: #0866ff; font-size: 12.5px; font-weight: 600; padding: 6px 14px; border-radius: 9999px; cursor: pointer;">
-                            ⚡ 1-Click Demo Fill (Abdi / Abdi@123)
-                        </button>
-                    </div>
-                    <div style="margin-top: 10px; text-align: center;">
-                        <a href="<?= BASE_URL ?>/admin/index.php" style="font-size: 13px; font-weight: 700; color: #475569; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(15, 23, 42, 0.05); border-radius: 8px;">
-                            🛡️ Open Admin Portal &rarr;
                         </a>
                     </div>
                 </div>
@@ -251,15 +241,6 @@ if (!$currentUser && !isset($_GET['explore'])) {
         } else {
             pw.type = 'password';
             btn.textContent = '👁️';
-        }
-    }
-
-    function fillPhpDemo() {
-        const emailInput = document.querySelector('input[name="email"]');
-        const pwInput = document.getElementById('firstPageLoginPassword');
-        if (emailInput && pwInput) {
-            emailInput.value = 'abdihabtamu368@gmail.com';
-            pwInput.value = 'Abdi@123';
         }
     }
     </script>
