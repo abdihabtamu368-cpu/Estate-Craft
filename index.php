@@ -493,9 +493,14 @@ require_once __DIR__ . '/includes/header.php';
                             </div>
                         </div>
 
-                        <a href="<?= BASE_URL ?>/properties/details.php?id=<?= $prop['id'] ?>" class="btn btn-outline btn-sm">
-                            View Details &rarr;
-                        </a>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <a href="<?= BASE_URL ?>/chat.php?property_id=<?= $prop['id'] ?>" class="btn btn-sm" title="Chat with Admin about this home" style="background: #0866ff; color: #ffffff; padding: 5px 10px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; text-decoration: none;">
+                                💬 Chat
+                            </a>
+                            <a href="<?= BASE_URL ?>/properties/details.php?id=<?= $prop['id'] ?>" class="btn btn-outline btn-sm">
+                                Details &rarr;
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

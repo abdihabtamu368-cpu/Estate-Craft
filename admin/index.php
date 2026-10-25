@@ -290,6 +290,10 @@ $countPendingProps = $pdo->query("SELECT COUNT(*) FROM properties WHERE status =
 $countResets = $pdo->query("SELECT COUNT(*) FROM password_resets WHERE expires_at > NOW()")->fetchColumn();
 $countReports = $pdo->query("SELECT COUNT(*) FROM listing_reports WHERE status = 'pending'")->fetchColumn();
 $countFeedback = $pdo->query("SELECT COUNT(*) FROM user_feedback WHERE status = 'new'")->fetchColumn();
+$countChats = 0;
+try {
+    $countChats = (int)$pdo->query("SELECT SUM(admin_unread_count) FROM chat_conversations")->fetchColumn();
+} catch (Exception $e) {}
 
 // =========================================================================
 // FETCH DATA FOR ACTIVE TAB
@@ -515,7 +519,13 @@ require_once __DIR__ . '/../includes/header.php';
             🚨 Safety Reports (<?= $countReports ?>)
         </a>
         <a href="?tab=feedback" class="btn btn-sm <?= $activeTab === 'feedback' ? 'btn-primary' : 'btn-secondary' ?>" style="border-radius: 8px 8px 0 0; padding: 10px 18px; font-weight: 700;">
-            💬 Customer Feedback (<?= $countFeedback ?>)
+            📝 Feedback (<?= $countFeedback ?>)
+        </a>
+        <a href="<?= BASE_URL ?>/chat.php" class="btn btn-sm btn-primary" style="border-radius: 8px 8px 0 0; padding: 10px 18px; font-weight: 700; background: #0866ff; color: #ffffff; display: inline-flex; align-items: center; gap: 6px;">
+            <span>💬 Live Chat & Inquiries</span>
+            <?php if ($countChats > 0): ?>
+                <span style="background: #ef4444; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 9999px;"><?= $countChats ?></span>
+            <?php endif; ?>
         </a>
     </div>
 

@@ -81,6 +81,7 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
             <li><a href="<?= BASE_URL ?>/properties/index.php?purpose=rent" class="<?= $activePage === 'rent' ? 'active' : '' ?>"><?= __('nav_rent', 'Rent') ?></a></li>
             <li><a href="<?= BASE_URL ?>/properties/create.php" class="<?= $activePage === 'sell' ? 'active' : '' ?>"><?= __('nav_sell', 'Sell') ?></a></li>
             <li><a href="<?= BASE_URL ?>/properties/index.php" class="<?= $activePage === 'browse' ? 'active' : '' ?>"><?= __('nav_explore', 'Explore All') ?></a></li>
+            <li><a href="<?= BASE_URL ?>/chat.php" class="<?= $activePage === 'chat' ? 'active' : '' ?>" style="display: inline-flex; align-items: center; gap: 4px;">💬 <?= __('nav_chat', 'Messages') ?></a></li>
             <?php if ($currentUser && strtolower(trim($currentUser['email'] ?? '')) === 'abdihabtamu368@gmail.com'): ?>
                 <li><a href="<?= BASE_URL ?>/user/reports.php" class="<?= $activePage === 'reports' ? 'active' : '' ?>"><?= __('nav_safety_reports', 'Safety Reports') ?></a></li>
             <?php endif; ?>
@@ -163,6 +164,12 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
                         </svg>
                     </a>
 
+                    <!-- Chat with Admin Button -->
+                    <a href="<?= BASE_URL ?>/chat.php" class="btn btn-secondary btn-sm" id="btnUserChat" title="Chat with Admin Abdi Habtamu" style="padding: 6px 10px; display: inline-flex; align-items: center; gap: 4px; color: #0866ff;">
+                        <span>💬</span>
+                        <span style="font-size: 12.5px; font-weight: 700;">Chat</span>
+                    </a>
+
                     <?php if ($currentUser && strtolower(trim($currentUser['email'] ?? '')) === 'abdihabtamu368@gmail.com'): ?>
                         <a href="<?= BASE_URL ?>/admin/index.php" class="btn btn-sm" id="btnAdminPanel" title="Admin Control Center" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #f59e0b; border: 1px solid #f59e0b; font-weight: 700; padding: 6px 12px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -181,6 +188,12 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
         </div>
     </div>
 </header>
+
+<!-- Floating Chat with Admin Button -->
+<a href="<?= BASE_URL ?>/chat.php" id="floatingAdminChatTrigger" title="Chat with Admin Abdi Habtamu" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: #0866ff; color: #ffffff; padding: 12px 18px; border-radius: 9999px; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(8, 102, 255, 0.4); text-decoration: none; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    <span style="font-size: 18px;">💬</span>
+    <span>Chat with Admin</span>
+</a>
 <?php endif; ?>
 
 <script>

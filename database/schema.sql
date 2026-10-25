@@ -4,6 +4,8 @@
 -- =======================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `chat_messages`;
+DROP TABLE IF EXISTS `chat_conversations`;
 DROP TABLE IF EXISTS `user_feedback`;
 DROP TABLE IF EXISTS `listing_reports`;
 DROP TABLE IF EXISTS `password_resets`;
@@ -152,6 +154,47 @@ CREATE TABLE IF NOT EXISTS `user_feedback` (
   CONSTRAINT `fk_feedback_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- -------------------------------------------------------
+-- Table: chat_conversations
+-- Active communication channels between users and admin
+-- -------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `chat_conversations` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT UNSIGNED NOT NULL,
+  `admin_id` INT UNSIGNED NOT NULL DEFAULT 5 COMMENT 'Default: Abdi Habtamu (abdihabtamu368@gmail.com)',
+  `property_id` INT UNSIGNED NULL COMMENT 'Associated property if inquiry started from listing',
+  `last_message` TEXT NULL,
+  `last_message_at` DATETIME NULL,
+  `user_unread_count` INT UNSIGNED DEFAULT 0,
+  `admin_unread_count` INT UNSIGNED DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX `idx_user_id` (`user_id`),
+  INDEX `idx_admin_id` (`admin_id`),
+  INDEX `idx_property_id` (`property_id`),
+  CONSTRAINT `fk_chat_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_chat_property` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -------------------------------------------------------
+-- Table: chat_messages
+-- Individual messages exchanged between user and admin
+-- -------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `chat_messages` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `conversation_id` INT UNSIGNED NOT NULL,
+  `sender_id` INT UNSIGNED NOT NULL,
+  `sender_role` ENUM('user', 'admin') NOT NULL DEFAULT 'user',
+  `property_id` INT UNSIGNED NULL COMMENT 'Snapshot of property card attached',
+  `message` TEXT NOT NULL,
+  `is_read` TINYINT(1) DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_conv_id` (`conversation_id`),
+  INDEX `idx_sender_id` (`sender_id`),
+  CONSTRAINT `fk_msg_conversation` FOREIGN KEY (`conversation_id`) REFERENCES `chat_conversations` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_msg_sender` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- =======================================================
 -- SEED SAMPLE ETHIOPIAN REAL ESTATE DATA
 -- Default passwords for sample accounts are: Password123!
@@ -203,3 +246,11 @@ INSERT INTO `property_images` (`property_id`, `image_path`, `is_primary`, `capti
 -- Sample Report for testing moderation
 INSERT INTO `listing_reports` (`property_id`, `reporter_user_id`, `reporter_email`, `reason`, `details`, `status`) VALUES
 (4, 1, 'admin@realestate.local', 'incorrect_price', 'Monthly rental rate seems inconsistent with recent CMC listings. Verified with owner.', 'pending');
+
+-- Sample Initial Chat Inquiry between Buyer Dawit and Admin Abdi Habtamu
+INSERT INTO `chat_conversations` (`id`, `user_id`, `admin_id`, `property_id`, `last_message`, `last_message_at`, `user_unread_count`, `admin_unread_count`) VALUES
+(1, 3, 5, 1, 'Yes Dawit, the Bole Luxury Villa is verified and ready for physical inspection tomorrow at 2:00 PM.', NOW(), 0, 0);
+
+INSERT INTO `chat_messages` (`conversation_id`, `sender_id`, `sender_role`, `property_id`, `message`, `is_read`, `created_at`) VALUES
+(1, 3, 'user', 1, 'Hello Admin Abdi, I am very interested in this Bole Luxury Architectural Villa (ETB 48,500,000). Is it still available for viewing this week?', 1, DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+(1, 5, 'admin', 1, 'Yes Dawit, the Bole Luxury Villa is verified and ready for physical inspection tomorrow at 2:00 PM. Our representative will meet you at the site.', 1, DATE_SUB(NOW(), INTERVAL 1 HOUR));

@@ -1904,6 +1904,7 @@
                 <li><a href="#propertiesSection" onclick="navFilter('sale'); return false;" data-i18n="nav_buy">Buy</a></li>
                 <li><a href="#propertiesSection" onclick="navFilter('rent'); return false;" data-i18n="nav_rent">Rent</a></li>
                 <li><a href="#mapSection" onclick="navScrollTo('mapSection'); return false;" data-i18n="nav_map">Map Explorer</a></li>
+                <li><a href="#" onclick="openChatModal(); return false;" style="display: inline-flex; align-items: center; gap: 4px;">💬 <span>Chat with Admin</span></a></li>
             </ul>
 
             <div class="nav-actions">
@@ -1929,6 +1930,12 @@
                 <button type="button" class="btn-nav-settings" onclick="openSettingsModal()" title="Settings, Language & Password">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     <span data-i18n="nav_settings">Settings</span>
+                </button>
+
+                <!-- Chat with Admin Button -->
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openChatModal()" title="Chat with Admin Abdi Habtamu" style="border-radius: var(--radius-full); height: 36px; padding: 6px 14px; white-space: nowrap; color: #0866ff; border-color: rgba(8, 102, 255, 0.4); display: inline-flex; align-items: center; gap: 4px; font-weight: 700;">
+                    <span>💬</span>
+                    <span>Chat</span>
                 </button>
 
                 <!-- Post Property Button -->
@@ -2380,6 +2387,70 @@
                 <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body" id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Live Chat Modal (Connects User & Admin Abdi Habtamu with Home Linking) -->
+    <div class="modal-overlay" id="chatModal" style="z-index: 10000;">
+        <div class="modal-card" style="max-width: 600px; height: 80vh; max-height: 700px; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 16px;">
+            <!-- Modal Header -->
+            <div class="modal-header" style="background: var(--bg-card); padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #0866ff; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0;">
+                        A
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <strong style="font-size: 15px; color: var(--text-main);">Abdi Habtamu</strong>
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 10.5px; border: 1px solid rgba(16, 185, 129, 0.4);">🛡️ Admin</span>
+                        </div>
+                        <div style="font-size: 11.5px; color: var(--text-muted);">
+                            abdihabtamu368@gmail.com &bull; <span style="color: #10b981; font-weight: 600;">● Active</span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="modal-close" onclick="closeChatModal()" style="font-size: 24px; background: none; border: none; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+
+            <!-- Attached Property Card in Modal -->
+            <div id="modalChatAttachedProp" style="display: none; background: rgba(8, 102, 255, 0.05); border-bottom: 1px solid var(--border-color); padding: 10px 18px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                        <img id="modalChatPropImg" src="" alt="Property" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); flex-shrink: 0;">
+                        <div style="min-width: 0;">
+                            <div style="font-size: 10px; font-weight: 700; color: #0866ff; text-transform: uppercase;">Inquiring regarding:</div>
+                            <h5 id="modalChatPropTitle" style="font-size: 13px; font-weight: 800; margin: 0; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Property</h5>
+                            <div style="font-size: 11.5px; color: var(--text-muted);">
+                                <strong id="modalChatPropPrice" style="color: #0866ff;">ETB 0</strong> &bull; <span id="modalChatPropLoc">Location</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="document.getElementById('modalChatAttachedProp').style.display='none'; window.activeModalChatPropId=null;" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px;" title="Remove linked property">&times;</button>
+                </div>
+            </div>
+
+            <!-- Chat Messages Container -->
+            <div id="modalChatMessages" style="flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-main);"></div>
+
+            <!-- Typing indicator -->
+            <div id="modalChatTyping" style="display: none; padding: 4px 20px 8px; font-size: 11.5px; color: #0866ff; font-weight: 600; font-style: italic;">
+                Abdi Habtamu is typing...
+            </div>
+
+            <!-- Quick Suggestions -->
+            <div style="padding: 6px 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="sendQuickChatMessage('👋 Hello Admin Abdi, is this home still available?')" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;">👋 Available?</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="sendQuickChatMessage('📅 I would like to schedule a viewing.')" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;">📅 Schedule viewing</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="sendQuickChatMessage('💰 Is the price negotiable?')" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;">💰 Price negotiable?</button>
+            </div>
+
+            <!-- Message Input Form -->
+            <form id="modalChatForm" onsubmit="handleSendModalChat(event)" style="padding: 10px 16px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="modalChatInput" class="form-input" placeholder="Type message to Admin Abdi Habtamu..." style="flex: 1; height: 40px; border-radius: 20px; font-size: 13.5px;" autocomplete="off">
+                <button type="submit" class="btn btn-primary" style="width: 40px; height: 40px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #0866ff;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -3453,9 +3524,14 @@
                 </div>
               </div>
 
-              <button class="card-btn-details" onclick="openDetailsModal(${prop.id})">
-                <span>View Details</span> &rarr;
-              </button>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="btn btn-sm" onclick="openChatForProperty(${prop.id}); event.stopPropagation();" title="Chat with Admin about this home" style="background: #0866ff; color: #ffffff; padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                  💬 Chat
+                </button>
+                <button class="card-btn-details" onclick="openDetailsModal(${prop.id})">
+                  <span>View Details</span> &rarr;
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -3669,10 +3745,16 @@
             </div>
           </div>
 
-          <a href="tel:${prop.sellerPhone.replace(/\\s+/g, '')}" class="btn btn-primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            Call Contact
-          </a>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" onclick="openChatForProperty(${prop.id})" style="background: #0866ff; color: #ffffff; border: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 9px 16px; border-radius: 8px; box-shadow: 0 3px 10px rgba(8, 102, 255, 0.3);">
+              <span>💬</span>
+              <span>Chat with Admin</span>
+            </button>
+            <a href="tel:${prop.sellerPhone.replace(/\\s+/g, '')}" class="btn btn-secondary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              Call Contact
+            </a>
+          </div>
         </div>
       `;
 
@@ -5864,8 +5946,197 @@
       }, 3500);
     }
 
+    /* =========================================================================
+       Live Chat with Admin Abdi Habtamu System (Property Linking & Instant Replies)
+       ========================================================================= */
+    const CHAT_STORAGE_KEY = 'estatecraft_chat_conversations';
+    window.activeModalChatPropId = null;
+
+    function getChatHistory() {
+      try {
+        const data = localStorage.getItem(CHAT_STORAGE_KEY);
+        if (data) return JSON.parse(data);
+      } catch (e) {}
+
+      return [
+        {
+          id: 1,
+          sender: 'admin',
+          name: 'Abdi Habtamu',
+          role: 'admin',
+          message: 'Hello! Welcome to EstateCraft Ethiopia. I am Abdi Habtamu, your administrator. How can I assist you with finding, verifying, or purchasing a property today?',
+          time: new Date(Date.now() - 3600000).toISOString()
+        }
+      ];
+    }
+
+    function saveChatHistory(history) {
+      try {
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(history));
+      } catch (e) {}
+    }
+
+    function openChatModal(propId = null) {
+      window.activeModalChatPropId = propId;
+      const modal = document.getElementById('chatModal');
+      if (!modal) return;
+
+      const attachedBanner = document.getElementById('modalChatAttachedProp');
+      if (propId && properties) {
+        const prop = properties.find(p => p.id === parseInt(propId));
+        if (prop && attachedBanner) {
+          attachedBanner.style.display = 'block';
+          document.getElementById('modalChatPropImg').src = prop.image;
+          document.getElementById('modalChatPropTitle').textContent = prop.title;
+          document.getElementById('modalChatPropPrice').textContent = `ETB ${formatNumber(prop.price)}`;
+          document.getElementById('modalChatPropLoc').textContent = prop.city;
+
+          const input = document.getElementById('modalChatInput');
+          if (input && !input.value) {
+            input.value = `Hello Admin Abdi, I am interested in ${prop.title} (${prop.city}). Could you share more details or schedule a viewing?`;
+          }
+        }
+      } else if (attachedBanner) {
+        attachedBanner.style.display = 'none';
+      }
+
+      renderModalChatMessages();
+      modal.classList.add('active');
+
+      const input = document.getElementById('modalChatInput');
+      if (input) setTimeout(() => input.focus(), 200);
+    }
+
+    function openChatForProperty(propId) {
+      closeModal();
+      openChatModal(propId);
+    }
+
+    function closeChatModal() {
+      const modal = document.getElementById('chatModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function renderModalChatMessages() {
+      const container = document.getElementById('modalChatMessages');
+      if (!container) return;
+      const history = getChatHistory();
+
+      container.innerHTML = history.map(m => {
+        const isSent = (m.sender === 'user');
+        const d = new Date(m.time);
+        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <div style="display: flex; gap: 8px; max-width: 82%; align-self: ${isSent ? 'flex-end' : 'flex-start'}; flex-direction: ${isSent ? 'row-reverse' : 'row'};">
+            <div style="padding: 10px 14px; border-radius: 16px; font-size: 13.5px; line-height: 1.45; word-break: break-word; ${isSent ? 'background: #0866ff; color: #ffffff; border-bottom-right-radius: 3px;' : 'background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-bottom-left-radius: 3px;'}">
+              <div style="font-size: 11px; font-weight: 700; margin-bottom: 2px; opacity: 0.9; display: flex; align-items: center; gap: 4px;">
+                ${escapeHtml(m.name)}
+                ${m.role === 'admin' ? '<span style="background: rgba(16,185,129,0.2); color: #10b981; font-size: 9.5px; padding: 1px 5px; border-radius: 8px;">Admin</span>' : ''}
+              </div>
+              ${m.propertyTitle ? `
+                <div style="font-size: 11.5px; font-weight: 700; background: rgba(0,0,0,0.06); padding: 4px 8px; border-radius: 6px; margin-bottom: 4px;">
+                  🏡 ${escapeHtml(m.propertyTitle)} (${escapeHtml(m.propertyPrice || '')})
+                </div>
+              ` : ''}
+              <div>${escapeHtml(m.message)}</div>
+              <div style="font-size: 10px; margin-top: 4px; opacity: 0.75; text-align: ${isSent ? 'right' : 'left'};">
+                ${timeStr} ${isSent ? '✓✓' : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendQuickChatMessage(text) {
+      const input = document.getElementById('modalChatInput');
+      if (input) {
+        input.value = text;
+        handleSendModalChat(new Event('submit'));
+      }
+    }
+
+    function handleSendModalChat(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('modalChatInput');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      const history = getChatHistory();
+
+      let linkedPropTitle = null;
+      let linkedPropPrice = null;
+      if (window.activeModalChatPropId && properties) {
+        const prop = properties.find(p => p.id === parseInt(window.activeModalChatPropId));
+        if (prop) {
+          linkedPropTitle = prop.title;
+          linkedPropPrice = `ETB ${formatNumber(prop.price)}`;
+        }
+      }
+
+      const userMsg = {
+        id: Date.now(),
+        sender: 'user',
+        name: (currentUser && currentUser.name) ? currentUser.name : 'You (Inquiring Client)',
+        role: 'user',
+        message: text,
+        propertyTitle: linkedPropTitle,
+        propertyPrice: linkedPropPrice,
+        time: new Date().toISOString()
+      };
+
+      history.push(userMsg);
+      saveChatHistory(history);
+      renderModalChatMessages();
+
+      const typingEl = document.getElementById('modalChatTyping');
+      if (typingEl) typingEl.style.display = 'block';
+
+      setTimeout(() => {
+        if (typingEl) typingEl.style.display = 'none';
+
+        let adminReply = "Thank you for reaching out! I've noted your inquiry and our team is ready to assist you. What is your preferred day for viewing?";
+        const lower = text.toLowerCase();
+
+        if (linkedPropTitle) {
+          adminReply = `Hello! I have received your inquiry for "${linkedPropTitle}". This property is currently active and fully verified with our legal team. We can schedule a physical site inspection for you tomorrow afternoon or whenever convenient. Would you like me to reserve a viewing slot?`;
+        } else if (lower.includes('available') || lower.includes('still')) {
+          adminReply = "Yes, this listing is currently available and ready for viewing. All title deeds and broker disclosures have been pre-screened by EstateCraft moderation.";
+        } else if (lower.includes('price') || lower.includes('negotiable')) {
+          adminReply = "The price is moderately negotiable directly with the verified owner during physical site inspection. We ensure complete transparency with zero hidden markups.";
+        } else if (lower.includes('view') || lower.includes('inspection') || lower.includes('schedule')) {
+          adminReply = "We would be delighted to host you for a site inspection. You can reach out directly via call at +251 90 909 0909 or reply with your preferred day and time!";
+        }
+
+        const replyMsg = {
+          id: Date.now() + 1,
+          sender: 'admin',
+          name: 'Abdi Habtamu',
+          role: 'admin',
+          message: adminReply,
+          time: new Date().toISOString()
+        };
+
+        const updatedHistory = getChatHistory();
+        updatedHistory.push(replyMsg);
+        saveChatHistory(updatedHistory);
+        renderModalChatMessages();
+      }, 1200);
+    }
+
     // Initialize Auth state on initial page load (Shows ONLY login if unauthenticated)
     syncAuthState();
     </script>
+
+    <!-- Floating Chat with Admin Button -->
+    <button type="button" id="floatingChatBtn" onclick="openChatModal()" title="Chat with Admin Abdi Habtamu" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: #0866ff; color: #ffffff; padding: 12px 18px; border-radius: 9999px; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(8, 102, 255, 0.4); border: none; cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <span style="font-size: 18px;">💬</span>
+        <span>Chat with Admin</span>
+    </button>
 </body>
 </html>

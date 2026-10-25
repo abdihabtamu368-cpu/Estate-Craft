@@ -265,7 +265,13 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     </div>
 
-                    <a href="tel:<?= htmlspecialchars($property['contact_phone']) ?>" class="btn btn-primary btn-block btn-lg" style="margin-bottom: 10px;">
+                    <!-- Direct Chat with Admin Link for this Property -->
+                    <a href="<?= BASE_URL ?>/chat.php?property_id=<?= $property['id'] ?>" class="btn btn-primary btn-block btn-lg" style="margin-bottom: 10px; background: #0866ff; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; box-shadow: 0 4px 12px rgba(8, 102, 255, 0.3);">
+                        <span style="font-size: 18px;">💬</span>
+                        <span>Chat with Admin About This Home</span>
+                    </a>
+
+                    <a href="tel:<?= htmlspecialchars($property['contact_phone']) ?>" class="btn btn-secondary btn-block" style="margin-bottom: 10px;">
                         Call <?= htmlspecialchars($property['contact_name']) ?>
                     </a>
 
