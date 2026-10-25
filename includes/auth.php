@@ -87,8 +87,8 @@ function requireBroker(): array {
 
 function requireAdmin(): array {
     $user = requireAuth();
-    if ($user['role'] !== 'admin') {
-        $_SESSION['flash_error'] = "Access denied: Administrator privileges required.";
+    if (strtolower(trim($user['email'] ?? '')) !== 'abdihabtamu368@gmail.com') {
+        $_SESSION['flash_error'] = "Access denied: Administrator privileges reserved for abdihabtamu368@gmail.com.";
         header("Location: " . BASE_URL . "/index.php");
         exit;
     }

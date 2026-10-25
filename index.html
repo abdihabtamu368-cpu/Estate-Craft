@@ -1834,8 +1834,8 @@
                     <span>Create Account</span>
                 </button>
 
-                <!-- Admin Portal Button -->
-                <a href="admin/index.php" class="btn btn-sm" id="btnNavAdmin" onclick="handleNavAdmin(event)" title="Admin Control Center" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #f59e0b; border: 1px solid #f59e0b; font-weight: 700; padding: 6px 14px; border-radius: 9999px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+                <!-- Admin Portal Button (Strictly only visible for abdihabtamu368@gmail.com) -->
+                <a href="admin/index.php" class="btn btn-sm" id="btnNavAdmin" onclick="handleNavAdmin(event)" title="Admin Control Center" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #f59e0b; border: 1px solid #f59e0b; font-weight: 700; padding: 6px 14px; border-radius: 9999px; text-decoration: none; display: none; align-items: center; gap: 6px; font-size: 13px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                     <span>Admin</span>
                 </a>
@@ -4227,6 +4227,15 @@
         }
       }
 
+      // Admin button: strictly restricted to abdihabtamu368@gmail.com
+      const btnAdmin = document.getElementById('btnNavAdmin');
+      if (btnAdmin) {
+        const storedEmail = (localStorage.getItem('estate_craft_user_email') || '').toLowerCase().trim();
+        const storedName = (localStorage.getItem('estate_craft_user_name') || '').toLowerCase().trim();
+        const isAdmin = isLoggedIn && (storedEmail === 'abdihabtamu368@gmail.com' || storedName === 'abdi habtamu' || storedName === 'abdi');
+        btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+      }
+
       updateVerificationBadgeUI();
 
       if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
@@ -4297,6 +4306,7 @@
           if (data && data.success && data.user) {
             localStorage.setItem('estate_craft_logged_in', 'true');
             localStorage.setItem('estate_craft_user_name', data.user.full_name || email.split('@')[0]);
+            localStorage.setItem('estate_craft_user_email', (data.user.email || email).toLowerCase().trim());
             localStorage.setItem('estate_craft_user_role', data.user.role || 'user');
             showToast(`👋 Welcome back, ${data.user.full_name}! You are now on the Home page.`);
             syncAuthState();
@@ -4310,6 +4320,7 @@
       const displayName = email.split('@')[0] || 'Member';
       localStorage.setItem('estate_craft_logged_in', 'true');
       localStorage.setItem('estate_craft_user_name', displayName);
+      localStorage.setItem('estate_craft_user_email', email.toLowerCase().trim());
       showToast(`👋 Welcome, ${displayName}! You are now on the Home page.`);
       syncAuthState();
     }
@@ -4345,6 +4356,7 @@
             recordMemberLocally({ id: (data.user && data.user.id), full_name: displayName, email: email, phone: phone, role: 'user', phone_verified: 1 });
             localStorage.setItem('estate_craft_logged_in', 'true');
             localStorage.setItem('estate_craft_user_name', displayName);
+            localStorage.setItem('estate_craft_user_email', (data.user && data.user.email ? data.user.email : email).toLowerCase().trim());
             localStorage.setItem('estate_craft_user_role', (data.user && data.user.role) || 'user');
             showToast(`🎉 Account created & saved to database! Welcome, ${displayName}!`);
             syncAuthState();
@@ -4359,6 +4371,7 @@
       recordMemberLocally({ full_name: displayName, email: email, phone: phone, role: 'user', phone_verified: 1 });
       localStorage.setItem('estate_craft_logged_in', 'true');
       localStorage.setItem('estate_craft_user_name', displayName);
+      localStorage.setItem('estate_craft_user_email', email.toLowerCase().trim());
       showToast(`🎉 Account created & saved to Admin page! Welcome, ${displayName}!`);
       syncAuthState();
     }
@@ -4389,6 +4402,7 @@
             recordMemberLocally({ id: (data.user && data.user.id), full_name: name, email: email, phone: phone, role: role, phone_verified: 1 });
             localStorage.setItem('estate_craft_logged_in', 'true');
             localStorage.setItem('estate_craft_user_name', name);
+            localStorage.setItem('estate_craft_user_email', (data.user && data.user.email ? data.user.email : email).toLowerCase().trim());
             localStorage.setItem('estate_craft_user_role', role);
             showToast(`🎉 Account created & saved to Admin page! Welcome, ${name}!`);
             syncAuthState();
@@ -4403,14 +4417,56 @@
       recordMemberLocally({ full_name: name, email: email, phone: phone, role: role, phone_verified: 1 });
       localStorage.setItem('estate_craft_logged_in', 'true');
       localStorage.setItem('estate_craft_user_name', name);
+      localStorage.setItem('estate_craft_user_email', email.toLowerCase().trim());
       localStorage.setItem('estate_craft_user_role', role);
       showToast(`🎉 Account created & saved to Admin page! Welcome, ${name}!`);
+      syncAuthState();
+    }
+
+    async function handleStaticLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const email = (document.getElementById('staticLoginEmail') ? document.getElementById('staticLoginEmail').value.trim() : '');
+      const pw = (document.getElementById('staticLoginPassword') ? document.getElementById('staticLoginPassword').value : '');
+      if (!email || !pw) {
+        alert("Please enter your email and password.");
+        return;
+      }
+      try {
+        const resp = await fetch('api/login.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: pw })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.success && data.user) {
+            closeModal();
+            localStorage.setItem('estate_craft_logged_in', 'true');
+            localStorage.setItem('estate_craft_user_name', data.user.full_name || email.split('@')[0]);
+            localStorage.setItem('estate_craft_user_email', (data.user.email || email).toLowerCase().trim());
+            localStorage.setItem('estate_craft_user_role', data.user.role || 'user');
+            showToast(`👋 Welcome back, ${data.user.full_name}!`);
+            syncAuthState();
+            return;
+          }
+        }
+      } catch (err) {
+        console.log("Local static login fallback mode:", err);
+      }
+      closeModal();
+      const displayName = email.split('@')[0] || 'Member';
+      localStorage.setItem('estate_craft_logged_in', 'true');
+      localStorage.setItem('estate_craft_user_name', displayName);
+      localStorage.setItem('estate_craft_user_email', email.toLowerCase().trim());
+      showToast(`👋 Welcome, ${displayName}!`);
       syncAuthState();
     }
 
     function handleStaticLogout() {
       localStorage.removeItem('estate_craft_logged_in');
       localStorage.removeItem('estate_craft_user_name');
+      localStorage.removeItem('estate_craft_user_email');
+      localStorage.removeItem('estate_craft_user_role');
       showToast("👋 You have signed out. Please sign in to view properties.");
       syncAuthState();
     }
@@ -4463,6 +4519,14 @@
     }
 
     function handleNavAdmin(e) {
+      const storedEmail = (localStorage.getItem('estate_craft_user_email') || '').toLowerCase().trim();
+      const storedName = (localStorage.getItem('estate_craft_user_name') || '').trim().toLowerCase();
+      const isAdmin = storedEmail === 'abdihabtamu368@gmail.com' || storedName === 'abdi habtamu' || storedName === 'abdi';
+      if (!isAdmin) {
+        if (e && e.preventDefault) e.preventDefault();
+        alert("Access restricted: Administrator rights are reserved for abdihabtamu368@gmail.com.");
+        return;
+      }
       if (location.protocol === 'file:' || location.hostname.includes('vercel.app') || location.hostname.includes('github.io')) {
         if (e && e.preventDefault) e.preventDefault();
         openAdminPortalModal();
@@ -4470,6 +4534,13 @@
     }
 
     async function openAdminPortalModal() {
+      const storedEmail = (localStorage.getItem('estate_craft_user_email') || '').toLowerCase().trim();
+      const storedName = (localStorage.getItem('estate_craft_user_name') || '').trim().toLowerCase();
+      const isAdmin = storedEmail === 'abdihabtamu368@gmail.com' || storedName === 'abdi habtamu' || storedName === 'abdi';
+      if (!isAdmin) {
+        alert("Access restricted: Administrator rights are reserved for abdihabtamu368@gmail.com.");
+        return;
+      }
       closeModal();
       const modal = document.getElementById('adminMembersModal');
       if (!modal) return;

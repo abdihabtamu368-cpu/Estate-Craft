@@ -81,7 +81,7 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
             <li><a href="<?= BASE_URL ?>/properties/index.php?purpose=rent" class="<?= $activePage === 'rent' ? 'active' : '' ?>"><?= __('nav_rent', 'Rent') ?></a></li>
             <li><a href="<?= BASE_URL ?>/properties/create.php" class="<?= $activePage === 'sell' ? 'active' : '' ?>"><?= __('nav_sell', 'Sell') ?></a></li>
             <li><a href="<?= BASE_URL ?>/properties/index.php" class="<?= $activePage === 'browse' ? 'active' : '' ?>"><?= __('nav_explore', 'Explore All') ?></a></li>
-            <?php if ($currentUser && $currentUser['role'] === 'admin'): ?>
+            <?php if ($currentUser && strtolower(trim($currentUser['email'] ?? '')) === 'abdihabtamu368@gmail.com'): ?>
                 <li><a href="<?= BASE_URL ?>/user/reports.php" class="<?= $activePage === 'reports' ? 'active' : '' ?>"><?= __('nav_safety_reports', 'Safety Reports') ?></a></li>
             <?php endif; ?>
         </ul>
@@ -163,7 +163,7 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
                         </svg>
                     </a>
 
-                    <?php if ($currentUser['role'] === 'admin'): ?>
+                    <?php if ($currentUser && strtolower(trim($currentUser['email'] ?? '')) === 'abdihabtamu368@gmail.com'): ?>
                         <a href="<?= BASE_URL ?>/admin/index.php" class="btn btn-sm" id="btnAdminPanel" title="Admin Control Center" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #f59e0b; border: 1px solid #f59e0b; font-weight: 700; padding: 6px 12px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                             Admin

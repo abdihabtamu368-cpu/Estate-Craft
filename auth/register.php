@@ -11,7 +11,7 @@ require_once __DIR__ . '/../includes/csrf.php';
 require_once __DIR__ . '/../includes/otp_service.php';
 
 $currentUser = getCurrentUser();
-$isAdminUser = ($currentUser && ($currentUser['role'] ?? '') === 'admin');
+$isAdminUser = ($currentUser && strtolower(trim($currentUser['email'] ?? '')) === 'abdihabtamu368@gmail.com');
 
 if (isLoggedIn() && !$isAdminUser) {
     header("Location: " . BASE_URL . "/index.php");
