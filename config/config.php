@@ -21,11 +21,11 @@ if (session_status() === PHP_SESSION_NONE) {
 // User: root
 // Password: (empty string)
 // Port: 3306 (or 3308 if MySQL alternate port in Wamp)
-define('DB_HOST', '127.0.0.1');
-define('DB_PORT', '3306'); 
-define('DB_NAME', 'realestate_db');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
+define('DB_PORT', getenv('DB_PORT') ?: '3306'); 
+define('DB_NAME', getenv('DB_NAME') ?: 'realestate_db');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
 
 // -------------------------------------------------------------
 // Site Identity & Currency
