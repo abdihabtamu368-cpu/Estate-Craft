@@ -315,12 +315,45 @@ require_once __DIR__ . '/includes/header.php';
 @media (max-width: 768px) {
     .chat-master-card {
         flex-direction: column !important;
-        height: 85vh !important;
+        height: calc(100vh - 120px) !important;
+        max-height: none !important;
+        border-radius: 12px !important;
     }
     .chat-sidebar {
         width: 100% !important;
-        height: 180px !important;
+        height: 160px !important;
+        min-height: 140px !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-color) !important;
     }
+    .chat-msg-row {
+        max-width: 92% !important;
+    }
+    .chat-input-bar {
+        padding: 8px 10px !important;
+        gap: 6px !important;
+    }
+}
+@media (max-width: 480px) {
+    .chat-master-card {
+        height: calc(100dvh - 80px) !important;
+        margin: 4px auto !important;
+        border-radius: 8px !important;
+    }
+    .chat-sidebar {
+        height: 130px !important;
+    }
+    .chat-bubble {
+        font-size: 13.5px !important;
+        padding: 8px 12px !important;
+    }
+    .chat-attachment-btn {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 15px !important;
+    }
+}
+
 /* Chat Media & Attachment Controls */
 .chat-attachment-btn {
     width: 36px;
