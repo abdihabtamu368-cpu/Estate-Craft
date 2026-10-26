@@ -4764,6 +4764,19 @@
       if (window.catalogMap && typeof window.catalogMap.invalidateSize === 'function') {
         window.catalogMap.invalidateSize();
       }
+
+      // Check for saved deep link after authentication
+      if (isLoggedIn) {
+        try {
+          const targetRoute = sessionStorage.getItem('estate_craft_target_route');
+          if (targetRoute) {
+            sessionStorage.removeItem('estate_craft_target_route');
+            setTimeout(() => {
+              if (typeof handleInitialRoute === 'function') handleInitialRoute(targetRoute);
+            }, 150);
+          }
+        } catch (e) {}
+      }
     }
 
     // Dismiss mobile navigation on outside click or escape
@@ -6116,8 +6129,142 @@
       }, 1200);
     }
 
+    /* =========================================================================
+       SPA Route & Deep-Linking Handler (Supports Vercel Clean URLs, Hash & Query)
+       ========================================================================= */
+    function handleInitialRoute(customUrl = null) {
+      const urlStr = customUrl || (window.location.pathname + window.location.search + window.location.hash);
+      const parser = new URL(urlStr, window.location.origin);
+      const path = (parser.pathname || '').toLowerCase();
+      const hash = (parser.hash || '').toLowerCase();
+      const params = parser.searchParams;
+
+      const isLoggedIn = localStorage.getItem('estate_craft_logged_in') === 'true';
+      if (!isLoggedIn) {
+        // If unauthenticated and navigating to an internal route, save target for post-login
+        if (path !== '/' && path !== '' && path !== '/index.html') {
+          try {
+            sessionStorage.setItem('estate_craft_target_route', urlStr);
+          } catch (e) {}
+        }
+        return;
+      }
+
+      // Check query params
+      const view = params.get('view') || '';
+      const intent = params.get('intent') || '';
+      const propParam = params.get('property') || params.get('prop') || params.get('id');
+      const tabParam = params.get('tab') || '';
+
+      // Route 1: Chat (/chat, /chat/123, #chat, ?view=chat, ?intent=list_property)
+      if (path.startsWith('/chat') || hash.startsWith('#chat') || view === 'chat' || intent === 'list_property' || intent === 'inquiry') {
+        let targetPropId = propParam;
+        if (!targetPropId && path.startsWith('/chat/')) {
+          const raw = path.replace('/chat/', '').split('/')[0].trim();
+          if (raw && !isNaN(raw)) targetPropId = raw;
+        }
+        setTimeout(() => {
+          openChatModal(targetPropId ? parseInt(targetPropId) : null);
+        }, 120);
+        return;
+      }
+
+      // Route 2: Property Details (/property/123, #property-123, ?property=123)
+      if (path.startsWith('/property/') || hash.startsWith('#property-') || (propParam && !path.startsWith('/chat') && !hash.startsWith('#chat'))) {
+        let propId = null;
+        if (propParam) {
+          propId = parseInt(propParam);
+        } else if (path.startsWith('/property/')) {
+          const raw = path.replace('/property/', '').split('/')[0].trim();
+          propId = parseInt(raw);
+        } else if (hash.startsWith('#property-')) {
+          const raw = hash.replace('#property-', '').trim();
+          propId = parseInt(raw);
+        }
+        if (propId && !isNaN(propId)) {
+          setTimeout(() => {
+            openDetailsModal(propId);
+          }, 120);
+          return;
+        }
+      }
+
+      // Route 3: Settings (/settings, /settings/:tab, #settings, #settings-:tab, ?view=settings)
+      if (path.startsWith('/settings') || hash.startsWith('#settings') || view === 'settings') {
+        let subTab = tabParam || 'lang';
+        if (path.startsWith('/settings/')) {
+          subTab = path.replace('/settings/', '').split('/')[0].trim() || 'lang';
+        } else if (hash.startsWith('#settings-')) {
+          subTab = hash.replace('#settings-', '').trim() || 'lang';
+        }
+        setTimeout(() => {
+          openSettingsModal(subTab);
+        }, 120);
+        return;
+      }
+
+      // Route 4: Admin Portal (/admin, /dashboard, #admin, ?view=admin)
+      if (path === '/admin' || path === '/dashboard' || hash === '#admin' || view === 'admin' || view === 'dashboard') {
+        setTimeout(() => {
+          openAdminPortalModal();
+        }, 120);
+        return;
+      }
+
+      // Route 5: Favorites (/favorites, #favorites, ?view=favorites)
+      if (path === '/favorites' || hash === '#favorites' || view === 'favorites') {
+        setTimeout(() => {
+          openFavoritesModal();
+        }, 120);
+        return;
+      }
+
+      // Route 6: Post Property (/post, #post, ?view=post)
+      if (path === '/post' || hash === '#post' || view === 'post') {
+        setTimeout(() => {
+          openPostModal();
+        }, 120);
+        return;
+      }
+
+      // Route 7: Mortgage Calculator (/mortgage, #mortgage, ?view=mortgage)
+      if (path === '/mortgage' || hash === '#mortgage' || view === 'mortgage') {
+        setTimeout(() => {
+          openMortgageModal();
+        }, 120);
+        return;
+      }
+
+      // Route 8: Interactive Map (/map, #map, ?view=map)
+      if (path === '/map' || hash === '#map' || view === 'map') {
+        setTimeout(() => {
+          const mapSec = document.getElementById('mapSection');
+          if (mapSec) {
+            mapSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 220);
+        return;
+      }
+
+      // Route 9: Catalog (/properties, #properties, ?view=properties)
+      if (path === '/properties' || hash === '#properties' || view === 'properties') {
+        setTimeout(() => {
+          const cat = document.getElementById('catalogSection') || document.getElementById('propertiesGrid');
+          if (cat) {
+            cat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 220);
+        return;
+      }
+    }
+
+    // Listen to browser navigation buttons (Back / Forward)
+    window.addEventListener('popstate', () => handleInitialRoute());
+    window.addEventListener('hashchange', () => handleInitialRoute());
+
     // Initialize Auth state on initial page load (Shows ONLY login if unauthenticated)
     syncAuthState();
+    handleInitialRoute();
     </script>
 
     <!-- Floating Chat with Admin Button -->

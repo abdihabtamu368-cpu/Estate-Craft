@@ -12,9 +12,17 @@
     { "source": "/obsidian", "destination": "/auth.html" },
     { "source": "/preview", "destination": "/auth.html" },
     { "source": "/properties", "destination": "/index.html" },
+    { "source": "/property/(.*)", "destination": "/index.html" },
     { "source": "/map", "destination": "/index.html" },
+    { "source": "/settings/(.*)", "destination": "/index.html" },
     { "source": "/settings", "destination": "/index.html" },
-    { "source": "/post", "destination": "/index.html" }
+    { "source": "/post", "destination": "/index.html" },
+    { "source": "/chat/(.*)", "destination": "/index.html" },
+    { "source": "/chat", "destination": "/index.html" },
+    { "source": "/admin", "destination": "/index.html" },
+    { "source": "/dashboard", "destination": "/index.html" },
+    { "source": "/favorites", "destination": "/index.html" },
+    { "source": "/mortgage", "destination": "/index.html" }
   ],
   "headers": [
     {
