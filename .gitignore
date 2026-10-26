@@ -35,4 +35,6 @@ uploads/properties/*
 !uploads/properties/.gitkeep
 uploads/verifications/*
 !uploads/verifications/.gitkeep
+uploads/chat/*
+!uploads/chat/.gitkeep
 

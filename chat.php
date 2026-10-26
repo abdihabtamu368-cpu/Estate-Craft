@@ -162,17 +162,82 @@ require_once __DIR__ . '/includes/header.php';
                 </button>
             </div>
 
-            <!-- Message Input Form -->
-            <form id="chatMessageForm" onsubmit="handleSendMessage(event)" style="padding: 14px 20px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; align-items: flex-end; gap: 10px;">
-                <div style="flex: 1; position: relative;">
-                    <textarea id="chatInputMessage" rows="1" class="form-input" placeholder="Type your message to <?= $isAdmin ? 'the user' : 'Admin Abdi Habtamu' ?>..." style="resize: none; min-height: 44px; max-height: 120px; padding: 10px 14px; border-radius: 22px; font-size: 14px; line-height: 1.4;" onkeydown="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); handleSendMessage(event); }"></textarea>
+            <!-- Hidden inputs for file/audio/image uploads -->
+            <input type="file" id="chatImgInput" accept="image/*" style="display:none;" onchange="handleChatAttachmentSelected(this, 'image')">
+            <input type="file" id="chatDocInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.zip" style="display:none;" onchange="handleChatAttachmentSelected(this, 'file')">
+            <input type="file" id="chatAudioInput" accept="audio/*" style="display:none;" onchange="handleChatAttachmentSelected(this, 'audio')">
+
+            <!-- Attachment Preview Tray -->
+            <div id="chatAttachmentTray" style="display: none; padding: 8px 18px; background: rgba(8, 102, 255, 0.05); border-top: 1px solid var(--border-color); align-items: center; justify-content: space-between; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                    <div id="chatAttachPreviewBox" style="width: 40px; height: 40px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border-color); flex-shrink: 0;">
+                        <span id="chatAttachIcon" style="font-size: 20px;">📎</span>
+                        <img id="chatAttachThumb" src="" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="min-width: 0;">
+                        <div id="chatAttachName" style="font-size: 13px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">file.png</div>
+                        <div id="chatAttachSize" style="font-size: 11.5px; color: var(--text-muted);">120 KB</div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary" id="btnSendChat" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #0866ff; box-shadow: 0 4px 10px rgba(8, 102, 255, 0.3);">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
-            </form>
+                <button type="button" onclick="clearChatAttachment()" style="background: none; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer; padding: 4px; line-height: 1;" title="Remove attachment">&times;</button>
+            </div>
+
+            <!-- Voice Note Recording Bar -->
+            <div id="chatVoiceRecordingBar" style="display: none; padding: 10px 18px; background: #fee2e2; border-top: 1px solid #fca5a5; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="rec-pulse-dot"></span>
+                    <strong style="color: #b91c1c; font-size: 13px;">Recording Voice Note...</strong>
+                    <span id="chatRecordTimer" style="font-family: monospace; font-size: 13px; font-weight: 800; color: #991b1b; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 6px;">00:00</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" onclick="stopChatVoiceRecording(true)" class="btn btn-sm" style="background: #dc2626; color: #fff; font-size: 12px; font-weight: 700; border-radius: 16px; padding: 4px 12px; border: none; display: flex; align-items: center; gap: 4px;">
+                        <span>⏹</span> Send Note
+                    </button>
+                    <button type="button" onclick="cancelChatVoiceRecording()" class="btn btn-secondary btn-sm" style="font-size: 12px; border-radius: 16px; padding: 4px 10px;">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Message Input Form & Media Controls -->
+            <div style="position: relative; background: var(--bg-card); border-top: 1px solid var(--border-color);">
+                <!-- Emoji Picker Popover -->
+                <div id="chatEmojiPicker" class="chat-emoji-picker-pop">
+                    <div class="chat-emoji-tabs">
+                        <button type="button" class="chat-emoji-tab-btn active" onclick="switchChatEmojiTab('real_estate', this)">🏡 Property</button>
+                        <button type="button" class="chat-emoji-tab-btn" onclick="switchChatEmojiTab('smileys', this)">😊 Smileys</button>
+                        <button type="button" class="chat-emoji-tab-btn" onclick="switchChatEmojiTab('business', this)">💼 Business</button>
+                    </div>
+                    <div id="chatEmojiGrid" class="chat-emoji-grid">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <form id="chatMessageForm" onsubmit="handleSendMessage(event)" style="padding: 12px 18px; display: flex; align-items: center; gap: 8px;">
+                    <button type="button" class="chat-attachment-btn" onclick="toggleChatEmojiPicker()" title="Insert Emoji">😊</button>
+                    <button type="button" class="chat-attachment-btn" onclick="document.getElementById('chatImgInput').click()" title="Send Photo/Image">📷</button>
+                    <button type="button" class="chat-attachment-btn" onclick="document.getElementById('chatDocInput').click()" title="Attach Document (PDF, Word, etc)">📎</button>
+                    <button type="button" class="chat-attachment-btn" id="chatMicBtn" onclick="toggleChatVoiceRecording()" title="Record Voice Note">🎙️</button>
+                    
+                    <div style="flex: 1; position: relative;">
+                        <input type="text" id="chatInputMessage" class="form-input" placeholder="Type your message to <?= $isAdmin ? 'the user' : 'Admin Abdi Habtamu' ?>..." style="height: 42px; border-radius: 21px; padding: 0 16px; font-size: 14px; width: 100%;" autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="btnSendChat" style="border-radius: 50%; width: 42px; height: 42px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #0866ff; box-shadow: 0 4px 10px rgba(8, 102, 255, 0.3);" title="Send">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </form>
+            </div>
 
         </div>
+    </div>
+</div>
+
+<!-- Universal Chat Image Lightbox Modal -->
+<div id="chatImageLightbox" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.88); z-index: 10000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px);" onclick="closeChatLightbox(event)">
+    <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
+        <button type="button" onclick="closeChatLightbox()" style="position: absolute; top: -44px; right: 0; background: rgba(255,255,255,0.25); color: #fff; border: none; font-size: 26px; line-height: 1; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.45)'" onmouseout="this.style.background='rgba(255,255,255,0.25)'">&times;</button>
+        <img id="chatLightboxImg" src="" alt="Enlarged Attachment" style="max-width: 100%; max-height: 82vh; border-radius: 12px; object-fit: contain; box-shadow: 0 15px 45px rgba(0,0,0,0.6);">
+        <div id="chatLightboxCaption" style="color: #ffffff; margin-top: 12px; font-size: 13px; font-weight: 600; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8);"></div>
     </div>
 </div>
 
@@ -256,6 +321,106 @@ require_once __DIR__ . '/includes/header.php';
         width: 100% !important;
         height: 180px !important;
     }
+/* Chat Media & Attachment Controls */
+.chat-attachment-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+    padding: 0;
+}
+.chat-attachment-btn:hover {
+    background: rgba(8, 102, 255, 0.1);
+    color: #0866ff;
+    border-color: #0866ff;
+    transform: scale(1.08);
+}
+.chat-emoji-picker-pop {
+    position: absolute;
+    bottom: 100%;
+    left: 14px;
+    margin-bottom: 8px;
+    width: 310px;
+    max-width: calc(100vw - 32px);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.22);
+    z-index: 100;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+}
+.chat-emoji-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-main);
+    padding: 4px;
+    gap: 4px;
+}
+.chat-emoji-tab-btn {
+    flex: 1;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 6px 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+}
+.chat-emoji-tab-btn.active, .chat-emoji-tab-btn:hover {
+    background: var(--bg-card);
+    color: #0866ff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.chat-emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    padding: 10px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+.chat-emoji-item {
+    font-size: 20px;
+    padding: 6px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.12s ease, background 0.12s ease;
+}
+.chat-emoji-item:hover {
+    background: rgba(8, 102, 255, 0.12);
+    transform: scale(1.2);
+}
+@keyframes recordingPulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.25); }
+    100% { opacity: 1; transform: scale(1); }
+}
+.rec-pulse-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: recordingPulse 1.2s infinite ease-in-out;
 }
 </style>
 
@@ -264,6 +429,257 @@ let currentConvId = <?= json_encode($selectedConvId) ?>;
 let activePropertyId = <?= json_encode($propertyId) ?>;
 const isUserAdmin = <?= json_encode($isAdmin) ?>;
 let pollTimer = null;
+
+// =============================================================================
+// Emoji Picker, Attachments (File, Image, Sound) & Voice Note Recorder
+// =============================================================================
+window.pendingPageAttachment = null;
+let pageMediaRecorder = null;
+let pageAudioChunks = [];
+let pageRecordingTimer = null;
+let pageRecordingSeconds = 0;
+
+const CHAT_PAGE_EMOJIS = {
+    real_estate: ['🏡', '🏢', '🏬', '🏠', '🔑', '🚪', '📍', '🛋️', '🚿', '🏗️', '📐', '🌲', '🏊', '🚗', '💰', '🛡️', '🌇', '🛖'],
+    smileys: ['😀', '😊', '😂', '😍', '😎', '👍', '👏', '🙏', '👋', '🤝', '❤️', '🔥', '✨', '🎉', '👌', '🙌', '🤩', '💯'],
+    business: ['💼', '📄', '📅', '📞', '✉️', '💵', '💳', '🕒', 'ℹ️', '⭐', '✅', '🎯', '📌', '💡', '🏷️', '📊', '🤝', '⚖️']
+};
+
+function toggleChatEmojiPicker() {
+    const picker = document.getElementById('chatEmojiPicker');
+    if (!picker) return;
+    if (picker.style.display === 'flex') {
+        picker.style.display = 'none';
+    } else {
+        picker.style.display = 'flex';
+        renderChatEmojiGrid('real_estate');
+    }
+}
+
+function switchChatEmojiTab(category, btn) {
+    document.querySelectorAll('.chat-emoji-tab-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderChatEmojiGrid(category);
+}
+
+function renderChatEmojiGrid(category) {
+    const grid = document.getElementById('chatEmojiGrid');
+    if (!grid) return;
+    const list = CHAT_PAGE_EMOJIS[category] || CHAT_PAGE_EMOJIS.real_estate;
+    grid.innerHTML = list.map(em => `
+        <button type="button" class="chat-emoji-item" onclick="insertChatEmoji('${em}')">${em}</button>
+    `).join('');
+}
+
+function insertChatEmoji(emoji) {
+    const input = document.getElementById('chatInputMessage');
+    if (input) {
+        const start = input.selectionStart || input.value.length;
+        const end = input.selectionEnd || input.value.length;
+        const val = input.value;
+        input.value = val.substring(0, start) + emoji + val.substring(end);
+        input.selectionStart = input.selectionEnd = start + emoji.length;
+        input.focus();
+    }
+}
+
+// Close emoji picker on outside click
+document.addEventListener('click', function(e) {
+    const picker = document.getElementById('chatEmojiPicker');
+    if (!picker || picker.style.display !== 'flex') return;
+    const btn = e.target.closest('.chat-attachment-btn');
+    if (!picker.contains(e.target) && (!btn || !btn.getAttribute('onclick') || !btn.getAttribute('onclick').includes('Emoji'))) {
+        picker.style.display = 'none';
+    }
+});
+
+// File / Image / Audio selection handler
+function handleChatAttachmentSelected(input, type) {
+    if (!input || !input.files || input.files.length === 0) return;
+    const file = input.files[0];
+
+    let sizeStr = '';
+    if (file.size >= 1048576) {
+        sizeStr = (file.size / 1048576).toFixed(1) + ' MB';
+    } else {
+        sizeStr = Math.max(1, Math.round(file.size / 1024)) + ' KB';
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        window.pendingPageAttachment = {
+            type: type,
+            url: dataUrl,
+            name: file.name,
+            size: sizeStr,
+            file: file
+        };
+
+        const tray = document.getElementById('chatAttachmentTray');
+        const nameEl = document.getElementById('chatAttachName');
+        const sizeEl = document.getElementById('chatAttachSize');
+        const thumb = document.getElementById('chatAttachThumb');
+        const icon = document.getElementById('chatAttachIcon');
+
+        if (nameEl) nameEl.textContent = file.name;
+        if (sizeEl) sizeEl.textContent = sizeStr;
+
+        if (type === 'image' && thumb && icon) {
+            thumb.src = dataUrl;
+            thumb.style.display = 'block';
+            icon.style.display = 'none';
+        } else if (icon && thumb) {
+            thumb.style.display = 'none';
+            icon.style.display = 'block';
+            icon.textContent = (type === 'audio' ? '🎙️' : '📄');
+        }
+
+        if (tray) tray.style.display = 'flex';
+        input.value = '';
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearChatAttachment() {
+    window.pendingPageAttachment = null;
+    const tray = document.getElementById('chatAttachmentTray');
+    if (tray) tray.style.display = 'none';
+    const imgIn = document.getElementById('chatImgInput');
+    const docIn = document.getElementById('chatDocInput');
+    const audIn = document.getElementById('chatAudioInput');
+    if (imgIn) imgIn.value = '';
+    if (docIn) docIn.value = '';
+    if (audIn) audIn.value = '';
+}
+
+// Voice Note Recording via Microphone
+async function toggleChatVoiceRecording() {
+    if (pageMediaRecorder && pageMediaRecorder.state === 'recording') {
+        stopChatVoiceRecording(true);
+    } else {
+        startChatVoiceRecording();
+    }
+}
+
+async function startChatVoiceRecording() {
+    try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("Microphone recording is not supported in this browser. You can select an audio file instead.");
+            const audIn = document.getElementById('chatAudioInput');
+            if (audIn) audIn.click();
+            return;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        pageMediaRecorder = new MediaRecorder(stream);
+        pageAudioChunks = [];
+
+        pageMediaRecorder.ondataavailable = e => {
+            if (e.data && e.data.size > 0) pageAudioChunks.push(e.data);
+        };
+
+        pageMediaRecorder.onstop = () => {
+            stream.getTracks().forEach(t => t.stop());
+        };
+
+        pageMediaRecorder.start();
+        pageRecordingSeconds = 0;
+
+        const bar = document.getElementById('chatVoiceRecordingBar');
+        const timer = document.getElementById('chatRecordTimer');
+        if (bar) bar.style.display = 'flex';
+        if (timer) timer.textContent = '00:00';
+
+        if (pageRecordingTimer) clearInterval(pageRecordingTimer);
+        pageRecordingTimer = setInterval(() => {
+            pageRecordingSeconds++;
+            const mins = String(Math.floor(pageRecordingSeconds / 60)).padStart(2, '0');
+            const secs = String(pageRecordingSeconds % 60).padStart(2, '0');
+            if (timer) timer.textContent = `${mins}:${secs}`;
+        }, 1000);
+
+    } catch (err) {
+        console.error("Mic access error:", err);
+        alert("Microphone access was denied or is unavailable. You can upload an audio file directly.");
+        const audIn = document.getElementById('chatAudioInput');
+        if (audIn) audIn.click();
+    }
+}
+
+function stopChatVoiceRecording(sendImmediately = true) {
+    if (!pageMediaRecorder || pageMediaRecorder.state === 'inactive') return;
+    if (pageRecordingTimer) clearInterval(pageRecordingTimer);
+
+    const durationSec = pageRecordingSeconds;
+    const mins = String(Math.floor(durationSec / 60)).padStart(2, '0');
+    const secs = String(durationSec % 60).padStart(2, '0');
+    const durationStr = `${mins}:${secs}`;
+
+    pageMediaRecorder.onstop = () => {
+        const audioBlob = new Blob(pageAudioChunks, { type: 'audio/webm;codecs=opus' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const dataUrl = reader.result;
+            window.pendingPageAttachment = {
+                type: 'audio',
+                url: dataUrl,
+                name: `Voice_Note_${mins}m${secs}s.webm`,
+                size: `Voice Note (${durationStr})`,
+                blob: audioBlob
+            };
+
+            const bar = document.getElementById('chatVoiceRecordingBar');
+            if (bar) bar.style.display = 'none';
+
+            if (sendImmediately) {
+                handleSendMessage(new Event('submit'));
+            } else {
+                const tray = document.getElementById('chatAttachmentTray');
+                const nameEl = document.getElementById('chatAttachName');
+                const sizeEl = document.getElementById('chatAttachSize');
+                const thumb = document.getElementById('chatAttachThumb');
+                const icon = document.getElementById('chatAttachIcon');
+                if (nameEl) nameEl.textContent = window.pendingPageAttachment.name;
+                if (sizeEl) sizeEl.textContent = 'Voice Note (' + durationStr + ')';
+                if (thumb) thumb.style.display = 'none';
+                if (icon) { icon.style.display = 'block'; icon.textContent = '🎙️'; }
+                if (tray) tray.style.display = 'flex';
+            }
+        };
+        reader.readAsDataURL(audioBlob);
+    };
+
+    pageMediaRecorder.stop();
+}
+
+function cancelChatVoiceRecording() {
+    if (pageMediaRecorder && pageMediaRecorder.state !== 'inactive') {
+        pageMediaRecorder.onstop = () => {};
+        pageMediaRecorder.stop();
+    }
+    if (pageRecordingTimer) clearInterval(pageRecordingTimer);
+    const bar = document.getElementById('chatVoiceRecordingBar');
+    if (bar) bar.style.display = 'none';
+}
+
+// Lightbox Modal for Full-size Image Viewing
+function openChatLightbox(src, caption) {
+    const box = document.getElementById('chatImageLightbox');
+    const img = document.getElementById('chatLightboxImg');
+    const cap = document.getElementById('chatLightboxCaption');
+    if (box && img) {
+        img.src = src;
+        if (cap) cap.textContent = caption || '';
+        box.style.display = 'flex';
+    }
+}
+
+function closeChatLightbox(e) {
+    if (e && e.target && e.target.id === 'chatLightboxImg') return;
+    const box = document.getElementById('chatImageLightbox');
+    if (box) box.style.display = 'none';
+}
 
 function escapeHtml(str) {
     if (!str) return '';
@@ -425,6 +841,48 @@ function loadConversation(convId = null) {
             stream.innerHTML = data.messages.map(m => {
                 const isSentByMe = (parseInt(m.sender_id) === currentUserId);
                 const roleBadge = m.sender_role === 'admin' ? '<span style="font-size: 10px; background: rgba(255,255,255,0.25); padding: 1px 5px; border-radius: 8px; margin-left: 4px;">Admin</span>' : '';
+
+                // Attachment Rendering (Image, Audio Voice Note, Document)
+                let attachmentHtml = '';
+                const attType = m.attachment_type;
+                const attUrl = m.attachment_url;
+                const attName = m.attachment_name;
+                const attSize = m.attachment_size;
+
+                if (attUrl && attType && attType !== 'none') {
+                    if (attType === 'image') {
+                        attachmentHtml = `
+                            <div style="margin-top: 6px; cursor: pointer;" onclick="openChatLightbox('${attUrl}', '${escapeHtml(attName || 'Photo')}')">
+                                <img src="${attUrl}" alt="Attachment" style="max-width: 240px; max-height: 190px; border-radius: 10px; object-fit: cover; display: block; border: 1px solid rgba(0,0,0,0.12); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                <div style="font-size: 10px; opacity: 0.8; margin-top: 3px;">🔍 Click to enlarge (${escapeHtml(attSize || 'Photo')})</div>
+                            </div>
+                        `;
+                    } else if (attType === 'audio') {
+                        attachmentHtml = `
+                            <div style="margin-top: 6px; min-width: 220px; max-width: 280px;">
+                                <div style="font-size: 11px; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; gap: 4px;">
+                                    <span>🎙️</span> Voice Note ${attSize ? `(${escapeHtml(attSize)})` : ''}
+                                </div>
+                                <audio controls src="${attUrl}" style="width: 100%; height: 34px; border-radius: 17px; outline: none;"></audio>
+                            </div>
+                        `;
+                    } else if (attType === 'file') {
+                        attachmentHtml = `
+                            <a href="${attUrl}" download="${escapeHtml(attName || 'document')}" target="_blank" style="display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 8px 11px; background: ${isSentByMe ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.05)'}; border-radius: 8px; text-decoration: none; color: inherit; border: 1px solid ${isSentByMe ? 'rgba(255,255,255,0.3)' : 'var(--border-color)'};">
+                                <span style="font-size: 22px;">📄</span>
+                                <div style="min-width: 0; flex: 1;">
+                                    <div style="font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        ${escapeHtml(attName || 'Document')}
+                                    </div>
+                                    <div style="font-size: 10.5px; opacity: 0.8;">
+                                        ${escapeHtml(attSize || 'Attachment')} &bull; Download ⬇
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    }
+                }
+
                 return `
                     <div class="chat-msg-row ${isSentByMe ? 'sent' : 'received'}">
                         <div class="chat-bubble">
@@ -432,6 +890,7 @@ function loadConversation(convId = null) {
                                 ${escapeHtml(m.sender_name)} ${roleBadge}
                             </div>
                             <div>${escapeHtml(m.message)}</div>
+                            ${attachmentHtml}
                             <div class="chat-msg-time">
                                 ${formatDisplayDate(m.created_at)} ${isSentByMe ? (parseInt(m.is_read) === 1 ? '✓✓' : '✓') : ''}
                             </div>
@@ -451,17 +910,40 @@ function handleSendMessage(e) {
     if (e) e.preventDefault();
     const input = document.getElementById('chatInputMessage');
     const msg = input.value.trim();
-    if (!msg) return;
+    const pendingAtt = window.pendingPageAttachment;
+    if (!msg && !pendingAtt) return;
 
     input.value = '';
+    clearChatAttachment();
+
+    let sendMsg = msg;
+    if (!sendMsg && pendingAtt) {
+        if (pendingAtt.type === 'image') sendMsg = '📷 Photo';
+        else if (pendingAtt.type === 'audio') sendMsg = '🎙️ Voice Note';
+        else if (pendingAtt.type === 'file') sendMsg = '📄 ' + (pendingAtt.name || 'Document');
+    }
+
     const btn = document.getElementById('btnSendChat');
     btn.disabled = true;
 
     const formData = new FormData();
     formData.append('action', 'send_message');
     formData.append('conversation_id', currentConvId || 0);
-    formData.append('message', msg);
+    formData.append('message', sendMsg);
     if (activePropertyId > 0) formData.append('property_id', activePropertyId);
+
+    if (pendingAtt) {
+        formData.append('attachment_type', pendingAtt.type);
+        formData.append('attachment_name', pendingAtt.name || '');
+        formData.append('attachment_size', pendingAtt.size || '');
+        if (pendingAtt.file) {
+            formData.append('attachment_file', pendingAtt.file);
+        } else if (pendingAtt.blob) {
+            formData.append('attachment_file', pendingAtt.blob, pendingAtt.name || 'voice.webm');
+        } else if (pendingAtt.url) {
+            formData.append('attachment_data', pendingAtt.url);
+        }
+    }
 
     fetch('<?= BASE_URL ?>/api/chat.php', {
         method: 'POST',

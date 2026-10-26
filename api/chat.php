@@ -41,12 +41,30 @@ try {
           `sender_role` ENUM('user', 'admin') NOT NULL DEFAULT 'user',
           `property_id` INT UNSIGNED NULL,
           `message` TEXT NOT NULL,
+          `attachment_type` ENUM('none', 'image', 'audio', 'file') DEFAULT 'none',
+          `attachment_url` TEXT NULL,
+          `attachment_name` VARCHAR(255) NULL,
+          `attachment_size` VARCHAR(50) NULL,
           `is_read` TINYINT(1) DEFAULT 0,
           `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           INDEX `idx_conv_id` (`conversation_id`),
           INDEX `idx_sender_id` (`sender_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ");
+
+    // Self-healing schema update for existing tables
+    try {
+        $pdo->exec("ALTER TABLE `chat_messages` ADD COLUMN `attachment_type` ENUM('none', 'image', 'audio', 'file') DEFAULT 'none' AFTER `message`");
+    } catch (Exception $e) {}
+    try {
+        $pdo->exec("ALTER TABLE `chat_messages` ADD COLUMN `attachment_url` TEXT NULL AFTER `attachment_type`");
+    } catch (Exception $e) {}
+    try {
+        $pdo->exec("ALTER TABLE `chat_messages` ADD COLUMN `attachment_name` VARCHAR(255) NULL AFTER `attachment_url`");
+    } catch (Exception $e) {}
+    try {
+        $pdo->exec("ALTER TABLE `chat_messages` ADD COLUMN `attachment_size` VARCHAR(50) NULL AFTER `attachment_name`");
+    } catch (Exception $e) {}
 
     $currentUser = getCurrentUser();
     if (!$currentUser) {
@@ -262,16 +280,68 @@ try {
     }
 
     // -------------------------------------------------------------------------
-    // ACTION: send_message (User or Admin posts a message)
+    // ACTION: send_message (User or Admin posts a message, sound, file, or image)
     // -------------------------------------------------------------------------
     if ($action === 'send_message') {
         $convId = (int)($_POST['conversation_id'] ?? 0);
         $messageText = trim($_POST['message'] ?? '');
         $propId = (int)($_POST['property_id'] ?? 0);
 
-        if ($messageText === '') {
-            echo json_encode(['success' => false, 'error' => 'empty_message', 'message' => 'Message text cannot be empty.']);
+        // Attachment handling (Sound, File, Image)
+        $attachmentType = 'none';
+        $attachmentUrl = null;
+        $attachmentName = null;
+        $attachmentSize = null;
+
+        if (isset($_FILES['attachment_file']) && $_FILES['attachment_file']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['attachment_file'];
+            $origName = basename($file['name']);
+            $sizeBytes = (int)$file['size'];
+            $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+
+            if ($sizeBytes >= 1048576) {
+                $attachmentSize = round($sizeBytes / 1048576, 1) . ' MB';
+            } else {
+                $attachmentSize = max(1, round($sizeBytes / 1024)) . ' KB';
+            }
+
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                $attachmentType = 'image';
+            } elseif (in_array($ext, ['mp3', 'wav', 'ogg', 'm4a', 'webm', 'aac'])) {
+                $attachmentType = 'audio';
+            } else {
+                $attachmentType = 'file';
+            }
+
+            $uploadChatDir = __DIR__ . '/../uploads/chat/';
+            if (!is_dir($uploadChatDir)) {
+                mkdir($uploadChatDir, 0755, true);
+            }
+
+            $safeFileName = 'chat_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
+            $targetPath = $uploadChatDir . $safeFileName;
+
+            if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+                $attachmentUrl = BASE_URL . '/uploads/chat/' . $safeFileName;
+                $attachmentName = $origName;
+            }
+        } elseif (!empty($_POST['attachment_data']) && !empty($_POST['attachment_type'])) {
+            $attachmentType = in_array($_POST['attachment_type'], ['image', 'audio', 'file']) ? $_POST['attachment_type'] : 'none';
+            $attachmentUrl = $_POST['attachment_data'];
+            $attachmentName = trim($_POST['attachment_name'] ?? 'attachment');
+            $attachmentSize = trim($_POST['attachment_size'] ?? '');
+        }
+
+        if ($messageText === '' && $attachmentType === 'none') {
+            echo json_encode(['success' => false, 'error' => 'empty_message', 'message' => 'Message or attachment cannot be empty.']);
             exit;
+        }
+
+        $summaryText = $messageText;
+        if ($summaryText === '') {
+            if ($attachmentType === 'image') $summaryText = '📷 Photo';
+            elseif ($attachmentType === 'audio') $summaryText = '🎙️ Voice Note';
+            elseif ($attachmentType === 'file') $summaryText = '📄 ' . ($attachmentName ?: 'Document');
         }
 
         // Resolve or create conversation
@@ -304,17 +374,21 @@ try {
 
         $senderRole = $isAdmin ? 'admin' : 'user';
 
-        // Insert message
+        // Insert message with attachment details
         $stmtInsert = $pdo->prepare("
-            INSERT INTO chat_messages (conversation_id, sender_id, sender_role, property_id, message, is_read, created_at)
-            VALUES (:cid, :sid, :role, :pid, :msg, 0, NOW())
+            INSERT INTO chat_messages (conversation_id, sender_id, sender_role, property_id, message, attachment_type, attachment_url, attachment_name, attachment_size, is_read, created_at)
+            VALUES (:cid, :sid, :role, :pid, :msg, :att_type, :att_url, :att_name, :att_size, 0, NOW())
         ");
         $stmtInsert->execute([
             'cid' => $convId,
             'sid' => $currentUserId,
             'role' => $senderRole,
             'pid' => $propId > 0 ? $propId : null,
-            'msg' => $messageText
+            'msg' => $messageText,
+            'att_type' => $attachmentType,
+            'att_url' => $attachmentUrl,
+            'att_name' => $attachmentName,
+            'att_size' => $attachmentSize
         ]);
         $newMsgId = (int)$pdo->lastInsertId();
 
@@ -324,13 +398,13 @@ try {
                 UPDATE chat_conversations 
                 SET last_message = :msg, last_message_at = NOW(), user_unread_count = user_unread_count + 1
                 WHERE id = :cid
-            ")->execute(['msg' => $messageText, 'cid' => $convId]);
+            ")->execute(['msg' => $summaryText, 'cid' => $convId]);
         } else {
             $updateSql = "
                 UPDATE chat_conversations 
                 SET last_message = :msg, last_message_at = NOW(), admin_unread_count = admin_unread_count + 1
             ";
-            $params = ['msg' => $messageText, 'cid' => $convId];
+            $params = ['msg' => $summaryText, 'cid' => $convId];
             if ($propId > 0) {
                 $updateSql .= ", property_id = :pid ";
                 $params['pid'] = $propId;
@@ -343,6 +417,12 @@ try {
             'success' => true,
             'conversation_id' => $convId,
             'message_id' => $newMsgId,
+            'attachment' => $attachmentType !== 'none' ? [
+                'type' => $attachmentType,
+                'url' => $attachmentUrl,
+                'name' => $attachmentName,
+                'size' => $attachmentSize
+            ] : null,
             'sent_at' => date('Y-m-d H:i:s')
         ]);
         exit;

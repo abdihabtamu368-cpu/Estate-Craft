@@ -1915,7 +1915,107 @@
       border-color: #0866ff !important;
       font-weight: 800 !important;
       box-shadow: 0 3px 10px rgba(8, 102, 255, 0.35);
-      transform: scale(1.05);
+    /* Chat Media & Toolbar Enhancements */
+    .chat-attachment-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.18s ease;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .chat-attachment-btn:hover {
+      background: rgba(8, 102, 255, 0.1);
+      color: #0866ff;
+      border-color: #0866ff;
+      transform: scale(1.08);
+    }
+    .chat-emoji-picker-pop {
+      position: absolute;
+      bottom: 100%;
+      left: 10px;
+      margin-bottom: 8px;
+      width: 310px;
+      max-width: calc(100vw - 32px);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.22);
+      z-index: 100;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      animation: fadeIn 0.15s ease-out;
+    }
+    .chat-emoji-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-main);
+      padding: 4px;
+      gap: 4px;
+    }
+    .chat-emoji-tab-btn {
+      flex: 1;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 6px 4px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+    .chat-emoji-tab-btn.active, .chat-emoji-tab-btn:hover {
+      background: var(--bg-card);
+      color: #0866ff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .chat-emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      padding: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .chat-emoji-item {
+      font-size: 20px;
+      padding: 6px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+    .chat-emoji-item:hover {
+      background: rgba(8, 102, 255, 0.12);
+      transform: scale(1.2);
+    }
+    @keyframes recordingPulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.25); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .rec-pulse-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: recordingPulse 1.2s infinite ease-in-out;
     }
     </style>
 </head>
@@ -2492,15 +2592,78 @@
                     <button type="button" class="btn btn-secondary btn-sm" onclick="sendQuickChatMessage('📅 I would like to schedule a physical inspection.')" style="font-size: 11px; padding: 4px 9px; border-radius: 14px;">📅 Schedule viewing</button>
                 </div>
 
-                <!-- Message Input Form -->
-                <form id="modalChatForm" onsubmit="handleSendModalChat(event)" style="padding: 10px 16px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
-                    <input type="text" id="modalChatInput" class="form-input" placeholder="Type message to Admin Abdi Habtamu..." style="flex: 1; height: 40px; border-radius: 20px; font-size: 13.5px;" autocomplete="off">
-                    <button type="submit" class="btn btn-primary" id="modalChatSendBtn" style="width: 40px; height: 40px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #0866ff;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                    </button>
-                </form>
+                <!-- Hidden inputs for file/audio/image uploads -->
+                <input type="file" id="modalChatImgInput" accept="image/*" style="display:none;" onchange="handleModalAttachmentSelected(this, 'image')">
+                <input type="file" id="modalChatDocInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.zip" style="display:none;" onchange="handleModalAttachmentSelected(this, 'file')">
+                <input type="file" id="modalChatAudioInput" accept="audio/*" style="display:none;" onchange="handleModalAttachmentSelected(this, 'audio')">
+
+                <!-- Attachment Preview Tray -->
+                <div id="modalChatAttachmentTray" style="display: none; padding: 8px 14px; background: rgba(8, 102, 255, 0.05); border-top: 1px solid var(--border-color); align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                        <div id="modalChatAttachPreviewBox" style="width: 38px; height: 38px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border-color); flex-shrink: 0;">
+                            <span id="modalChatAttachIcon" style="font-size: 18px;">📎</span>
+                            <img id="modalChatAttachThumb" src="" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="min-width: 0;">
+                            <div id="modalChatAttachName" style="font-size: 12.5px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">file.png</div>
+                            <div id="modalChatAttachSize" style="font-size: 11px; color: var(--text-muted);">120 KB</div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="clearModalAttachment()" style="background: none; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer; padding: 4px; line-height: 1;" title="Remove attachment">&times;</button>
+                </div>
+
+                <!-- Voice Note Recording Bar -->
+                <div id="modalChatVoiceRecordingBar" style="display: none; padding: 8px 14px; background: #fee2e2; border-top: 1px solid #fca5a5; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="rec-pulse-dot"></span>
+                        <strong style="color: #b91c1c; font-size: 12.5px;">Recording...</strong>
+                        <span id="modalChatRecordTimer" style="font-family: monospace; font-size: 12.5px; font-weight: 800; color: #991b1b; background: rgba(255,255,255,0.8); padding: 1px 6px; border-radius: 6px;">00:00</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <button type="button" onclick="stopModalVoiceRecording(true)" class="btn btn-sm" style="background: #dc2626; color: #fff; font-size: 11.5px; font-weight: 700; border-radius: 14px; padding: 3px 10px; border: none; display: flex; align-items: center; gap: 4px;">
+                            <span>⏹</span> Send
+                        </button>
+                        <button type="button" onclick="cancelModalVoiceRecording()" class="btn btn-secondary btn-sm" style="font-size: 11.5px; border-radius: 14px; padding: 3px 8px;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Message Input Form & Media Controls -->
+                <div style="position: relative; background: var(--bg-card); border-top: 1px solid var(--border-color);">
+                    <!-- Emoji Picker Popover -->
+                    <div id="modalChatEmojiPicker" class="chat-emoji-picker-pop">
+                        <div class="chat-emoji-tabs">
+                            <button type="button" class="chat-emoji-tab-btn active" onclick="switchModalEmojiTab('real_estate', this)">🏡 Property</button>
+                            <button type="button" class="chat-emoji-tab-btn" onclick="switchModalEmojiTab('smileys', this)">😊 Smileys</button>
+                            <button type="button" class="chat-emoji-tab-btn" onclick="switchModalEmojiTab('business', this)">💼 Business</button>
+                        </div>
+                        <div id="modalChatEmojiGrid" class="chat-emoji-grid">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <form id="modalChatForm" onsubmit="handleSendModalChat(event)" style="padding: 9px 12px; display: flex; align-items: center; gap: 6px;">
+                        <button type="button" class="chat-attachment-btn" onclick="toggleModalEmojiPicker()" title="Insert Emoji">😊</button>
+                        <button type="button" class="chat-attachment-btn" onclick="document.getElementById('modalChatImgInput').click()" title="Send Photo/Image">📷</button>
+                        <button type="button" class="chat-attachment-btn" onclick="document.getElementById('modalChatDocInput').click()" title="Attach Document (PDF, Word, etc)">📎</button>
+                        <button type="button" class="chat-attachment-btn" id="modalChatMicBtn" onclick="toggleModalVoiceRecording()" title="Record Voice Note">🎙️</button>
+                        <input type="text" id="modalChatInput" class="form-input" placeholder="Type message to Admin Abdi Habtamu..." style="flex: 1; height: 38px; border-radius: 19px; font-size: 13.5px;" autocomplete="off">
+                        <button type="submit" class="btn btn-primary" id="modalChatSendBtn" style="width: 38px; height: 38px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #0866ff;" title="Send">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </form>
+                </div>
             </div>
-            </form>
+        </div>
+    </div>
+
+    <!-- Universal Chat Image Lightbox Modal -->
+    <div id="chatImageLightbox" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.88); z-index: 10000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px);" onclick="closeChatLightbox(event)">
+        <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
+            <button type="button" onclick="closeChatLightbox()" style="position: absolute; top: -44px; right: 0; background: rgba(255,255,255,0.25); color: #fff; border: none; font-size: 26px; line-height: 1; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.45)'" onmouseout="this.style.background='rgba(255,255,255,0.25)'">&times;</button>
+            <img id="chatLightboxImg" src="" alt="Enlarged Attachment" style="max-width: 100%; max-height: 82vh; border-radius: 12px; object-fit: contain; box-shadow: 0 15px 45px rgba(0,0,0,0.6);">
+            <div id="chatLightboxCaption" style="color: #ffffff; margin-top: 12px; font-size: 13px; font-weight: 600; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8);"></div>
         </div>
     </div>
 
@@ -6524,6 +6687,257 @@
       if (inputEl) setTimeout(() => inputEl.focus(), 200);
     }
 
+    // =========================================================================
+    // Emoji Picker & Media Attachments (Sound, File, Image)
+    // =========================================================================
+    window.pendingModalAttachment = null;
+    let modalMediaRecorder = null;
+    let modalAudioChunks = [];
+    let modalRecordingTimer = null;
+    let modalRecordingSeconds = 0;
+
+    const CHAT_EMOJIS = {
+      real_estate: ['🏡', '🏢', '🏬', '🏠', '🔑', '🚪', '📍', '🛋️', '🚿', '🏗️', '📐', '🌲', '🏊', '🚗', '💰', '🛡️', '🌇', '🛖'],
+      smileys: ['😀', '😊', '😂', '😍', '😎', '👍', '👏', '🙏', '👋', '🤝', '❤️', '🔥', '✨', '🎉', '👌', '🙌', '🤩', '💯'],
+      business: ['💼', '📄', '📅', '📞', '✉️', '💵', '💳', '🕒', 'ℹ️', '⭐', '✅', '🎯', '📌', '💡', '🏷️', '📊', '🤝', '⚖️']
+    };
+
+    function toggleModalEmojiPicker() {
+      const picker = document.getElementById('modalChatEmojiPicker');
+      if (!picker) return;
+      if (picker.style.display === 'flex') {
+        picker.style.display = 'none';
+      } else {
+        picker.style.display = 'flex';
+        renderModalEmojiGrid('real_estate');
+      }
+    }
+
+    function switchModalEmojiTab(category, btn) {
+      document.querySelectorAll('.chat-emoji-tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderModalEmojiGrid(category);
+    }
+
+    function renderModalEmojiGrid(category) {
+      const grid = document.getElementById('modalChatEmojiGrid');
+      if (!grid) return;
+      const list = CHAT_EMOJIS[category] || CHAT_EMOJIS.real_estate;
+      grid.innerHTML = list.map(em => `
+        <button type="button" class="chat-emoji-item" onclick="insertModalEmoji('${em}')">${em}</button>
+      `).join('');
+    }
+
+    function insertModalEmoji(emoji) {
+      const input = document.getElementById('modalChatInput');
+      if (input) {
+        const start = input.selectionStart || input.value.length;
+        const end = input.selectionEnd || input.value.length;
+        const val = input.value;
+        input.value = val.substring(0, start) + emoji + val.substring(end);
+        input.selectionStart = input.selectionEnd = start + emoji.length;
+        input.focus();
+      }
+    }
+
+    // Close emoji picker on outside click
+    document.addEventListener('click', function(e) {
+      const picker = document.getElementById('modalChatEmojiPicker');
+      if (!picker || picker.style.display !== 'flex') return;
+      const btn = e.target.closest('.chat-attachment-btn');
+      if (!picker.contains(e.target) && (!btn || !btn.getAttribute('onclick') || !btn.getAttribute('onclick').includes('Emoji'))) {
+        picker.style.display = 'none';
+      }
+    });
+
+    // File / Image / Audio selection handler
+    function handleModalAttachmentSelected(input, type) {
+      if (!input || !input.files || input.files.length === 0) return;
+      const file = input.files[0];
+
+      let sizeStr = '';
+      if (file.size >= 1048576) {
+        sizeStr = (file.size / 1048576).toFixed(1) + ' MB';
+      } else {
+        sizeStr = Math.max(1, Math.round(file.size / 1024)) + ' KB';
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        window.pendingModalAttachment = {
+          type: type,
+          url: dataUrl,
+          name: file.name,
+          size: sizeStr,
+          file: file
+        };
+
+        const tray = document.getElementById('modalChatAttachmentTray');
+        const nameEl = document.getElementById('modalChatAttachName');
+        const sizeEl = document.getElementById('modalChatAttachSize');
+        const thumb = document.getElementById('modalChatAttachThumb');
+        const icon = document.getElementById('modalChatAttachIcon');
+
+        if (nameEl) nameEl.textContent = file.name;
+        if (sizeEl) sizeEl.textContent = sizeStr;
+
+        if (type === 'image' && thumb && icon) {
+          thumb.src = dataUrl;
+          thumb.style.display = 'block';
+          icon.style.display = 'none';
+        } else if (icon && thumb) {
+          thumb.style.display = 'none';
+          icon.style.display = 'block';
+          icon.textContent = (type === 'audio' ? '🎙️' : '📄');
+        }
+
+        if (tray) tray.style.display = 'flex';
+        input.value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearModalAttachment() {
+      window.pendingModalAttachment = null;
+      const tray = document.getElementById('modalChatAttachmentTray');
+      if (tray) tray.style.display = 'none';
+      const imgIn = document.getElementById('modalChatImgInput');
+      const docIn = document.getElementById('modalChatDocInput');
+      const audIn = document.getElementById('modalChatAudioInput');
+      if (imgIn) imgIn.value = '';
+      if (docIn) docIn.value = '';
+      if (audIn) audIn.value = '';
+    }
+
+    // Voice Note Recording via Microphone
+    async function toggleModalVoiceRecording() {
+      if (modalMediaRecorder && modalMediaRecorder.state === 'recording') {
+        stopModalVoiceRecording(true);
+      } else {
+        startModalVoiceRecording();
+      }
+    }
+
+    async function startModalVoiceRecording() {
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert("Microphone recording is not supported in this browser. You can select an audio file instead.");
+          const audIn = document.getElementById('modalChatAudioInput');
+          if (audIn) audIn.click();
+          return;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        modalMediaRecorder = new MediaRecorder(stream);
+        modalAudioChunks = [];
+
+        modalMediaRecorder.ondataavailable = e => {
+          if (e.data && e.data.size > 0) modalAudioChunks.push(e.data);
+        };
+
+        modalMediaRecorder.onstop = () => {
+          stream.getTracks().forEach(t => t.stop());
+        };
+
+        modalMediaRecorder.start();
+        modalRecordingSeconds = 0;
+
+        const bar = document.getElementById('modalChatVoiceRecordingBar');
+        const timer = document.getElementById('modalChatRecordTimer');
+        if (bar) bar.style.display = 'flex';
+        if (timer) timer.textContent = '00:00';
+
+        if (modalRecordingTimer) clearInterval(modalRecordingTimer);
+        modalRecordingTimer = setInterval(() => {
+          modalRecordingSeconds++;
+          const mins = String(Math.floor(modalRecordingSeconds / 60)).padStart(2, '0');
+          const secs = String(modalRecordingSeconds % 60).padStart(2, '0');
+          if (timer) timer.textContent = `${mins}:${secs}`;
+        }, 1000);
+
+      } catch (err) {
+        console.error("Mic access error:", err);
+        alert("Microphone access was denied or is unavailable. You can upload an audio file directly.");
+        const audIn = document.getElementById('modalChatAudioInput');
+        if (audIn) audIn.click();
+      }
+    }
+
+    function stopModalVoiceRecording(sendImmediately = true) {
+      if (!modalMediaRecorder || modalMediaRecorder.state === 'inactive') return;
+      if (modalRecordingTimer) clearInterval(modalRecordingTimer);
+
+      const durationSec = modalRecordingSeconds;
+      const mins = String(Math.floor(durationSec / 60)).padStart(2, '0');
+      const secs = String(durationSec % 60).padStart(2, '0');
+      const durationStr = `${mins}:${secs}`;
+
+      modalMediaRecorder.onstop = () => {
+        const audioBlob = new Blob(modalAudioChunks, { type: 'audio/webm;codecs=opus' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const dataUrl = reader.result;
+          window.pendingModalAttachment = {
+            type: 'audio',
+            url: dataUrl,
+            name: `Voice_Note_${mins}m${secs}s.webm`,
+            size: `Voice Note (${durationStr})`,
+            blob: audioBlob
+          };
+
+          const bar = document.getElementById('modalChatVoiceRecordingBar');
+          if (bar) bar.style.display = 'none';
+
+          if (sendImmediately) {
+            handleSendModalChat(new Event('submit'));
+          } else {
+            const tray = document.getElementById('modalChatAttachmentTray');
+            const nameEl = document.getElementById('modalChatAttachName');
+            const sizeEl = document.getElementById('modalChatAttachSize');
+            const thumb = document.getElementById('modalChatAttachThumb');
+            const icon = document.getElementById('modalChatAttachIcon');
+            if (nameEl) nameEl.textContent = window.pendingModalAttachment.name;
+            if (sizeEl) sizeEl.textContent = 'Voice Note (' + durationStr + ')';
+            if (thumb) thumb.style.display = 'none';
+            if (icon) { icon.style.display = 'block'; icon.textContent = '🎙️'; }
+            if (tray) tray.style.display = 'flex';
+          }
+        };
+        reader.readAsDataURL(audioBlob);
+      };
+
+      modalMediaRecorder.stop();
+    }
+
+    function cancelModalVoiceRecording() {
+      if (modalMediaRecorder && modalMediaRecorder.state !== 'inactive') {
+        modalMediaRecorder.onstop = () => {};
+        modalMediaRecorder.stop();
+      }
+      if (modalRecordingTimer) clearInterval(modalRecordingTimer);
+      const bar = document.getElementById('modalChatVoiceRecordingBar');
+      if (bar) bar.style.display = 'none';
+    }
+
+    // Lightbox Modal for Full-size Image Viewing
+    function openChatLightbox(src, caption) {
+      const box = document.getElementById('chatImageLightbox');
+      const img = document.getElementById('chatLightboxImg');
+      const cap = document.getElementById('chatLightboxCaption');
+      if (box && img) {
+        img.src = src;
+        if (cap) cap.textContent = caption || '';
+        box.style.display = 'flex';
+      }
+    }
+
+    function closeChatLightbox(e) {
+      if (e && e.target && e.target.id === 'chatLightboxImg') return;
+      const box = document.getElementById('chatImageLightbox');
+      if (box) box.style.display = 'none';
+    }
+
     function renderModalChatMessages() {
       const container = document.getElementById('modalChatMessages');
       if (!container) return;
@@ -6543,8 +6957,6 @@
 
       const totalMsgs = conv.messages.length;
       container.innerHTML = conv.messages.map((m, index) => {
-        // If viewer is Admin, messages sent by Admin are on the right
-        // If viewer is Client, messages sent by Client are on the right
         const isSent = isViewerAdmin
           ? (m.sender === 'admin' || m.role === 'admin')
           : (m.sender === 'user' || m.role === 'user');
@@ -6561,6 +6973,49 @@
         const isLastMsg = (index === totalMsgs - 1);
         const isAwaitingAdmin = (!isViewerAdmin && isLastMsg && m.sender === 'user');
 
+        // Attachment Rendering (Image, Audio Voice Note, Document)
+        let attachmentHtml = '';
+        const att = m.attachment || (m.attachment_type && m.attachment_type !== 'none' ? {
+          type: m.attachment_type,
+          url: m.attachment_url,
+          name: m.attachment_name,
+          size: m.attachment_size
+        } : null);
+
+        if (att && att.url) {
+          if (att.type === 'image') {
+            attachmentHtml = `
+              <div style="margin-top: 6px; cursor: pointer;" onclick="openChatLightbox('${att.url}', '${escapeHtml(att.name || 'Image Attachment')}')">
+                <img src="${att.url}" alt="Attachment" style="max-width: 220px; max-height: 180px; border-radius: 10px; object-fit: cover; display: block; border: 1px solid rgba(0,0,0,0.12); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div style="font-size: 10px; opacity: 0.8; margin-top: 3px;">🔍 Click to enlarge (${escapeHtml(att.size || 'Photo')})</div>
+              </div>
+            `;
+          } else if (att.type === 'audio') {
+            attachmentHtml = `
+              <div style="margin-top: 6px; min-width: 210px; max-width: 270px;">
+                <div style="font-size: 11px; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; gap: 4px;">
+                  <span>🎙️</span> Voice Note ${att.size ? `(${escapeHtml(att.size)})` : ''}
+                </div>
+                <audio controls src="${att.url}" style="width: 100%; height: 34px; border-radius: 17px; outline: none;"></audio>
+              </div>
+            `;
+          } else if (att.type === 'file') {
+            attachmentHtml = `
+              <a href="${att.url}" download="${escapeHtml(att.name || 'document')}" target="_blank" style="display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 7px 10px; background: ${isSent ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.05)'}; border-radius: 8px; text-decoration: none; color: inherit; border: 1px solid ${isSent ? 'rgba(255,255,255,0.3)' : 'var(--border-color)'};">
+                <span style="font-size: 20px;">📄</span>
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    ${escapeHtml(att.name || 'Document')}
+                  </div>
+                  <div style="font-size: 10px; opacity: 0.8;">
+                    ${escapeHtml(att.size || 'File')} &bull; Download ⬇
+                  </div>
+                </div>
+              </a>
+            `;
+          }
+        }
+
         return `
           <div style="display: flex; flex-direction: column; max-width: 82%; align-self: ${isSent ? 'flex-end' : 'flex-start'};">
             <div style="padding: 10px 14px; border-radius: 16px; font-size: 13.5px; line-height: 1.45; word-break: break-word; ${isSent ? 'background: #0866ff; color: #ffffff; border-bottom-right-radius: 3px;' : 'background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-bottom-left-radius: 3px;'}">
@@ -6574,6 +7029,7 @@
                 </div>
               ` : ''}
               <div>${escapeHtml(m.message)}</div>
+              ${attachmentHtml}
               <div style="font-size: 10px; margin-top: 4px; opacity: 0.75; text-align: ${isSent ? 'right' : 'left'};">
                 ${timeStr} ${isSent ? '✓✓' : ''}
               </div>
@@ -6595,9 +7051,21 @@
       const input = document.getElementById('modalChatInput');
       if (!input) return;
       const text = input.value.trim();
-      if (!text) return;
+      const pendingAtt = window.pendingModalAttachment;
+
+      if (!text && !pendingAtt) return;
 
       input.value = '';
+      clearModalAttachment();
+
+      // If text is blank but an attachment is present, give a neat summary text
+      let msgText = text;
+      if (!msgText && pendingAtt) {
+        if (pendingAtt.type === 'image') msgText = '📷 Photo';
+        else if (pendingAtt.type === 'audio') msgText = '🎙️ Voice Note';
+        else if (pendingAtt.type === 'file') msgText = '📄 ' + (pendingAtt.name || 'Document');
+      }
+
       const userEmail = (localStorage.getItem('estate_craft_user_email') || '').toLowerCase().trim();
       const isViewerAdmin = (userEmail === 'abdihabtamu368@gmail.com');
       const map = getAllConversations();
@@ -6627,12 +7095,18 @@
           sender: 'admin',
           name: 'Abdi Habtamu',
           role: 'admin',
-          message: text,
+          message: msgText,
+          attachment: pendingAtt ? {
+            type: pendingAtt.type,
+            url: pendingAtt.url,
+            name: pendingAtt.name,
+            size: pendingAtt.size
+          } : null,
           time: new Date().toISOString()
         };
 
         conv.messages.push(adminMsg);
-        conv.lastMessage = text;
+        conv.lastMessage = msgText;
         conv.lastMessageAt = new Date().toISOString();
         conv.unreadForAdmin = 0;
         conv.unreadForUser = (conv.unreadForUser || 0) + 1;
@@ -6645,7 +7119,15 @@
         try {
           const fd = new FormData();
           fd.append('action', 'send_message');
-          fd.append('message', text);
+          fd.append('message', msgText);
+          if (pendingAtt) {
+            fd.append('attachment_type', pendingAtt.type);
+            fd.append('attachment_data', pendingAtt.url);
+            fd.append('attachment_name', pendingAtt.name || '');
+            fd.append('attachment_size', pendingAtt.size || '');
+            if (pendingAtt.file) fd.append('attachment_file', pendingAtt.file);
+            else if (pendingAtt.blob) fd.append('attachment_file', pendingAtt.blob, pendingAtt.name || 'voice.webm');
+          }
           if (conv.backendConvId) fd.append('conversation_id', conv.backendConvId);
           if (conv.userId) fd.append('user_id', conv.userId);
           fetch(getApiUrl('chat.php'), { method: 'POST', credentials: 'include', body: fd }).catch(() => {});
@@ -6669,7 +7151,7 @@
             userPhone: localStorage.getItem('estate_craft_user_phone') || '',
             propertyTitle: linkedPropTitle,
             propertyPrice: linkedPropPrice,
-            lastMessage: text,
+            lastMessage: msgText,
             lastMessageAt: new Date().toISOString(),
             unreadForAdmin: 1,
             unreadForUser: 0,
@@ -6692,14 +7174,20 @@
           sender: 'user',
           name: userName,
           role: 'user',
-          message: text,
+          message: msgText,
+          attachment: pendingAtt ? {
+            type: pendingAtt.type,
+            url: pendingAtt.url,
+            name: pendingAtt.name,
+            size: pendingAtt.size
+          } : null,
           propertyTitle: linkedPropTitle || conv.propertyTitle,
           propertyPrice: linkedPropPrice || conv.propertyPrice,
           time: new Date().toISOString()
         };
 
         conv.messages.push(userMsg);
-        conv.lastMessage = text;
+        conv.lastMessage = msgText;
         conv.lastMessageAt = new Date().toISOString();
         conv.unreadForAdmin = (conv.unreadForAdmin || 0) + 1;
         if (linkedPropTitle) {
@@ -6715,7 +7203,15 @@
         try {
           const fd = new FormData();
           fd.append('action', 'send_message');
-          fd.append('message', text);
+          fd.append('message', msgText);
+          if (pendingAtt) {
+            fd.append('attachment_type', pendingAtt.type);
+            fd.append('attachment_data', pendingAtt.url);
+            fd.append('attachment_name', pendingAtt.name || '');
+            fd.append('attachment_size', pendingAtt.size || '');
+            if (pendingAtt.file) fd.append('attachment_file', pendingAtt.file);
+            else if (pendingAtt.blob) fd.append('attachment_file', pendingAtt.blob, pendingAtt.name || 'voice.webm');
+          }
           if (window.activeModalChatPropId) fd.append('property_id', window.activeModalChatPropId);
           fetch(getApiUrl('chat.php'), { method: 'POST', credentials: 'include', body: fd }).catch(() => {});
         } catch (err) {}
