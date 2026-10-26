@@ -4,6 +4,7 @@
  * Supports: 'light' (Day Mode), 'dark' (Night Mode), 'default' (System Default)
  */
 
+require_once __DIR__ . '/../includes/cors.php';
 header('Content-Type: application/json; charset=UTF-8');
 
 require_once __DIR__ . '/../config/config.php';

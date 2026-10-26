@@ -4821,6 +4821,15 @@
       }
     }
 
+    function getApiUrl(endpoint) {
+      const customBackend = window.BACKEND_API_URL || localStorage.getItem('estate_craft_backend_url');
+      const clean = endpoint.replace(/^\/?api\//i, '').replace(/^\//, '');
+      if (customBackend) {
+        return `${customBackend.replace(/\/+$/, '')}/api/${clean}`;
+      }
+      return `api/${clean}`;
+    }
+
     async function handleStaticFirstPageLogin(e) {
       e.preventDefault();
       const email = document.getElementById('fpLoginEmail').value.trim();
@@ -4832,9 +4841,10 @@
 
       // Attempt backend login if available
       try {
-        const resp = await fetch('api/login.php', {
+        const resp = await fetch(getApiUrl('login.php'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ email: email, password: pw })
         });
         if (resp.ok) {
@@ -4880,9 +4890,10 @@
 
       // Persist to MySQL database whenever backend is reachable
       try {
-        const resp = await fetch('api/register.php', {
+        const resp = await fetch(getApiUrl('register.php'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ full_name: name, email: email, phone: phone, password: pw, role: 'user' })
         });
         if (resp.ok) {
@@ -4926,9 +4937,10 @@
       }
 
       try {
-        const resp = await fetch('api/register.php', {
+        const resp = await fetch(getApiUrl('register.php'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ full_name: name, email: email, phone: phone, password: pw, role: role })
         });
         if (resp.ok) {
@@ -4968,9 +4980,10 @@
         return;
       }
       try {
-        const resp = await fetch('api/login.php', {
+        const resp = await fetch(getApiUrl('login.php'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ email: email, password: pw })
         });
         if (resp.ok) {
@@ -5089,7 +5102,9 @@
       const badge = document.getElementById('adminDbStatusBadge');
       
       try {
-        const resp = await fetch('api/get_users.php');
+        const resp = await fetch(getApiUrl('get_users.php'), {
+          credentials: 'include'
+        });
         if (resp.ok) {
           const data = await resp.json();
           if (data && data.success && Array.isArray(data.users)) {
@@ -5205,9 +5220,10 @@
       }
 
       try {
-        const resp = await fetch('api/register.php', {
+        const resp = await fetch(getApiUrl('register.php'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ full_name: name, email: email, phone: phone, password: pass, role: role })
         });
         if (resp.ok) {
