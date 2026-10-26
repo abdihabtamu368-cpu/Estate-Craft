@@ -59,7 +59,8 @@ $stmtImages->execute(['id' => $propertyId]);
 $images = $stmtImages->fetchAll();
 
 $currentUser = getCurrentUser();
-$isOwner = $currentUser && ($currentUser['id'] == $property['user_id'] || $currentUser['role'] === 'admin');
+$isAdmin = $currentUser && (strtolower(trim($currentUser['email'] ?? '')) === 'abdihabtamu368@gmail.com' || ($currentUser['role'] ?? '') === 'admin');
+$isOwner = $isAdmin;
 
 $pageTitle = $property['title'];
 $pageDescription = substr(strip_tags($property['description']), 0, 160);

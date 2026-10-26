@@ -2667,100 +2667,37 @@
         </div>
     </div>
 
-    <!-- Post Property Modal -->
-    <div class="modal-overlay" id="postPropertyModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <div class="modal-title">Post a New Property</div>
+    <!-- Non-Admin Post Notice Modal (Routes Non-Admin Users to Verified Admin Chat) -->
+    <div class="modal-overlay" id="nonAdminPostNoticeModal">
+        <div class="modal-card" style="max-width: 480px; width: 92%; text-align: center; border-radius: 20px; box-shadow: var(--shadow-xl);">
+            <div class="modal-header" style="justify-content: flex-end; padding: 16px 20px 0 20px; border-bottom: none;">
                 <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
             </div>
-            <div class="modal-body">
-                <form id="postPropForm" onsubmit="handlePostProperty(event)">
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
-                            <label class="form-label" for="newTitle" style="margin-bottom: 0;">Property Title *</label>
-                            <select id="modalTitlePreset" class="form-select" style="padding: 4px 10px; font-size: 12px; width: auto; max-width: 250px; height: auto;" onchange="if(this.value){document.getElementById('newTitle').value=this.value;}">
-                                <option value="">-- Choose from options --</option>
-                                <option value="Luxury 5-Bedroom Diplomatic Villa with Garden">🏡 Luxury Villa</option>
-                                <option value="Modern 3-Bedroom Furnished Penthouse">🏢 Furnished Penthouse</option>
-                                <option value="Contemporary 4-Bedroom Family Compound Residence">🏠 Family Compound</option>
-                                <option value="Spacious 2-Bedroom Luxury Apartment with Balcony">🛋️ 2-Bed Luxury Condo</option>
-                                <option value="Executive Grade-A Commercial Office Floor">🏬 Commercial Office</option>
-                                <option value="Prime Residential Land Plot with Ready Title">🌿 Land Plot</option>
-                            </select>
-                        </div>
-                        <input type="text" id="newTitle" list="modalTitleDatalist" class="form-input" placeholder="e.g. Sunny 3-Bedroom Villa with Swimming Pool and Mountain View" required autocomplete="off">
-                        <datalist id="modalTitleDatalist">
-                            <option value="Luxury 5-Bedroom Diplomatic Villa with Landscaped Garden">
-                            <option value="Modern 4-Bedroom Gated Villa with 24/7 Security & Parking">
-                            <option value="Modern 3-Bedroom Furnished Penthouse with Panoramic City Views">
-                            <option value="Spacious 2-Bedroom Luxury Apartment with Balcony & Elevator">
-                            <option value="Contemporary 4-Bedroom Family Compound Residence">
-                            <option value="Executive Grade-A Commercial Office Floor with Fiber Internet">
-                            <option value="Prime Residential Land Plot with Title Deed Ready">
-                        </datalist>
-                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
-                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Luxury 5-Bedroom Diplomatic Villa with Garden'">🏡 Luxury Villa</button>
-                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Modern 3-Bedroom Furnished Penthouse'">🏢 Penthouse</button>
-                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Contemporary 4-Bedroom Family Compound'">🏠 Family Home</button>
-                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11px; border-radius: 20px;" onclick="document.getElementById('newTitle').value='Spacious 2-Bedroom Luxury Apartment'">🛋️ Apartment</button>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                        <div class="form-group">
-                            <label class="form-label" for="newPurpose">Purpose *</label>
-                            <select id="newPurpose" class="form-select">
-                                <option value="sale">For Sale</option>
-                                <option value="rent">For Rent</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="newType">Property Type *</label>
-                            <select id="newType" class="form-select">
-                                <option value="house">House</option>
-                                <option value="apartment">Apartment</option>
-                                <option value="villa">Villa</option>
-                                <option value="commercial">Commercial</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                        <div class="form-group">
-                            <label class="form-label" for="newPrice">Price (ETB) *</label>
-                            <input type="number" id="newPrice" class="form-input" placeholder="e.g. 25000000" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="newCity">City / Subcity *</label>
-                            <input type="text" id="newCity" class="form-input" placeholder="e.g. Bole, Addis Ababa" required>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                        <div class="form-group">
-                            <label class="form-label" for="newBeds">Bedrooms</label>
-                            <input type="number" id="newBeds" class="form-input" value="3">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="newBaths">Bathrooms</label>
-                            <input type="number" id="newBaths" class="form-input" value="2">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="newSqft">Area (sqft)</label>
-                            <input type="number" id="newSqft" class="form-input" value="2200">
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label class="form-label" for="newDesc">Description</label>
-                        <textarea id="newDesc" rows="3" class="form-input" style="height: auto;" placeholder="Highlight main features, compound details, parking, backup generator..."></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="width: 100%;">
-                        Submit & Publish Listing
+            <div class="modal-body" style="padding: 10px 24px 28px 24px;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, rgba(8, 102, 255, 0.12), rgba(16, 185, 129, 0.15)); border: 2px solid rgba(8, 102, 255, 0.25); display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 14px auto;">
+                    🛡️
+                </div>
+                <h3 style="font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">
+                    Administrator-Verified Listings
+                </h3>
+                <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px;">
+                    To protect buyers, prevent title fraud, and ensure document verification across Ethiopia, direct property publishing on EstateCraft is strictly managed by Chief Administrator <strong>Abdi Habtamu</strong>.
+                </p>
+                <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; text-align: left; margin-bottom: 22px;">
+                    <strong style="font-size: 13px; color: var(--text-main); display: block; margin-bottom: 4px;">Want to list your home for Sale or Rent?</strong>
+                    <p style="font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5;">
+                        Submit your property details directly to Admin Abdi via live chat. Abdi will verify your title and feature your property across our portal.
+                    </p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button type="button" class="btn btn-primary btn-block btn-lg" onclick="openChatForListingIntent()" style="background: #0866ff; color: #fff; font-weight: 800; border: none; padding: 12px 18px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(8, 102, 255, 0.35);">
+                        <span>💬</span>
+                        <span>Submit Property to Admin via Chat</span>
                     </button>
-                </form>
+                    <button type="button" class="btn btn-secondary btn-block" onclick="closeModal()" style="border-radius: 12px; padding: 10px 16px;">
+                        Explore Published Properties
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -3158,24 +3095,36 @@
                 </p>
             </div>
         </div>
-    <!-- Post Property Modal with Interactive Map Location Picker -->
+    </div>
+
+    <!-- Post Property Modal with Interactive Map Location Picker (Admin Editor Studio) -->
     <div class="modal-overlay" id="postPropertyModal">
-        <div class="modal-card" style="max-width: 640px; width: 95%;">
-            <div class="modal-header">
-                <div class="modal-title">🏡 Post a Property Listing</div>
+        <div class="modal-card" style="max-width: 660px; width: 95%; border-radius: 18px;">
+            <div class="modal-header" style="background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 22px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #0866ff, #0052cc); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; flex-shrink: 0;">
+                        🛡️
+                    </div>
+                    <div>
+                        <div class="modal-title" id="postModalHeaderTitle" style="font-size: 16.5px; font-weight: 800; color: var(--text-main);">Admin Property Studio</div>
+                        <div id="postModalHeaderSub" style="font-size: 12px; color: var(--text-muted);">Verified Publishing & Editing &bull; Abdi Habtamu</div>
+                    </div>
+                </div>
                 <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 24px; max-height: 85vh; overflow-y: auto;">
+            <div class="modal-body" style="padding: 22px; max-height: 84vh; overflow-y: auto;">
                 <form id="postPropForm" onsubmit="handlePostProperty(event)">
+                    <input type="hidden" id="editPropId" value="">
+
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label class="form-label" for="newTitle">Property Title *</label>
-                        <input type="text" id="newTitle" class="form-input" placeholder="e.g. Modern 3-Bedroom Furnished Penthouse in Bole" required>
+                        <input type="text" id="newTitle" class="form-input" placeholder="e.g. Modern 4-Bedroom Luxury Villa with Garden in Bole" required>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                         <div class="form-group">
                             <label class="form-label" for="newPurpose">Listing Purpose *</label>
-                            <select id="newPurpose" class="form-select">
+                            <select id="newPurpose" class="form-select" onchange="updatePriceFrequencyOptions()">
                                 <option value="sale">For Sale</option>
                                 <option value="rent">For Rent</option>
                             </select>
@@ -3183,11 +3132,12 @@
                         <div class="form-group">
                             <label class="form-label" for="newType">Property Type *</label>
                             <select id="newType" class="form-select">
-                                <option value="apartment">Apartment</option>
-                                <option value="villa">Villa / House</option>
+                                <option value="villa">Villa / Luxury House</option>
+                                <option value="apartment">Modern Apartment</option>
                                 <option value="condo">Condominium</option>
-                                <option value="commercial">Commercial</option>
-                                <option value="land">Land Plot</option>
+                                <option value="house">Family Compound Home</option>
+                                <option value="commercial">Commercial Office / Mall Floor</option>
+                                <option value="land">Residential / Commercial Land</option>
                             </select>
                         </div>
                     </div>
@@ -3195,72 +3145,110 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                         <div class="form-group">
                             <label class="form-label" for="newPrice">Price (ETB) *</label>
-                            <input type="number" id="newPrice" class="form-input" placeholder="e.g. 15000000" required>
+                            <input type="number" id="newPrice" class="form-input" placeholder="e.g. 28000000" min="1" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="newCity">City / Neighborhood *</label>
+                            <label class="form-label" for="newFrequency">Price Schedule</label>
+                            <select id="newFrequency" class="form-select">
+                                <option value="total">Total Price (Full Sale)</option>
+                                <option value="monthly">Monthly Rent (/month)</option>
+                                <option value="yearly">Yearly Lease (/year)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newCity">City / Subcity / Neighborhood *</label>
                             <input type="text" id="newCity" class="form-input" placeholder="e.g. Bole Atlas, Addis Ababa" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newImageUrl">Photo URL (High Resolution)</label>
+                            <input type="url" id="newImageUrl" class="form-input" placeholder="https://images.unsplash.com/...">
+                        </div>
+                    </div>
+
+                    <!-- Quick Preset Photo Selector -->
+                    <div style="margin-bottom: 14px;">
+                        <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
+                            Quick Photo Presets:
+                        </div>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;" onclick="document.getElementById('newImageUrl').value='https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80'">🏡 Bole Villa</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;" onclick="document.getElementById('newImageUrl').value='https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80'">🏢 Penthouse</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;" onclick="document.getElementById('newImageUrl').value='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'">🏠 Family Compound</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;" onclick="document.getElementById('newImageUrl').value='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80'">🏬 Commercial</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;" onclick="document.getElementById('newImageUrl').value='https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80'">🏖️ Waterfront Villa</button>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                         <div class="form-group">
                             <label class="form-label" for="newBeds">Bedrooms</label>
-                            <input type="number" id="newBeds" class="form-input" value="3">
+                            <input type="number" id="newBeds" class="form-input" min="0" value="4">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="newBaths">Bathrooms</label>
-                            <input type="number" id="newBaths" class="form-input" value="2">
+                            <input type="number" id="newBaths" class="form-input" min="0" value="3">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="newSqft">Area (sqft)</label>
-                            <input type="number" id="newSqft" class="form-input" value="1800">
+                            <input type="number" id="newSqft" class="form-input" min="50" value="3200">
                         </div>
                     </div>
 
                     <!-- Interactive Map Location Picker -->
                     <div style="margin-bottom: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
-                            <label class="form-label" style="margin-bottom: 0;">📍 Pin Location on Map (Click Map or Drag Pin)</label>
+                            <label class="form-label" style="margin-bottom: 0;">📍 Satellite Map Location (Drag Pin or Click Map)</label>
                             <button type="button" class="btn btn-secondary btn-sm" onclick="useDeviceGpsForPostModal()" style="font-size: 11.5px; padding: 3px 10px;">
                                 🎯 Detect My GPS
                             </button>
                         </div>
 
                         <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
-                            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Jump:</span>
+                            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Neighborhoods:</span>
                             <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(9.0016, 38.7845, 'Bole')">📍 Bole</button>
                             <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(9.0203, 38.7675, 'Kazanchis')">📍 Kazanchis</button>
                             <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(8.9880, 38.7420, 'Old Airport')">📍 Old Airport</button>
                             <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(9.0250, 38.8350, 'CMC')">📍 CMC</button>
                             <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(7.0504, 38.4764, 'Hawassa')">📍 Hawassa</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 11px; border-radius: 14px;" onclick="jumpPostModalMap(8.7523, 38.9785, 'Bishoftu')">📍 Bishoftu</button>
                         </div>
 
-                        <div id="modalPostPickerMap" style="height: 220px; border-radius: 8px; border: 1px solid var(--border-color); background: #e2e8f0;"></div>
+                        <div id="modalPostPickerMap" style="height: 220px; border-radius: 10px; border: 1px solid var(--border-color); background: #e2e8f0;"></div>
 
                         <!-- Accepted Coordinates Badge -->
                         <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 8px 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <span>📍</span>
                                 <div>
-                                    <strong style="color: #065f46;">Location Accepted:</strong>
+                                    <strong style="color: #065f46;">Location Coordinates:</strong>
                                     <span id="postModalAcceptedCoords" style="color: #047857; font-weight: 700;">9.010800, 38.761300</span>
                                 </div>
                             </div>
-                            <span style="font-size: 11px; color: #047857;">✓ Coordinates saved</span>
+                            <span style="font-size: 11px; color: #047857;">✓ Coordinates attached</span>
                         </div>
                         <input type="hidden" id="newLat" value="9.0108">
                         <input type="hidden" id="newLng" value="38.7613">
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label class="form-label" for="newDesc">Description</label>
-                        <textarea id="newDesc" rows="3" class="form-input" style="height: auto;" placeholder="Highlight main features, parking, neighborhood amenities..."></textarea>
+                        <label class="form-label" for="newDesc">Listing Description & Amenities</label>
+                        <textarea id="newDesc" rows="3" class="form-input" style="height: auto;" placeholder="Detail title deeds, Italian kitchen, security compound, 3-phase power, water reserve..."></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="width: 100%;">
-                        Submit & Publish Listing &rarr;
-                    </button>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <button type="submit" id="btnPostSubmit" class="btn btn-primary btn-lg" style="flex: 1; min-width: 170px; background: #0866ff; color: #ffffff; border: none; font-weight: 800; border-radius: 10px; padding: 12px 18px; box-shadow: 0 4px 14px rgba(8, 102, 255, 0.35);">
+                            💾 Publish Listing
+                        </button>
+                        <button type="button" id="btnPostDelete" class="btn btn-danger btn-lg" onclick="handleDeleteFromEditor()" style="display: none; background: #ef4444; color: #fff; border: none; font-weight: 700; border-radius: 10px; padding: 12px 18px;">
+                            🗑️ Delete Listing
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-lg" onclick="closeModal()" style="border-radius: 10px; padding: 12px 18px;">
+                            Cancel
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -3555,7 +3543,70 @@
     let properties = [...initialProperties];
     let currentTabFilter = "";
 
+    function loadStoredProperties() {
+      try {
+        const stored = localStorage.getItem('estate_craft_custom_properties');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            properties = parsed;
+          }
+        }
+      } catch (e) {
+        console.warn("Could not load local custom properties", e);
+      }
+
+      // Live fetch from backend MySQL database via api/properties.php
+      fetch('api/properties.php')
+        .then(r => {
+          if (!r.ok) return null;
+          return r.json();
+        })
+        .then(data => {
+          if (data && data.success && Array.isArray(data.properties) && data.properties.length > 0) {
+            const apiProps = data.properties.map(p => ({
+              id: parseInt(p.id),
+              title: p.title,
+              purpose: p.purpose || 'sale',
+              type: p.property_type || 'villa',
+              price: parseFloat(p.price) || 0,
+              priceFrequency: p.price_frequency || (p.purpose === 'rent' ? 'monthly' : 'total'),
+              city: p.city || 'Addis Ababa, Ethiopia',
+              bedrooms: parseInt(p.bedrooms) || 3,
+              bathrooms: parseInt(p.bathrooms) || 2,
+              areaSqft: parseInt(p.area_sqft) || 2000,
+              image: p.image_url || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
+              sellerName: p.seller_name || 'Abdi Habtamu (Chief Admin)',
+              sellerRole: 'admin',
+              sellerPhone: p.seller_phone || '+251 91 100 1122',
+              sellerVerified: true,
+              hasBroker: false,
+              brokerFee: 'Zero Broker Fees (Admin Listing)',
+              description: p.description || '',
+              latitude: parseFloat(p.latitude) || 9.0108,
+              longitude: parseFloat(p.longitude) || 38.7613,
+              featured: Boolean(p.featured)
+            }));
+
+            // Merge API listings with initial static listings
+            const apiIds = new Set(apiProps.map(p => p.id));
+            properties = [...apiProps, ...initialProperties.filter(p => !apiIds.has(p.id))];
+            try {
+              localStorage.setItem('estate_craft_custom_properties', JSON.stringify(properties));
+            } catch (e) {}
+            renderProperties(properties);
+            if (typeof updateMapMarkers === 'function') {
+              updateMapMarkers(properties);
+            }
+          }
+        })
+        .catch(err => {
+          // Running static preview or API unreachable
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+      loadStoredProperties();
       initTheme();
       initLanguage();
       updateFavBadge();
@@ -3650,6 +3701,7 @@
       const grid = document.getElementById('propertyGrid');
       if (!grid) return;
 
+      const isViewerAdmin = checkIsAdminUser();
       updatePillCounts();
 
       if (list.length === 0) {
@@ -3679,6 +3731,7 @@
                 ${capitalize(prop.type)}
               </span>
               ${prop.featured ? `<span class="badge badge-featured">⭐ Featured</span>` : ''}
+              ${isViewerAdmin ? `<span class="badge" style="background: rgba(8, 102, 255, 0.9); color: #ffffff; font-weight: 800; font-size: 10px; border-radius: 6px; box-shadow: 0 2px 6px rgba(8, 102, 255, 0.35);">🛡️ Admin</span>` : ''}
             </div>
             <div class="card-price-tag">
               ${formatDisplayPrice(prop.price)}
@@ -3737,7 +3790,15 @@
                 </div>
               </div>
 
-              <div style="display: flex; gap: 6px; align-items: center;">
+              <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                ${isViewerAdmin ? `
+                  <button type="button" class="btn btn-sm btn-secondary" onclick="openPostModal(${prop.id}); event.stopPropagation();" title="Edit Listing (Admin)" style="padding: 4px 8px; font-size: 11.5px; font-weight: 700; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                    ✏️ Edit
+                  </button>
+                  <button type="button" class="btn btn-sm btn-danger" onclick="deletePropertyAdmin(${prop.id}); event.stopPropagation();" title="Delete Listing (Admin)" style="padding: 4px 8px; font-size: 11.5px; font-weight: 700; border-radius: 6px; background: #ef4444; color: #ffffff; border: none; cursor: pointer;">
+                    🗑️
+                  </button>
+                ` : ''}
                 <button type="button" class="btn btn-sm" onclick="openChatForProperty(${prop.id}); event.stopPropagation();" title="Chat with Admin about this home" style="background: #0866ff; color: #ffffff; padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
                   💬 Chat
                 </button>
@@ -3895,7 +3956,29 @@
       const content = document.getElementById('modalContent');
       if (!modal || !content) return;
 
+      const isViewerAdmin = checkIsAdminUser();
+
       content.innerHTML = `
+        ${isViewerAdmin ? `
+          <div style="background: linear-gradient(135deg, rgba(8, 102, 255, 0.08), rgba(16, 185, 129, 0.08)); border: 1px solid rgba(8, 102, 255, 0.3); border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 20px;">🛡️</span>
+              <div>
+                <strong style="color: #0866ff; font-size: 13.5px;">Chief Admin Studio Mode (Abdi Habtamu)</strong>
+                <div style="color: var(--text-muted); font-size: 11.5px;">You have full role-based permissions to update details, pin coordinates, or permanently remove this post.</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal(); openPostModal(${prop.id});" style="font-weight: 700; padding: 6px 12px; font-size: 12px; border-radius: 8px;">
+                ✏️ Edit Listing
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" onclick="deletePropertyAdmin(${prop.id});" style="font-weight: 700; padding: 6px 12px; font-size: 12px; background: #ef4444; color: #fff; border: none; border-radius: 8px;">
+                🗑️ Delete Listing
+              </button>
+            </div>
+          </div>
+        ` : ''}
+
         <div style="position: relative; height: 300px; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
           <img src="${prop.image}" alt="${escapeHtml(prop.title)}" style="width: 100%; height: 100%; object-fit: cover;">
           <div style="position: absolute; top: 16px; left: 16px; display: flex; gap: 8px;">
@@ -3959,6 +4042,14 @@
           </div>
 
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            ${isViewerAdmin ? `
+              <button type="button" class="btn btn-warning" onclick="closeModal(); openPostModal(${prop.id});" style="background: #f59e0b; color: #fff; border: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 9px 14px; border-radius: 8px;">
+                ✏️ Edit Listing
+              </button>
+              <button type="button" class="btn btn-danger" onclick="deletePropertyAdmin(${prop.id});" style="background: #ef4444; color: #fff; border: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 9px 14px; border-radius: 8px;">
+                🗑️ Delete
+              </button>
+            ` : ''}
             <button type="button" class="btn btn-primary" onclick="openChatForProperty(${prop.id})" style="background: #0866ff; color: #ffffff; border: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 9px 16px; border-radius: 8px; box-shadow: 0 3px 10px rgba(8, 102, 255, 0.3);">
               <span>💬</span>
               <span>Chat with Admin</span>
@@ -3981,20 +4072,154 @@
     let postPickerMapInstance = null;
     let postPickerMarkerInstance = null;
 
-    function openPostModal() {
-      const postModal = document.getElementById('postPropertyModal');
-      if (postModal) {
-        postModal.classList.add('active');
-        setTimeout(initPostModalMap, 250);
+    function updatePriceFrequencyOptions() {
+      const purpose = document.getElementById('newPurpose') ? document.getElementById('newPurpose').value : 'sale';
+      const freqSelect = document.getElementById('newFrequency');
+      if (!freqSelect) return;
+      if (purpose === 'rent') {
+        freqSelect.innerHTML = `
+          <option value="monthly">Monthly Rent (/month)</option>
+          <option value="yearly">Yearly Lease (/year)</option>
+          <option value="total">Full Contract Period</option>
+        `;
+      } else {
+        freqSelect.innerHTML = `
+          <option value="total">Total Price (Full Sale)</option>
+          <option value="yearly">Annual Installments</option>
+        `;
       }
+    }
+
+    function openChatForListingIntent() {
+      closeModal();
+      if (typeof openChatModal === 'function') {
+        openChatModal();
+        setTimeout(() => {
+          const input = document.getElementById('chatInput');
+          if (input) {
+            input.value = "Hello Admin Abdi, I would like to submit my property for verified listing on EstateCraft:\n- Location: \n- Property Type (Villa/Apartment/Land): \n- Purpose (Sale/Rent): \n- Asking Price (ETB): \n- Phone Number: ";
+            input.focus();
+          }
+        }, 350);
+      }
+    }
+
+    function openPostModal(editId = null) {
+      const isAdmin = checkIsAdminUser();
+
+      // Strict role-based check: non-admins are routed to verified listing notice modal
+      if (!isAdmin) {
+        closeModal();
+        const notice = document.getElementById('nonAdminPostNoticeModal');
+        if (notice) notice.classList.add('active');
+        return;
+      }
+
+      const postModal = document.getElementById('postPropertyModal');
+      if (!postModal) return;
+
+      const titleEl = document.getElementById('postModalHeaderTitle');
+      const submitBtn = document.getElementById('btnPostSubmit');
+      const deleteBtn = document.getElementById('btnPostDelete');
+      const editIdInput = document.getElementById('editPropId');
+
+      if (editId) {
+        const prop = properties.find(p => p.id === parseInt(editId));
+        if (prop) {
+          if (editIdInput) editIdInput.value = prop.id;
+          if (titleEl) titleEl.textContent = `✏️ Edit Listing #${prop.id} (Admin Studio)`;
+          if (submitBtn) {
+            submitBtn.textContent = '💾 Save Listing Changes';
+            submitBtn.disabled = false;
+          }
+          if (deleteBtn) deleteBtn.style.display = 'inline-block';
+
+          const titleInput = document.getElementById('newTitle');
+          const purposeSelect = document.getElementById('newPurpose');
+          const typeSelect = document.getElementById('newType');
+          const priceInput = document.getElementById('newPrice');
+          const freqSelect = document.getElementById('newFrequency');
+          const cityInput = document.getElementById('newCity');
+          const imgInput = document.getElementById('newImageUrl');
+          const bedsInput = document.getElementById('newBeds');
+          const bathsInput = document.getElementById('newBaths');
+          const sqftInput = document.getElementById('newSqft');
+          const descInput = document.getElementById('newDesc');
+          const latInput = document.getElementById('newLat');
+          const lngInput = document.getElementById('newLng');
+          const coordsBadge = document.getElementById('postModalAcceptedCoords');
+
+          if (titleInput) titleInput.value = prop.title || '';
+          if (purposeSelect) {
+            purposeSelect.value = prop.purpose || 'sale';
+            updatePriceFrequencyOptions();
+          }
+          if (typeSelect) typeSelect.value = prop.type || 'villa';
+          if (priceInput) priceInput.value = prop.price || '';
+          if (freqSelect) freqSelect.value = prop.priceFrequency || 'total';
+          if (cityInput) cityInput.value = prop.city || '';
+          if (imgInput) imgInput.value = prop.image || '';
+          if (bedsInput) bedsInput.value = prop.bedrooms ?? 3;
+          if (bathsInput) bathsInput.value = prop.bathrooms ?? 2;
+          if (sqftInput) sqftInput.value = prop.areaSqft ?? 1800;
+          if (descInput) descInput.value = prop.description || '';
+
+          const lat = parseFloat(prop.latitude) || 9.0108;
+          const lng = parseFloat(prop.longitude) || 38.7613;
+          if (latInput) latInput.value = lat.toFixed(6);
+          if (lngInput) lngInput.value = lng.toFixed(6);
+          if (coordsBadge) coordsBadge.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+          postModal.classList.add('active');
+          setTimeout(() => {
+            initPostModalMap();
+            if (postPickerMapInstance && postPickerMarkerInstance) {
+              postPickerMapInstance.setView([lat, lng], 14);
+              postPickerMarkerInstance.setLatLng([lat, lng]);
+            }
+          }, 250);
+          return;
+        }
+      }
+
+      // Create New Listing Mode
+      if (editIdInput) editIdInput.value = '';
+      if (titleEl) titleEl.textContent = '✨ Post a Property Listing (Admin)';
+      if (submitBtn) {
+        submitBtn.textContent = '💾 Publish Listing';
+        submitBtn.disabled = false;
+      }
+      if (deleteBtn) deleteBtn.style.display = 'none';
+
+      const form = document.getElementById('postPropForm');
+      if (form) form.reset();
+      updatePriceFrequencyOptions();
+
+      const defaultLat = 9.0108;
+      const defaultLng = 38.7613;
+      const latInput = document.getElementById('newLat');
+      const lngInput = document.getElementById('newLng');
+      const coordsBadge = document.getElementById('postModalAcceptedCoords');
+      if (latInput) latInput.value = defaultLat.toFixed(6);
+      if (lngInput) lngInput.value = defaultLng.toFixed(6);
+      if (coordsBadge) coordsBadge.textContent = `${defaultLat.toFixed(6)}, ${defaultLng.toFixed(6)}`;
+
+      postModal.classList.add('active');
+      setTimeout(() => {
+        initPostModalMap();
+        if (postPickerMapInstance && postPickerMarkerInstance) {
+          postPickerMapInstance.setView([defaultLat, defaultLng], 13);
+          postPickerMarkerInstance.setLatLng([defaultLat, defaultLng]);
+        }
+      }, 250);
     }
 
     function initPostModalMap() {
       const mapEl = document.getElementById('modalPostPickerMap');
       if (!mapEl || typeof L === 'undefined') return;
 
-      const defaultLat = 9.0108;
-      const defaultLng = 38.7613;
+      const defaultLat = parseFloat(document.getElementById('newLat') ? document.getElementById('newLat').value : 9.0108) || 9.0108;
+      const defaultLng = parseFloat(document.getElementById('newLng') ? document.getElementById('newLng').value : 38.7613) || 38.7613;
 
       if (!postPickerMapInstance) {
         postPickerMapInstance = L.map('modalPostPickerMap', {
@@ -4079,50 +4304,229 @@
       });
     }
 
-    function handlePostProperty(event) {
+    async function handlePostProperty(event) {
       event.preventDefault();
-      const title = document.getElementById('newTitle').value.trim();
-      const purpose = document.getElementById('newPurpose').value;
-      const type = document.getElementById('newType').value;
-      const price = parseFloat(document.getElementById('newPrice').value) || 0;
-      const city = document.getElementById('newCity').value.trim();
-      const beds = parseInt(document.getElementById('newBeds').value) || 1;
-      const baths = parseInt(document.getElementById('newBaths').value) || 1;
-      const sqft = parseInt(document.getElementById('newSqft').value) || 1000;
-      const desc = document.getElementById('newDesc').value.trim();
+
+      const isAdmin = checkIsAdminUser();
+      if (!isAdmin) {
+        closeModal();
+        const notice = document.getElementById('nonAdminPostNoticeModal');
+        if (notice) notice.classList.add('active');
+        return;
+      }
+
+      const submitBtn = document.getElementById('btnPostSubmit');
+      const origBtnText = submitBtn ? submitBtn.textContent : 'Publish';
+
+      const editId = (document.getElementById('editPropId') ? document.getElementById('editPropId').value.trim() : '');
+      const isEditing = Boolean(editId);
+
+      const title = (document.getElementById('newTitle') ? document.getElementById('newTitle').value.trim() : '');
+      const purpose = (document.getElementById('newPurpose') ? document.getElementById('newPurpose').value : 'sale');
+      const type = (document.getElementById('newType') ? document.getElementById('newType').value : 'villa');
+      const price = parseFloat(document.getElementById('newPrice') ? document.getElementById('newPrice').value : 0) || 0;
+      const frequency = (document.getElementById('newFrequency') ? document.getElementById('newFrequency').value : (purpose === 'rent' ? 'monthly' : 'total'));
+      const city = (document.getElementById('newCity') ? document.getElementById('newCity').value.trim() : '');
+      const beds = parseInt(document.getElementById('newBeds') ? document.getElementById('newBeds').value : 1) || 0;
+      const baths = parseInt(document.getElementById('newBaths') ? document.getElementById('newBaths').value : 1) || 0;
+      const sqft = parseInt(document.getElementById('newSqft') ? document.getElementById('newSqft').value : 1000) || 0;
+      const imageUrl = (document.getElementById('newImageUrl') ? document.getElementById('newImageUrl').value.trim() : '');
+      const desc = (document.getElementById('newDesc') ? document.getElementById('newDesc').value.trim() : '');
       const lat = parseFloat(document.getElementById('newLat') ? document.getElementById('newLat').value : 9.0108) || 9.0108;
       const lng = parseFloat(document.getElementById('newLng') ? document.getElementById('newLng').value : 38.7613) || 38.7613;
 
-      const newProp = {
-        id: Date.now(),
-        title: title || "Modern Property",
-        purpose: purpose,
-        type: type,
-        price: price,
-        priceFrequency: purpose === 'rent' ? 'monthly' : 'total',
-        city: city || "Addis Ababa, Ethiopia",
-        bedrooms: beds,
-        bathrooms: baths,
-        areaSqft: sqft,
-        latitude: lat,
-        longitude: lng,
-        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80",
-        sellerName: localStorage.getItem('estate_craft_user_name') || "Direct Property Owner",
-        sellerRole: "user",
-        sellerPhone: "+251 91 000 0000",
-        sellerVerified: true,
-        hasBroker: false,
-        brokerFee: "Zero Broker Fees (Direct Owner)",
-        description: desc || "Newly listed property in Ethiopia."
-      };
+      // Input Validation
+      if (title.length < 5) {
+        alert("Please enter a descriptive property title (at least 5 characters).");
+        return;
+      }
+      if (price <= 0) {
+        alert("Please specify a valid price greater than zero.");
+        return;
+      }
+      if (!city) {
+        alert("Please enter a city or neighborhood location.");
+        return;
+      }
 
-      properties.unshift(newProp);
+      // Loading state on button
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `⏳ <span>${isEditing ? 'Saving Changes...' : 'Publishing Listing...'}</span>`;
+      }
+
+      const finalImage = imageUrl || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80";
+
+      // 1. Update in-memory property array
+      if (isEditing) {
+        const pIndex = properties.findIndex(p => p.id === parseInt(editId));
+        if (pIndex !== -1) {
+          properties[pIndex] = {
+            ...properties[pIndex],
+            title: title,
+            purpose: purpose,
+            type: type,
+            price: price,
+            priceFrequency: frequency,
+            city: city,
+            bedrooms: beds,
+            bathrooms: baths,
+            areaSqft: sqft,
+            image: finalImage,
+            description: desc,
+            latitude: lat,
+            longitude: lng,
+            sellerName: "Abdi Habtamu (Chief Admin)",
+            sellerRole: "admin",
+            sellerVerified: true
+          };
+        }
+      } else {
+        const newProp = {
+          id: Date.now(),
+          title: title,
+          purpose: purpose,
+          type: type,
+          price: price,
+          priceFrequency: frequency,
+          city: city,
+          bedrooms: beds,
+          bathrooms: baths,
+          areaSqft: sqft,
+          latitude: lat,
+          longitude: lng,
+          image: finalImage,
+          sellerName: "Abdi Habtamu (Chief Admin)",
+          sellerRole: "admin",
+          sellerPhone: "+251 91 100 1122",
+          sellerVerified: true,
+          hasBroker: false,
+          brokerFee: "Zero Broker Fees (Admin Listing)",
+          description: desc || "Exclusive verified property listing.",
+          featured: true
+        };
+        properties.unshift(newProp);
+      }
+
+      // Persist custom properties locally
+      try {
+        localStorage.setItem('estate_craft_custom_properties', JSON.stringify(properties));
+      } catch (e) {}
+
+      // 2. Asynchronous backend API sync (RBAC verified on server)
+      try {
+        const adminEmail = (localStorage.getItem('estate_craft_user_email') || 'abdihabtamu368@gmail.com').toLowerCase().trim();
+        const formData = new FormData();
+        formData.append('admin_email', adminEmail);
+        formData.append('title', title);
+        formData.append('purpose', purpose);
+        formData.append('property_type', type);
+        formData.append('price', price);
+        formData.append('price_frequency', frequency);
+        formData.append('bedrooms', beds);
+        formData.append('bathrooms', baths);
+        formData.append('area_sqft', sqft);
+        formData.append('city', city);
+        formData.append('address', city);
+        formData.append('latitude', lat);
+        formData.append('longitude', lng);
+        formData.append('description', desc);
+        formData.append('image_url', finalImage);
+
+        if (isEditing) {
+          formData.append('action', 'edit');
+          formData.append('id', editId);
+        }
+
+        const resp = await fetch('api/properties.php', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'X-Admin-Email': adminEmail
+          },
+          body: formData
+        });
+
+        if (resp.status === 403) {
+          const errData = await resp.json().catch(() => ({}));
+          alert(errData.message || "Access Denied: Only administrator Abdi Habtamu can create or edit listings.");
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = origBtnText;
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn("API properties sync offline/standalone mode:", err);
+      }
+
+      // Refresh UI components
+      renderProperties(properties);
+      if (typeof updateMapMarkers === 'function') {
+        updateMapMarkers(properties);
+      }
+
+      closeModal();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
+      }
+
+      showToast(isEditing ? "💾 Listing updated successfully!" : "🎉 Property published successfully by Admin!");
+    }
+
+    async function handleDeleteFromEditor() {
+      const editId = document.getElementById('editPropId') ? document.getElementById('editPropId').value.trim() : '';
+      if (!editId) return;
+      await deletePropertyAdmin(parseInt(editId));
+    }
+
+    async function deletePropertyAdmin(propId) {
+      const isAdmin = checkIsAdminUser();
+      if (!isAdmin) {
+        alert("Access Denied: Only administrator Abdi Habtamu can delete listings.");
+        return;
+      }
+
+      const prop = properties.find(p => p.id === propId);
+      const title = prop ? prop.title : `Listing #${propId}`;
+
+      if (!confirm(`Are you sure you want to permanently delete '${title}'? This action cannot be undone.`)) {
+        return;
+      }
+
+      // 1. Remove from local array
+      properties = properties.filter(p => p.id !== propId);
+      try {
+        localStorage.setItem('estate_craft_custom_properties', JSON.stringify(properties));
+      } catch (e) {}
+
       renderProperties(properties);
       if (typeof updateMapMarkers === 'function') {
         updateMapMarkers(properties);
       }
       closeModal();
-      showToast("🎉 Property published with exact map location accepted!");
+      showToast(`🗑️ Listing '${title}' deleted successfully.`);
+
+      // 2. Server API deletion with RBAC
+      try {
+        const adminEmail = (localStorage.getItem('estate_craft_user_email') || 'abdihabtamu368@gmail.com').toLowerCase().trim();
+        const formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('id', propId);
+        formData.append('admin_email', adminEmail);
+
+        await fetch('api/properties.php', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'X-Admin-Email': adminEmail
+          },
+          body: formData
+        });
+      } catch (err) {
+        console.warn("Backend deletion offline/standalone mode:", err);
+      }
     }
 
     let staticMarkersLayer = null;
@@ -4959,12 +5363,28 @@
 
       // Admin button: strictly restricted to abdihabtamu368@gmail.com
       const btnAdmin = document.getElementById('btnNavAdmin');
+      const isAdminUser = checkIsAdminUser();
       if (btnAdmin) {
-        const storedEmail = (localStorage.getItem('estate_craft_user_email') || '').toLowerCase().trim();
-        const storedName = (localStorage.getItem('estate_craft_user_name') || '').toLowerCase().trim();
-        const isAdmin = isLoggedIn && (storedEmail === 'abdihabtamu368@gmail.com' || storedName === 'abdi habtamu' || storedName === 'abdi');
-        btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+        btnAdmin.style.display = (isLoggedIn && isAdminUser) ? 'inline-flex' : 'none';
       }
+
+      // Post Property button customization based on Admin status
+      const navPostBtns = document.querySelectorAll('.btn-nav-post');
+      navPostBtns.forEach(btn => {
+        if (isAdminUser) {
+          btn.innerHTML = `
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ Post Property (Admin)</span>
+          `;
+          btn.title = "Admin Listing Studio (Publish & Edit)";
+        } else {
+          btn.innerHTML = `
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ Post Property</span>
+          `;
+          btn.title = "Submit Property for Administrator Verification";
+        }
+      });
 
       updateVerificationBadgeUI();
 

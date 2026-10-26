@@ -27,10 +27,11 @@ if (!$property) {
     exit;
 }
 
-$isSuperAdmin = (strtolower(trim($user['email'] ?? '')) === 'abdihabtamu368@gmail.com');
-if ($property['user_id'] != $user['id'] && !$isSuperAdmin) {
-    $_SESSION['flash_error'] = "You are not authorized to delete this property listing.";
-    header("Location: " . BASE_URL . "/user/dashboard.php");
+$isSuperAdmin = (strtolower(trim($user['email'] ?? '')) === 'abdihabtamu368@gmail.com' || ($user['role'] ?? '') === 'admin');
+if (!$isSuperAdmin) {
+    http_response_code(403);
+    $_SESSION['flash_error'] = "Access denied: Only administrator Abdi Habtamu can delete property listings.";
+    header("Location: " . BASE_URL . "/properties/index.php");
     exit;
 }
 

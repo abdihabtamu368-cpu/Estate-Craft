@@ -13,13 +13,14 @@ require_once __DIR__ . '/../includes/upload.php';
 $user = requireAuth();
 $pdo = getDB();
 
-$isAdmin = (strtolower(trim($user['email'] ?? '')) === 'abdihabtamu368@gmail.com');
+$isAdmin = (strtolower(trim($user['email'] ?? '')) === 'abdihabtamu368@gmail.com' || ($user['role'] ?? '') === 'admin');
 $error = '';
 $activePage = 'sell';
 
-// Security check: Only abdihabtamu368@gmail.com can directly post properties
-if (!$isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_SESSION['flash_error'] = "Only administrator abdihabtamu368@gmail.com can publish property listings directly. Please chat with Admin Abdi to submit your listing for Sale, Buy, or Rent.";
+// Security check: Only administrators can create property listings (GET & POST)
+if (!$isAdmin) {
+    http_response_code(403);
+    $_SESSION['flash_error'] = "Access denied: Only administrator Abdi Habtamu (abdihabtamu368@gmail.com) can publish property listings directly. Please chat with Admin Abdi to submit your listing for verification.";
     header("Location: " . BASE_URL . "/chat.php?intent=list_property");
     exit;
 }
