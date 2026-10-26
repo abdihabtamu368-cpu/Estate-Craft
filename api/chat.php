@@ -364,6 +364,28 @@ try {
         exit;
     }
 
+    // -------------------------------------------------------------------------
+    // ACTION: mark_as_read
+    // -------------------------------------------------------------------------
+    if ($action === 'mark_as_read') {
+        $convId = (int)($_POST['conversation_id'] ?? ($_GET['conversation_id'] ?? 0));
+        if ($convId > 0) {
+            if ($isAdmin) {
+                $pdo->prepare("UPDATE chat_messages SET is_read = 1 WHERE conversation_id = :cid AND sender_role = 'user'")
+                    ->execute(['cid' => $convId]);
+                $pdo->prepare("UPDATE chat_conversations SET admin_unread_count = 0 WHERE id = :cid")
+                    ->execute(['cid' => $convId]);
+            } else {
+                $pdo->prepare("UPDATE chat_messages SET is_read = 1 WHERE conversation_id = :cid AND sender_role = 'admin'")
+                    ->execute(['cid' => $convId]);
+                $pdo->prepare("UPDATE chat_conversations SET user_unread_count = 0 WHERE id = :cid AND user_id = :uid")
+                    ->execute(['cid' => $convId, 'uid' => $currentUserId]);
+            }
+        }
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
     echo json_encode(['success' => false, 'error' => 'invalid_action']);
 } catch (Exception $e) {
     http_response_code(500);
