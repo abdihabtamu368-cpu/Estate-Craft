@@ -2429,20 +2429,23 @@
             <!-- Modal Header -->
             <div class="modal-header" style="background: var(--bg-card); padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #0866ff; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0;">
+                    <div id="modalChatHeaderAvatar" style="width: 40px; height: 40px; border-radius: 50%; background: #0866ff; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0;">
                         A
                     </div>
                     <div>
                         <div style="display: flex; align-items: center; gap: 6px;">
-                            <strong style="font-size: 15px; color: var(--text-main);">Abdi Habtamu</strong>
-                            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 10.5px; border: 1px solid rgba(16, 185, 129, 0.4);">🛡️ Admin</span>
+                            <strong id="modalChatHeaderName" style="font-size: 15px; color: var(--text-main);">Abdi Habtamu</strong>
+                            <span id="modalChatHeaderBadge" class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 10.5px; border: 1px solid rgba(16, 185, 129, 0.4);">🛡️ Admin</span>
                         </div>
-                        <div style="font-size: 11.5px; color: var(--text-muted);">
+                        <div id="modalChatHeaderSub" style="font-size: 11.5px; color: var(--text-muted);">
                             abdihabtamu368@gmail.com &bull; <span style="color: #10b981; font-weight: 600;">● Active</span>
                         </div>
                     </div>
                 </div>
-                <button type="button" class="modal-close" onclick="closeChatModal()" style="font-size: 24px; background: none; border: none; cursor: pointer; color: var(--text-muted);">&times;</button>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <button type="button" onclick="clearModalChatHistory()" title="Clear Chat History" style="background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 14px; padding: 4px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text-muted)'">🗑️</button>
+                    <button type="button" class="modal-close" onclick="closeChatModal()" style="font-size: 24px; background: none; border: none; cursor: pointer; color: var(--text-muted);">&times;</button>
+                </div>
             </div>
 
             <!-- Attached Property Card in Modal -->
@@ -6000,7 +6003,10 @@
     function getChatHistory() {
       try {
         const data = localStorage.getItem(CHAT_STORAGE_KEY);
-        if (data) return JSON.parse(data);
+        if (data) {
+          const parsed = JSON.parse(data);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
       } catch (e) {}
 
       return [
@@ -6021,24 +6027,105 @@
       } catch (e) {}
     }
 
+    function clearModalChatHistory() {
+      if (confirm("Reset conversation history with Admin Abdi Habtamu?")) {
+        localStorage.removeItem(CHAT_STORAGE_KEY);
+        renderModalChatMessages();
+        showToast("🧹 Chat history cleared.");
+      }
+    }
+
+    function setChatTemplate(type) {
+      const input = document.getElementById('modalChatInput');
+      if (!input) return;
+      const userEmail = (localStorage.getItem('estate_craft_user_email') || '').toLowerCase().trim();
+      const isViewerAdmin = (userEmail === 'abdihabtamu368@gmail.com');
+
+      if (isViewerAdmin) {
+        if (type === 'sale') input.value = "Hello! To list your property for sale on EstateCraft, please submit your title deed or verification documents.";
+        else if (type === 'rent') input.value = "Hello! For rental listings, our admin team verifies the property and coordinates verified tenant visits.";
+        else if (type === 'buy') input.value = "Hello! We have several verified residential and commercial listings matching your criteria in Addis Ababa.";
+      } else {
+        if (type === 'sale') input.value = "Hello Admin Abdi, I would like to list my property for SALE. How do I get verified and featured?";
+        else if (type === 'rent') input.value = "Hello Admin Abdi, I have a property available for RENT. Can you guide me through listing it?";
+        else if (type === 'buy') input.value = "Hello Admin Abdi, I am looking to BUY a verified home in Addis Ababa. Can you recommend available listings?";
+      }
+      input.focus();
+    }
+
+    async function syncBackendChatMessages(propId = null) {
+      try {
+        let url = getApiUrl('chat.php') + '?action=get_conversation';
+        const pid = propId || window.activeModalChatPropId;
+        if (pid) url += '&property_id=' + pid;
+
+        const res = await fetch(url, { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success && Array.isArray(data.messages) && data.messages.length > 0) {
+            const remoteHistory = data.messages.map(m => ({
+              id: m.id,
+              sender: m.sender_role,
+              name: m.sender_name || (m.sender_role === 'admin' ? 'Abdi Habtamu' : 'Client'),
+              role: m.sender_role,
+              message: m.message,
+              propertyTitle: (data.property && data.property.title) || null,
+              propertyPrice: (data.property && ('ETB ' + Number(data.property.price).toLocaleString())) || null,
+              time: m.created_at
+            }));
+            saveChatHistory(remoteHistory);
+            renderModalChatMessages();
+          }
+        }
+      } catch (err) {
+        // Backend offline / static mode: local storage handles conversation
+      }
+    }
+
     function openChatModal(propId = null) {
       window.activeModalChatPropId = propId;
       const modal = document.getElementById('chatModal');
       if (!modal) return;
+
+      const userEmail = (localStorage.getItem('estate_craft_user_email') || '').toLowerCase().trim();
+      const isViewerAdmin = (userEmail === 'abdihabtamu368@gmail.com');
+
+      // Update header elements based on whether Admin or Client is viewing
+      const nameEl = document.getElementById('modalChatHeaderName');
+      const badgeEl = document.getElementById('modalChatHeaderBadge');
+      const subEl = document.getElementById('modalChatHeaderSub');
+      const inputEl = document.getElementById('modalChatInput');
+
+      if (isViewerAdmin) {
+        if (nameEl) nameEl.textContent = 'Client Inquiry Channel';
+        if (badgeEl) badgeEl.textContent = '👤 Active Inquiring Client';
+        if (subEl) subEl.innerHTML = 'Replying as <strong style="color: #10b981;">Abdi Habtamu (Chief Admin)</strong>';
+        if (inputEl) inputEl.placeholder = 'Reply to client as Admin Abdi Habtamu...';
+      } else {
+        if (nameEl) nameEl.textContent = 'Abdi Habtamu';
+        if (badgeEl) badgeEl.textContent = '🛡️ Admin';
+        if (subEl) subEl.innerHTML = 'abdihabtamu368@gmail.com &bull; <span style="color: #10b981; font-weight: 600;">● Active</span>';
+        if (inputEl) inputEl.placeholder = 'Type message to Admin Abdi Habtamu...';
+      }
 
       const attachedBanner = document.getElementById('modalChatAttachedProp');
       if (propId && properties) {
         const prop = properties.find(p => p.id === parseInt(propId));
         if (prop && attachedBanner) {
           attachedBanner.style.display = 'block';
-          document.getElementById('modalChatPropImg').src = prop.image;
-          document.getElementById('modalChatPropTitle').textContent = prop.title;
-          document.getElementById('modalChatPropPrice').textContent = `ETB ${formatNumber(prop.price)}`;
-          document.getElementById('modalChatPropLoc').textContent = prop.city;
+          const imgEl = document.getElementById('modalChatPropImg');
+          if (imgEl) imgEl.src = prop.image;
+          const titleEl = document.getElementById('modalChatPropTitle');
+          if (titleEl) titleEl.textContent = prop.title;
+          const priceEl = document.getElementById('modalChatPropPrice');
+          if (priceEl) priceEl.textContent = `ETB ${formatNumber(prop.price)}`;
+          const locEl = document.getElementById('modalChatPropLoc');
+          if (locEl) locEl.textContent = prop.city;
 
-          const input = document.getElementById('modalChatInput');
-          if (input && !input.value) {
-            input.value = `Hello Admin Abdi, I am interested in ${prop.title} (${prop.city}). Could you share more details or schedule a viewing?`;
+          if (inputEl && !inputEl.value) {
+            inputEl.value = isViewerAdmin
+              ? `Hello! Regarding "${prop.title}", how can I assist you with scheduling a viewing?`
+              : `Hello Admin Abdi, I am interested in ${prop.title} (${prop.city}). Could you share more details or schedule a viewing?`;
           }
         }
       } else if (attachedBanner) {
@@ -6048,8 +6135,10 @@
       renderModalChatMessages();
       modal.classList.add('active');
 
-      const input = document.getElementById('modalChatInput');
-      if (input) setTimeout(() => input.focus(), 200);
+      // Attempt to sync latest messages from backend
+      syncBackendChatMessages(propId);
+
+      if (inputEl) setTimeout(() => inputEl.focus(), 200);
     }
 
     function openChatForProperty(propId) {
@@ -6067,20 +6156,35 @@
       if (!container) return;
       const history = getChatHistory();
 
+      const userEmail = (localStorage.getItem('estate_craft_user_email') || '').toLowerCase().trim();
+      const isViewerAdmin = (userEmail === 'abdihabtamu368@gmail.com');
+
       container.innerHTML = history.map(m => {
-        const isSent = (m.sender === 'user');
+        // If viewer is Admin, messages sent by Admin are on the right
+        // If viewer is Client, messages sent by Client are on the right
+        const isSent = isViewerAdmin
+          ? (m.sender === 'admin' || m.role === 'admin')
+          : (m.sender === 'user' || m.role === 'user');
+
         const d = new Date(m.time);
-        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const timeStr = !isNaN(d.getTime())
+          ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          : 'Now';
+
+        const displayName = isSent
+          ? 'You'
+          : escapeHtml(m.name || (m.role === 'admin' ? 'Abdi Habtamu' : 'Client'));
+        const isAdminRole = (m.role === 'admin' || m.sender === 'admin');
 
         return `
           <div style="display: flex; gap: 8px; max-width: 82%; align-self: ${isSent ? 'flex-end' : 'flex-start'}; flex-direction: ${isSent ? 'row-reverse' : 'row'};">
             <div style="padding: 10px 14px; border-radius: 16px; font-size: 13.5px; line-height: 1.45; word-break: break-word; ${isSent ? 'background: #0866ff; color: #ffffff; border-bottom-right-radius: 3px;' : 'background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-bottom-left-radius: 3px;'}">
               <div style="font-size: 11px; font-weight: 700; margin-bottom: 2px; opacity: 0.9; display: flex; align-items: center; gap: 4px;">
-                ${escapeHtml(m.name)}
-                ${m.role === 'admin' ? '<span style="background: rgba(16,185,129,0.2); color: #10b981; font-size: 9.5px; padding: 1px 5px; border-radius: 8px;">Admin</span>' : ''}
+                ${displayName}
+                ${isAdminRole ? '<span style="background: rgba(16,185,129,0.25); color: ' + (isSent ? '#d1fae5' : '#10b981') + '; font-size: 9.5px; padding: 1px 5px; border-radius: 8px;">Admin</span>' : ''}
               </div>
               ${m.propertyTitle ? `
-                <div style="font-size: 11.5px; font-weight: 700; background: rgba(0,0,0,0.06); padding: 4px 8px; border-radius: 6px; margin-bottom: 4px;">
+                <div style="font-size: 11.5px; font-weight: 700; background: ${isSent ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.06)'}; padding: 4px 8px; border-radius: 6px; margin-bottom: 4px;">
                   🏡 ${escapeHtml(m.propertyTitle)} (${escapeHtml(m.propertyPrice || '')})
                 </div>
               ` : ''}
@@ -6116,7 +6220,7 @@
 
       let linkedPropTitle = null;
       let linkedPropPrice = null;
-      if (window.activeModalChatPropId && properties) {
+      if (window.activeModalChatPropId && typeof properties !== 'undefined' && properties) {
         const prop = properties.find(p => p.id === parseInt(window.activeModalChatPropId));
         if (prop) {
           linkedPropTitle = prop.title;
@@ -6124,11 +6228,17 @@
         }
       }
 
+      const userEmail = (localStorage.getItem('estate_craft_user_email') || '').toLowerCase().trim();
+      const userName = localStorage.getItem('estate_craft_user_name') || 'Client';
+      const isViewerAdmin = (userEmail === 'abdihabtamu368@gmail.com');
+      const senderRole = isViewerAdmin ? 'admin' : 'user';
+      const senderName = isViewerAdmin ? 'Abdi Habtamu' : userName;
+
       const userMsg = {
         id: Date.now(),
-        sender: 'user',
-        name: (currentUser && currentUser.name) ? currentUser.name : 'You (Inquiring Client)',
-        role: 'user',
+        sender: senderRole,
+        name: senderName,
+        role: senderRole,
         message: text,
         propertyTitle: linkedPropTitle,
         propertyPrice: linkedPropPrice,
@@ -6139,39 +6249,67 @@
       saveChatHistory(history);
       renderModalChatMessages();
 
-      const typingEl = document.getElementById('modalChatTyping');
-      if (typingEl) typingEl.style.display = 'block';
-
-      setTimeout(() => {
-        if (typingEl) typingEl.style.display = 'none';
-
-        let adminReply = "Thank you for reaching out! I've noted your inquiry and our team is ready to assist you. What is your preferred day for viewing?";
-        const lower = text.toLowerCase();
-
-        if (linkedPropTitle) {
-          adminReply = `Hello! I have received your inquiry for "${linkedPropTitle}". This property is currently active and fully verified with our legal team. We can schedule a physical site inspection for you tomorrow afternoon or whenever convenient. Would you like me to reserve a viewing slot?`;
-        } else if (lower.includes('available') || lower.includes('still')) {
-          adminReply = "Yes, this listing is currently available and ready for viewing. All title deeds and broker disclosures have been pre-screened by EstateCraft moderation.";
-        } else if (lower.includes('price') || lower.includes('negotiable')) {
-          adminReply = "The price is moderately negotiable directly with the verified owner during physical site inspection. We ensure complete transparency with zero hidden markups.";
-        } else if (lower.includes('view') || lower.includes('inspection') || lower.includes('schedule')) {
-          adminReply = "We would be delighted to host you for a site inspection. You can reach out directly via call at +251 90 909 0909 or reply with your preferred day and time!";
+      // Send to backend API if available
+      try {
+        const fd = new FormData();
+        fd.append('action', 'send_message');
+        fd.append('message', text);
+        if (window.activeModalChatPropId) {
+          fd.append('property_id', window.activeModalChatPropId);
         }
+        fetch(getApiUrl('chat.php'), {
+          method: 'POST',
+          credentials: 'include',
+          body: fd
+        }).then(res => res.json()).then(data => {
+          if (data && data.success) {
+            // Synced successfully with MySQL chat_messages table
+          }
+        }).catch(err => {
+          console.log("Local static chat mode active:", err);
+        });
+      } catch (err) {}
 
-        const replyMsg = {
-          id: Date.now() + 1,
-          sender: 'admin',
-          name: 'Abdi Habtamu',
-          role: 'admin',
-          message: adminReply,
-          time: new Date().toISOString()
-        };
+      // If viewer is a client, trigger simulated instant reply from Admin Abdi Habtamu
+      if (!isViewerAdmin) {
+        const typingEl = document.getElementById('modalChatTyping');
+        if (typingEl) typingEl.style.display = 'block';
 
-        const updatedHistory = getChatHistory();
-        updatedHistory.push(replyMsg);
-        saveChatHistory(updatedHistory);
-        renderModalChatMessages();
-      }, 1200);
+        setTimeout(() => {
+          if (typingEl) typingEl.style.display = 'none';
+
+          let adminReply = "Thank you for reaching out! I've noted your inquiry and our team is ready to assist you. What is your preferred day for viewing?";
+          const lower = text.toLowerCase();
+
+          if (linkedPropTitle) {
+            adminReply = `Hello! I have received your inquiry for "${linkedPropTitle}". This property is currently active and fully verified with our legal team. We can schedule a physical site inspection for you tomorrow afternoon or whenever convenient. Would you like me to reserve a viewing slot?`;
+          } else if (lower.includes('available') || lower.includes('still')) {
+            adminReply = "Yes, this listing is currently active and ready for viewing. All title deeds and broker disclosures have been pre-screened by EstateCraft moderation.";
+          } else if (lower.includes('price') || lower.includes('negotiable') || lower.includes('cost')) {
+            adminReply = "The price is moderately negotiable directly with the verified owner during physical site inspection. We ensure complete transparency with zero hidden markups.";
+          } else if (lower.includes('view') || lower.includes('inspection') || lower.includes('schedule') || lower.includes('visit')) {
+            adminReply = "We would be delighted to host you for a site inspection. You can reach out directly via call at +251 90 909 0909 or reply with your preferred day and time!";
+          } else if (lower.includes('sale') || lower.includes('sell')) {
+            adminReply = "To list your home for sale, click the '+ Post Property' button in the navigation or submit your verification under Settings > ID Verification. I'll personally verify your title deed within 24 hours!";
+          } else if (lower.includes('rent')) {
+            adminReply = "We have high tenant demand for verified rental apartments and villas in Bole, CMC, and Kazanchis. Let me know your property details and we can fast-track the listing!";
+          }
+
+          const replyMsg = {
+            id: Date.now() + 1,
+            sender: 'admin',
+            name: 'Abdi Habtamu',
+            role: 'admin',
+            message: adminReply,
+            time: new Date().toISOString()
+          };
+
+          const updatedHistory = getChatHistory();
+          updatedHistory.push(replyMsg);
+          saveChatHistory(updatedHistory);
+          renderModalChatMessages();
+        }, 1100);
+      }
     }
 
     /* =========================================================================

@@ -308,7 +308,7 @@ function loadThreads() {
         return;
     }
 
-    fetch('<?= BASE_URL ?>/api/chat.php?action=get_threads')
+    fetch('<?= BASE_URL ?>/api/chat.php?action=get_threads', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
             const container = document.getElementById('threadListContainer');
@@ -369,7 +369,7 @@ function loadConversation(convId = null) {
     if (convId && convId > 0) url += '&conversation_id=' + convId;
     if (activePropertyId && activePropertyId > 0) url += '&property_id=' + activePropertyId;
 
-    fetch(url)
+    fetch(url, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
             if (!data.success) {
@@ -465,6 +465,7 @@ function handleSendMessage(e) {
 
     fetch('<?= BASE_URL ?>/api/chat.php', {
         method: 'POST',
+        credentials: 'include',
         body: formData
     })
     .then(res => res.json())
@@ -482,6 +483,20 @@ function handleSendMessage(e) {
         btn.disabled = false;
         console.error("Error sending message:", err);
     });
+}
+
+function setQuickMessage(text) {
+    const input = document.getElementById('chatInputMessage');
+    if (input) {
+        input.value = text;
+        input.focus();
+    }
+}
+
+function setChatTemplate(type) {
+    if (type === 'sale') setQuickMessage("Hello Admin Abdi, I would like to list my property for SALE. Please guide me on verification.");
+    else if (type === 'rent') setQuickMessage("Hello Admin Abdi, I have a property available for RENT. How can I list it?");
+    else if (type === 'buy') setQuickMessage("Hello Admin Abdi, I am looking to BUY a verified home in Addis Ababa.");
 }
 
 // Initial Kickoff & Background Polling
