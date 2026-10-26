@@ -431,6 +431,165 @@ const isUserAdmin = <?= json_encode($isAdmin) ?>;
 let pollTimer = null;
 
 // =============================================================================
+// Universal Cross-Device Cloud Sync Engine (ntfy.sh Real-Time Relay)
+// =============================================================================
+const CLOUD_CHAT_TOPIC = 'estatecraft_ethiopia_live_hub_v3';
+let cloudChatEventSource = null;
+const cloudSyncedMsgIds = new Set();
+
+function initCloudChatSync() {
+    if (!cloudChatEventSource && 'EventSource' in window) {
+        try {
+            cloudChatEventSource = new EventSource(`https://ntfy.sh/${CLOUD_CHAT_TOPIC}/sse`);
+            cloudChatEventSource.onmessage = function(event) {
+                if (!event || !event.data) return;
+                try {
+                    const item = JSON.parse(event.data);
+                    if (item && item.event === 'message') {
+                        processIncomingCloudMessage(item);
+                    }
+                } catch (e) {}
+            };
+            cloudChatEventSource.onerror = function() {
+                setTimeout(pollCloudChatHistory, 2000);
+            };
+        } catch (e) {}
+    }
+
+    pollCloudChatHistory();
+
+    if (!window.cloudChatPollInterval) {
+        window.cloudChatPollInterval = setInterval(pollCloudChatHistory, 3500);
+    }
+}
+
+async function pollCloudChatHistory() {
+    try {
+        const res = await fetch(`https://ntfy.sh/${CLOUD_CHAT_TOPIC}/json?poll=1&since=all`);
+        if (res.ok) {
+            const text = await res.text();
+            const lines = text.trim().split('\n');
+            for (const line of lines) {
+                if (!line.trim()) continue;
+                try {
+                    const item = JSON.parse(line);
+                    if (item && item.event === 'message') {
+                        processIncomingCloudMessage(item);
+                    }
+                } catch (e) {}
+            }
+        }
+    } catch (e) {}
+}
+
+function playChatChime() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.14);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.28);
+    } catch (e) {}
+}
+
+function processIncomingCloudMessage(item) {
+    if (!item || !item.id) return;
+    if (cloudSyncedMsgIds.has(item.id)) return;
+    cloudSyncedMsgIds.add(item.id);
+
+    let packet = null;
+    if (item.attachment && item.attachment.url) {
+        if (item.title) {
+            try {
+                packet = JSON.parse(decodeURIComponent(item.title));
+            } catch (e) {
+                try { packet = JSON.parse(item.title); } catch (e2) {}
+            }
+        }
+    } else if (item.message) {
+        try {
+            packet = typeof item.message === 'string' ? JSON.parse(item.message) : item.message;
+        } catch (e) {}
+    }
+
+    if (!packet || !packet.convKey || !packet.msg) return;
+
+    const myEmail = <?= json_encode(strtolower(trim($currentUser['email']))) ?>;
+    const isMeAdmin = isUserAdmin;
+
+    const matchesEmail = (packet.userEmail && packet.userEmail.toLowerCase() === myEmail);
+    const matchesConv = (packet.convKey.includes(myEmail.replace(/[^a-zA-Z0-9_]/g, '_')));
+
+    if (!isMeAdmin && !matchesEmail && !matchesConv) {
+        return;
+    }
+
+    // Refresh active messages and thread list
+    playChatChime();
+    if (currentConvId) {
+        loadConversation(currentConvId);
+    }
+    if (isUserAdmin) {
+        loadThreads();
+    }
+}
+
+async function broadcastMessageToCloud(packet, pendingAttachment = null) {
+    try {
+        if (packet.msg && packet.msg.id) {
+            cloudSyncedMsgIds.add(String(packet.msg.id));
+        }
+
+        if (pendingAttachment && (pendingAttachment.file || pendingAttachment.blob)) {
+            const blob = pendingAttachment.file || pendingAttachment.blob;
+            const fileName = pendingAttachment.name || (pendingAttachment.type === 'image' ? 'photo.jpg' : (pendingAttachment.type === 'audio' ? 'voice.webm' : 'document.pdf'));
+
+            const meta = {
+                convKey: packet.convKey,
+                userName: packet.userName,
+                userEmail: packet.userEmail,
+                userPhone: packet.userPhone,
+                propertyTitle: packet.propertyTitle,
+                propertyPrice: packet.propertyPrice,
+                attType: pendingAttachment.type,
+                attName: fileName,
+                attSize: pendingAttachment.size || '',
+                msg: packet.msg
+            };
+
+            await fetch(`https://ntfy.sh/${CLOUD_CHAT_TOPIC}`, {
+                method: 'PUT',
+                headers: {
+                    'Filename': fileName,
+                    'Title': encodeURIComponent(JSON.stringify(meta))
+                },
+                body: blob
+            });
+        } else {
+            await fetch('https://ntfy.sh', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    topic: CLOUD_CHAT_TOPIC,
+                    message: JSON.stringify(packet)
+                })
+            });
+        }
+    } catch (err) {
+        console.warn("Cloud relay notice:", err);
+    }
+}
+
+// =============================================================================
 // Emoji Picker, Attachments (File, Image, Sound) & Voice Note Recorder
 // =============================================================================
 window.pendingPageAttachment = null;
@@ -801,6 +960,8 @@ function loadConversation(convId = null) {
 
             // Update Header Information
             if (isUserAdmin && data.user) {
+                window.activeChatUserEmail = data.user.email;
+                window.activeChatUserName = data.user.full_name;
                 document.getElementById('chatHeaderName').textContent = data.user.full_name;
                 document.getElementById('chatHeaderAvatar').textContent = data.user.full_name.charAt(0).toUpperCase();
                 document.getElementById('chatHeaderBadge').innerHTML = '👤 Inquiring Buyer / Client';
@@ -957,6 +1118,28 @@ function handleSendMessage(e) {
             currentConvId = data.conversation_id;
             loadConversation(currentConvId);
             loadThreads();
+
+            // Broadcast to cloud relay for cross-device sync
+            const myEmail = <?= json_encode(strtolower(trim($currentUser['email']))) ?>;
+            const clientEmail = isUserAdmin ? (window.activeChatUserEmail || 'client@estatecraft.et') : myEmail;
+            const clientName = isUserAdmin ? (window.activeChatUserName || 'Client') : <?= json_encode($currentUser['full_name']) ?>;
+            const cloudPacket = {
+                convKey: 'user_' + clientEmail.replace(/[^a-zA-Z0-9_]/g, '_'),
+                userName: clientName,
+                userEmail: clientEmail,
+                userPhone: isUserAdmin ? '' : <?= json_encode($currentUser['phone'] ?? '') ?>,
+                propertyTitle: (data.property && data.property.title) || null,
+                propertyPrice: (data.property && ('ETB ' + Number(data.property.price).toLocaleString())) || null,
+                msg: {
+                    id: Date.now(),
+                    sender: isUserAdmin ? 'admin' : 'user',
+                    name: <?= json_encode($currentUser['full_name']) ?>,
+                    role: isUserAdmin ? 'admin' : 'user',
+                    message: sendMsg,
+                    time: new Date().toISOString()
+                }
+            };
+            broadcastMessageToCloud(cloudPacket, pendingAtt);
         } else {
             alert(data.message || 'Failed to send message.');
         }
@@ -975,6 +1158,7 @@ function setChatTemplate(type) {
 
 // Initial Kickoff & Background Polling
 document.addEventListener('DOMContentLoaded', function() {
+    initCloudChatSync();
     loadThreads();
     loadConversation(currentConvId);
 
