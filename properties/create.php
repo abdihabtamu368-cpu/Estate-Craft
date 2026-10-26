@@ -13,8 +13,16 @@ require_once __DIR__ . '/../includes/upload.php';
 $user = requireAuth();
 $pdo = getDB();
 
+$isAdmin = (strtolower(trim($user['email'] ?? '')) === 'abdihabtamu368@gmail.com');
 $error = '';
 $activePage = 'sell';
+
+// Security check: Only abdihabtamu368@gmail.com can directly post properties
+if (!$isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_SESSION['flash_error'] = "Only administrator abdihabtamu368@gmail.com can publish property listings directly. Please chat with Admin Abdi to submit your listing for Sale, Buy, or Rent.";
+    header("Location: " . BASE_URL . "/chat.php?intent=list_property");
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validateCsrfOrDie();
@@ -113,6 +121,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
+
+<?php if (!$isAdmin): ?>
+<div style="max-width: 820px; margin: 40px auto 80px; padding: 0 20px;">
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 40px 32px; text-align: center; box-shadow: var(--shadow-md);">
+        <div style="width: 76px; height: 76px; border-radius: 50%; background: rgba(8, 102, 255, 0.1); color: #0866ff; display: flex; align-items: center; justify-content: center; font-size: 34px; margin: 0 auto 20px; box-shadow: 0 4px 14px rgba(8, 102, 255, 0.2);">
+            🛡️
+        </div>
+        
+        <span class="badge" style="background: #0866ff; color: #ffffff; font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 9999px; margin-bottom: 14px; display: inline-block;">
+            Exclusive Verified Admin Publishing
+        </span>
+
+        <h1 style="font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; letter-spacing: -0.02em;">
+            Only Admin Abdi Habtamu Can Publish Properties
+        </h1>
+
+        <p style="color: var(--text-muted); font-size: 15px; max-width: 620px; margin: 0 auto 28px; line-height: 1.65;">
+            To ensure <strong>100% fraud prevention, title deed verification, and authentic listings</strong> across Ethiopia, users cannot directly post properties. 
+            First, chat with Admin Abdi Habtamu (<code style="background: var(--bg-main); padding: 2px 8px; border-radius: 6px; color: var(--primary); font-weight: 700;">abdihabtamu368@gmail.com</code>) to discuss your home for <strong>Sale, Buy, or Rent</strong>. Admin Abdi will inspect your details and publish your home immediately!
+        </p>
+
+        <!-- 3 Pillars: Sale, Buy, Rent -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; max-width: 720px; margin: 0 auto 32px; text-align: left;">
+            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px;">
+                <div style="font-size: 22px; margin-bottom: 6px;">🏡 For Sale</div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Selling Your Property?</div>
+                <div style="font-size: 12px; color: var(--text-muted); line-height: 1.45;">Chat with Admin Abdi to submit your villa, condo, or house details and price for verification.</div>
+            </div>
+            
+            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px;">
+                <div style="font-size: 22px; margin-bottom: 6px;">🔑 For Rent</div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Renting Out a Home?</div>
+                <div style="font-size: 12px; color: var(--text-muted); line-height: 1.45;">Submit your rental apartment or commercial office to Admin Abdi for verified tenant placement.</div>
+            </div>
+
+            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px;">
+                <div style="font-size: 22px; margin-bottom: 6px;">🔍 Looking to Buy/Rent</div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Finding Your Dream Home?</div>
+                <div style="font-size: 12px; color: var(--text-muted); line-height: 1.45;">Tell Admin Abdi your desired neighborhood (Bole, CMC, Kazanchis) and budget for direct matching.</div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <a href="<?= BASE_URL ?>/chat.php?intent=list_property" class="btn btn-primary btn-lg" style="background: #0866ff; color: #ffffff; display: inline-flex; align-items: center; gap: 8px; font-weight: 800; padding: 14px 28px; border-radius: 10px; box-shadow: 0 4px 14px rgba(8, 102, 255, 0.35); text-decoration: none;">
+                <span style="font-size: 20px;">💬</span>
+                <span>Chat with Admin Abdi to Post Home</span>
+            </a>
+            <a href="<?= BASE_URL ?>/properties/index.php" class="btn btn-secondary btn-lg" style="padding: 14px 24px; border-radius: 10px;">
+                Browse Available Listings &rarr;
+            </a>
+        </div>
+    </div>
+</div>
+<?php require_once __DIR__ . '/../includes/footer.php'; exit; ?>
+<?php endif; ?>
 
 <div style="max-width: 900px; margin: 30px auto 60px; padding: 0 24px;">
     <div style="margin-bottom: 24px;">

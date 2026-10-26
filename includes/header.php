@@ -79,7 +79,7 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
         <ul class="nav-links" id="navLinks">
             <li><a href="<?= BASE_URL ?>/properties/index.php?purpose=sale" class="<?= $activePage === 'buy' ? 'active' : '' ?>"><?= __('nav_buy', 'Buy') ?></a></li>
             <li><a href="<?= BASE_URL ?>/properties/index.php?purpose=rent" class="<?= $activePage === 'rent' ? 'active' : '' ?>"><?= __('nav_rent', 'Rent') ?></a></li>
-            <li><a href="<?= BASE_URL ?>/properties/create.php" class="<?= $activePage === 'sell' ? 'active' : '' ?>"><?= __('nav_sell', 'Sell') ?></a></li>
+            <li><a href="<?= ($currentUser && strtolower(trim($currentUser['email'] ?? '')) === 'abdihabtamu368@gmail.com') ? BASE_URL . '/properties/create.php' : BASE_URL . '/chat.php?intent=list_property' ?>" class="<?= $activePage === 'sell' ? 'active' : '' ?>"><?= __('nav_sell', 'Sell / List Home') ?></a></li>
             <li><a href="<?= BASE_URL ?>/properties/index.php" class="<?= $activePage === 'browse' ? 'active' : '' ?>"><?= __('nav_explore', 'Explore All') ?></a></li>
             <li><a href="<?= BASE_URL ?>/chat.php" class="<?= $activePage === 'chat' ? 'active' : '' ?>" style="display: inline-flex; align-items: center; gap: 4px;">💬 <?= __('nav_chat', 'Messages') ?></a></li>
             <?php if ($currentUser && strtolower(trim($currentUser['email'] ?? '')) === 'abdihabtamu368@gmail.com'): ?>
@@ -127,7 +127,7 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
             <!-- Language Dropdown Switcher (Amharic, Afaan Oromoo, English) -->
             <div class="lang-dropdown-wrapper" style="position: relative; display: inline-block;">
                 <button type="button" class="btn btn-secondary btn-sm" id="langToggleBtn" style="padding: 6px 10px; display: flex; align-items: center; gap: 6px; font-size: 13px;">
-                    <span style="font-size: 14px;"><?= $availableLangs[$currentLang]['flag'] ?></span>
+                    <span style="font-size: 14px"><?= $availableLangs[$currentLang]['flag'] ?></span>
                     <span><?= $availableLangs[$currentLang]['native'] ?></span>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
@@ -145,10 +145,17 @@ if (!empty($currentUser['theme_mode']) && in_array($currentUser['theme_mode'], [
             </div>
 
             <?php if ($currentUser): ?>
-                <a href="<?= BASE_URL ?>/properties/create.php" class="btn btn-primary btn-sm" id="btnPostProperty">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <?= __('nav_post_property', 'Post Property') ?>
-                </a>
+                <?php if (strtolower(trim($currentUser['email'] ?? '')) === 'abdihabtamu368@gmail.com'): ?>
+                    <a href="<?= BASE_URL ?>/properties/create.php" class="btn btn-primary btn-sm" id="btnPostProperty">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Post Property
+                    </a>
+                <?php else: ?>
+                    <a href="<?= BASE_URL ?>/chat.php?intent=list_property" class="btn btn-primary btn-sm" id="btnPostProperty" title="Chat with Admin Abdi Habtamu to Post Home" style="background: #0866ff;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        Post via Admin Chat
+                    </a>
+                <?php endif; ?>
                 
                 <div style="display:flex; align-items:center; gap:6px;">
                     <a href="<?= BASE_URL ?>/user/dashboard.php" class="btn btn-secondary btn-sm" id="btnUserDashboard" title="My Dashboard">

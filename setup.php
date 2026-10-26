@@ -124,6 +124,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' || isset($_GET['auto']) || php
         <div class="credentials-box">
             <h3>Sample Testing Accounts (Password for all: <code>Password123!</code>)</h3>
             <div class="cred-item">
+                <span class="cred-role">Super Administrator (Abdi)</span>
+                <span class="cred-val">abdihabtamu368@gmail.com</span>
+            </div>
+            <div class="cred-item">
                 <span class="cred-role">Verified Broker</span>
                 <span class="cred-val">sara.broker@realestate.local</span>
             </div>

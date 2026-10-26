@@ -11,6 +11,7 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/upload.php';
 
 $user = requireAuth();
+$isUserAdmin = (strtolower(trim($user['email'] ?? '')) === 'abdihabtamu368@gmail.com');
 $pdo = getDB();
 
 // Fetch all listings belonging to this user
@@ -95,7 +96,14 @@ require_once __DIR__ . '/../includes/header.php';
             </a>
             <a href="<?= BASE_URL ?>/user/settings.php" class="btn btn-secondary btn-sm">⚙️ Settings</a>
             <a href="<?= BASE_URL ?>/user/profile.php" class="btn btn-secondary btn-sm">Edit Profile & Fees</a>
-            <a href="<?= BASE_URL ?>/properties/create.php" class="btn btn-primary btn-sm">+ Post New Listing</a>
+            <?php if ($isUserAdmin): ?>
+                <a href="<?= BASE_URL ?>/properties/create.php" class="btn btn-primary btn-sm">+ Post New Listing</a>
+            <?php else: ?>
+                <a href="<?= BASE_URL ?>/chat.php?intent=list_property" class="btn btn-primary btn-sm" style="background: #0866ff; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Post Listing via Admin
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -231,7 +239,14 @@ require_once __DIR__ . '/../includes/header.php';
             <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin: 0 auto 12px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
             <h3 style="font-size: 18px; font-weight: 700; color: var(--secondary); margin-bottom: 6px;">You haven't listed any properties yet</h3>
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Ready to sell or rent out a home? Post your first listing in minutes.</p>
-            <a href="<?= BASE_URL ?>/properties/create.php" class="btn btn-primary">+ Post Your First Property</a>
+            <?php if ($isUserAdmin): ?>
+                <a href="<?= BASE_URL ?>/properties/create.php" class="btn btn-primary">+ Post Your First Property</a>
+            <?php else: ?>
+                <a href="<?= BASE_URL ?>/chat.php?intent=list_property" class="btn btn-primary" style="background: #0866ff; display: inline-flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Chat with Admin Abdi to List Home
+                </a>
+            <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="table-responsive">

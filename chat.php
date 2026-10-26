@@ -140,19 +140,25 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
 
-            <!-- Quick Inquiry Suggestions Pill Bar (for Users) -->
+            <!-- Quick Inquiry Suggestions Pill Bar (for Users: Sale, Buy, Rent & Inquiries) -->
             <div id="quickSuggestionsBar" style="padding: 8px 16px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickMessage('Hello Admin Abdi, I would like to list my home for SALE. Please review and post it.')" style="font-size: 11.5px; border-radius: 16px; padding: 4px 10px; background: rgba(8, 102, 255, 0.08); color: #0866ff; font-weight: 700;">
+                    🏡 List Home for Sale
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickMessage('Hello Admin Abdi, I would like to list my property for RENT. Please assist me with publishing it.')" style="font-size: 11.5px; border-radius: 16px; padding: 4px 10px; background: rgba(16, 185, 129, 0.08); color: #059669; font-weight: 700;">
+                    🔑 List Home for Rent
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickMessage('Hello Admin Abdi, I am looking to BUY a home. My preferred neighborhood is [Bole / CMC / Kazanchis] and budget is [ETB].')" style="font-size: 11.5px; border-radius: 16px; padding: 4px 10px;">
+                    🔍 Looking to Buy
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickMessage('Hello Admin Abdi, I am looking to RENT a home/apartment. Can you recommend verified options?')" style="font-size: 11.5px; border-radius: 16px; padding: 4px 10px;">
+                    🏢 Looking to Rent
+                </button>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickMessage('Hello Admin Abdi, is this property still available for purchase/rent?')" style="font-size: 11.5px; border-radius: 16px; padding: 4px 10px;">
                     👋 Still available?
                 </button>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickMessage('Can I schedule a physical site inspection this week?')" style="font-size: 11.5px; border-radius: 16px; padding: 4px 10px;">
                     📅 Schedule viewing
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickMessage('Could you provide the exact address and title deed verification status?')" style="font-size: 11.5px; border-radius: 16px; padding: 4px 10px;">
-                    📜 Title deed verified?
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickMessage('Is the stated price negotiable, or are there flexible installment plans?')" style="font-size: 11.5px; border-radius: 16px; padding: 4px 10px;">
-                    💰 Price negotiable?
                 </button>
             </div>
 
@@ -482,6 +488,26 @@ function handleSendMessage(e) {
 document.addEventListener('DOMContentLoaded', function() {
     loadThreads();
     loadConversation(currentConvId);
+
+    // Check if user came to chat about listing a property (Sale, Rent, Buy)
+    const urlParams = new URLSearchParams(window.location.search);
+    const intent = urlParams.get('intent');
+    const input = document.getElementById('chatInputMessage');
+    if (input && !input.value && intent) {
+        if (intent === 'sale') {
+            input.value = "Hello Admin Abdi, I would like to list my property for SALE.\n- Property Type (Villa / Apartment / House / Condo):\n- Neighborhood / City: (e.g. Bole / CMC / Kazanchis):\n- Asking Price (ETB):\n- Bedrooms / Bathrooms:\n- Contact Phone Number: ";
+            input.focus();
+        } else if (intent === 'rent') {
+            input.value = "Hello Admin Abdi, I would like to list my property for RENT.\n- Property Type (Apartment / Villa / Commercial):\n- Neighborhood / City: (e.g. Bole / CMC / Kazanchis):\n- Monthly Rent (ETB):\n- Bedrooms / Bathrooms:\n- Contact Phone Number: ";
+            input.focus();
+        } else if (intent === 'buy') {
+            input.value = "Hello Admin Abdi, I am looking to BUY a property in Ethiopia.\n- Preferred Neighborhood / City:\n- Target Budget (ETB):\n- Property Type (Villa / Condo / Apartment):\n- Contact Phone Number: ";
+            input.focus();
+        } else if (intent === 'list_property') {
+            input.value = "Hello Admin Abdi, I would like to list my property for [Sale / Rent]. Here are my property details:\n- Purpose: (Sale / Rent)\n- Property Type: (Villa / Apartment / House / Condo)\n- Neighborhood: (e.g. Bole / CMC / Kazanchis)\n- Price (ETB):\n- Bedrooms / Baths:\n- Phone Number: ";
+            input.focus();
+        }
+    }
 
     // Live Polling every 3.5 seconds
     pollTimer = setInterval(function() {

@@ -27,7 +27,8 @@ if (!$property) {
     exit;
 }
 
-if ($property['user_id'] != $user['id'] && $user['role'] !== 'admin') {
+$isSuperAdmin = (strtolower(trim($user['email'] ?? '')) === 'abdihabtamu368@gmail.com');
+if ($property['user_id'] != $user['id'] && !$isSuperAdmin) {
     $_SESSION['flash_error'] = "You are not authorized to delete this property listing.";
     header("Location: " . BASE_URL . "/user/dashboard.php");
     exit;

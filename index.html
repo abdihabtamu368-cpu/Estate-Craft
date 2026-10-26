@@ -2437,11 +2437,13 @@
                 Abdi Habtamu is typing...
             </div>
 
-            <!-- Quick Suggestions -->
-            <div style="padding: 6px 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="sendQuickChatMessage('👋 Hello Admin Abdi, is this home still available?')" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;">👋 Available?</button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="sendQuickChatMessage('📅 I would like to schedule a viewing.')" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;">📅 Schedule viewing</button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="sendQuickChatMessage('💰 Is the price negotiable?')" style="font-size: 11px; padding: 3px 8px; border-radius: 12px;">💰 Price negotiable?</button>
+            <!-- Quick Suggestions for Sale, Rent, Buy & Verification -->
+            <div style="padding: 7px 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setChatTemplate('sale')" style="font-size: 11px; padding: 4px 10px; border-radius: 14px; background: rgba(8, 102, 255, 0.1); color: #0866ff; font-weight: 700; border: 1px solid rgba(8, 102, 255, 0.3);">🏡 List for Sale</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setChatTemplate('rent')" style="font-size: 11px; padding: 4px 10px; border-radius: 14px; background: rgba(16, 185, 129, 0.1); color: #059669; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3);">🔑 List for Rent</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setChatTemplate('buy')" style="font-size: 11px; padding: 4px 10px; border-radius: 14px; background: rgba(245, 158, 11, 0.1); color: #d97706; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.3);">🔍 Looking to Buy</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="sendQuickChatMessage('👋 Hello Admin Abdi, is this home still available?')" style="font-size: 11px; padding: 4px 9px; border-radius: 14px;">👋 Available?</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="sendQuickChatMessage('📅 I would like to schedule a physical inspection.')" style="font-size: 11px; padding: 4px 9px; border-radius: 14px;">📅 Schedule viewing</button>
             </div>
 
             <!-- Message Input Form -->
