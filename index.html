@@ -1114,7 +1114,9 @@
       max-width: 980px;
       width: 95%;
       border-radius: 18px;
-      max-height: 90vh;
+      height: 85vh;
+      max-height: 720px;
+      min-height: 480px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -1125,9 +1127,8 @@
       display: flex;
       flex-direction: row;
       flex: 1;
-      height: 640px;
-      max-height: calc(88vh - 70px);
       min-height: 0;
+      height: 100%;
       background: var(--bg-card);
       overflow: hidden;
     }
@@ -1142,6 +1143,7 @@
       display: flex;
       flex-direction: column;
       height: 100%;
+      min-height: 0;
       overflow: hidden;
     }
 
@@ -1256,40 +1258,67 @@
       min-width: 0;
       min-height: 0;
       height: 100%;
+      max-height: 100%;
       overflow-y: auto !important;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
-      padding: 24px 28px 40px;
+      padding: 24px 28px 48px;
       background: var(--bg-card);
       position: relative;
     }
 
     /* Visible Modern Scrollbars */
-    .settings-body-vertical::-webkit-scrollbar,
-    .settings-tabs-vertical::-webkit-scrollbar,
-    .settings-sidebar-vertical::-webkit-scrollbar {
-      width: 8px;
+    .settings-body-vertical::-webkit-scrollbar {
+      width: 10px;
       display: block;
     }
-    .settings-body-vertical::-webkit-scrollbar-track,
+    .settings-body-vertical::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin: 6px 0;
+    }
+    .settings-body-vertical::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    .settings-body-vertical::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+    .settings-tabs-vertical::-webkit-scrollbar,
+    .settings-sidebar-vertical::-webkit-scrollbar {
+      width: 6px;
+      display: block;
+    }
     .settings-tabs-vertical::-webkit-scrollbar-track,
     .settings-sidebar-vertical::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.05);
       border-radius: 4px;
     }
-    .settings-body-vertical::-webkit-scrollbar-thumb,
     .settings-tabs-vertical::-webkit-scrollbar-thumb,
     .settings-sidebar-vertical::-webkit-scrollbar-thumb {
       background: #64748b;
       border-radius: 4px;
     }
-    .settings-body-vertical::-webkit-scrollbar-thumb:hover,
     .settings-tabs-vertical::-webkit-scrollbar-thumb:hover,
     .settings-sidebar-vertical::-webkit-scrollbar-thumb:hover {
       background: #475569;
     }
-    .settings-body-vertical,
+    .settings-body-vertical {
+      scrollbar-width: thin;
+      scrollbar-color: #475569 rgba(255, 255, 255, 0.05);
+    }
+    [data-theme="light"] .settings-body-vertical::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    [data-theme="light"] .settings-body-vertical::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+    }
+    [data-theme="light"] .settings-body-vertical {
+      scrollbar-color: #94a3b8 rgba(0, 0, 0, 0.05);
+    }
     .settings-tabs-vertical,
     .settings-sidebar-vertical {
       scrollbar-width: thin;
