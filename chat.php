@@ -485,14 +485,6 @@ function handleSendMessage(e) {
     });
 }
 
-function setQuickMessage(text) {
-    const input = document.getElementById('chatInputMessage');
-    if (input) {
-        input.value = text;
-        input.focus();
-    }
-}
-
 function setChatTemplate(type) {
     if (type === 'sale') setQuickMessage("Hello Admin Abdi, I would like to list my property for SALE. Please guide me on verification.");
     else if (type === 'rent') setQuickMessage("Hello Admin Abdi, I have a property available for RENT. How can I list it?");
